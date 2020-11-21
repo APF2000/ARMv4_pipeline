@@ -633,3 +633,4 @@ begin
              (a(31) xor sum(31));
   ALUFlags    <= (neg, zero, carry, overflow);
 end;
+

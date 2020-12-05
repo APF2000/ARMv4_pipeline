@@ -3,7 +3,7 @@
 -- David_Harris@hmc.edu, Sarah.Harris@unlv.edu 6 March 2014
 -- Single-cycle implementation of a subset of ARMv4
 --
--- Compile in ModelSim at the command line with the command 
+-- Compile in ModelSim at the command line with the command
 -- vcom -2008 arm_single.vhd
 -- Expect plenty of simulation warnings of metavalues detected
 -- run 210

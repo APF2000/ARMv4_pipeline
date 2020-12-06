@@ -30,7 +30,7 @@ architecture test OF testbench is
 begin
 
   -- instantiate device to be tested
-  dut : top port MAP(clk, reset, WriteData, DataAdr, MemWrite);
+  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite);
 
   -- Generate clock with 10 ns period
   PROCESS begin
@@ -97,11 +97,11 @@ architecture test OF top is
   ReadData : std_logic_vector(31 downto 0);
 begin
   -- instantiate processor and memories
-  i_arm : arm port MAP(
+  i_arm : arm port map(
     clk, reset, PC, instr, MemWrite, DataAdr,
     WriteData, ReadData);
-  i_imem : imem port MAP(PC, instr);
-  i_dmem : dmem port MAP(
+  i_imem : imem port map(PC, instr);
+  i_dmem : dmem port map(
     clk, MemWrite, DataAdr,
     WriteData, ReadData);
 end;
@@ -409,41 +409,7 @@ entity arm is -- single cycle processor
 end;
 
 architecture struct OF arm is
-  component controller
-    port (
-      clk, reset : in std_logic;
-      instr : in std_logic_vector(31 downto 12);
-      ALUFlags : in std_logic_vector(3 downto 0);
-      RegSrc : out std_logic_vector(1 downto 0);
-      RegWrite : out std_logic;
-      ImmSrc : out std_logic_vector(1 downto 0);
-      ALUSrc : out std_logic;
-      ALUControl : out std_logic_vector(1 downto 0);
-      MemWrite : out std_logic;
-      MemtoReg : out std_logic;
-      PCSrc : out std_logic);
-    
-      -- Sinais a mais pra poder controlar o fluxo das instrucoes
-      FlagWrite, Branch : out std_logic
-  end component;
-  component datapath
-    port (
-      clk, reset : in std_logic;
-      RegSrc : in std_logic_vector(1 downto 0);
-      RegWrite : in std_logic;
-      ImmSrc : in std_logic_vector(1 downto 0);
-      ALUSrc : in std_logic;
-      ALUControl : in std_logic_vector(1 downto 0);
-      MemtoReg : in std_logic;
-      PCSrc : in std_logic;
-      ALUFlags : out std_logic_vector(3 downto 0);
-      PC : BUFFER std_logic_vector(31 downto 0);
-      instr : in std_logic_vector(31 downto 0);
-      ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
-      ReadData : in std_logic_vector(31 downto 0));
-  end component; 
   
-
 component partial_IF_ID is
   port (
     clock, reset : in std_logic;
@@ -542,7 +508,47 @@ end component;
 
 -------------------------------------------------------
 
-component condlogic
+component controller
+    port (
+      clk, reset : in std_logic;
+      instr : in std_logic_vector(31 downto 12);
+      ALUFlags : in std_logic_vector(3 downto 0);
+
+      RegSrc : out std_logic_vector(1 downto 0);
+      RegWrite : out std_logic;
+      ImmSrc : out std_logic_vector(1 downto 0);
+      ALUSrc : out std_logic;
+      ALUControl : out std_logic_vector(1 downto 0);
+      MemWrite : out std_logic;
+      MemtoReg : out std_logic;
+      PCSrc : out std_logic);
+    
+      -- Sinais a mais pra poder controlar o fluxo das instrucoes
+      FlagWrite, Branch : out std_logic
+  end component;
+
+-------------------------------------------
+
+  component datapath
+    port (
+      clk, reset : in std_logic;
+      RegSrc : in std_logic_vector(1 downto 0);
+      RegWrite : in std_logic;
+      ImmSrc : in std_logic_vector(1 downto 0);
+      ALUSrc : in std_logic;
+      ALUControl : in std_logic_vector(1 downto 0);
+      MemtoReg : in std_logic;
+      PCSrc : in std_logic;
+      ALUFlags : out std_logic_vector(3 downto 0);
+      PC : BUFFER std_logic_vector(31 downto 0);
+      instr : in std_logic_vector(31 downto 0);
+      ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
+      ReadData : in std_logic_vector(31 downto 0));
+  end component; 
+  
+--------------------------------------------------
+
+component cond_unit
 port (
   clk, reset : in std_logic;
   Cond : in std_logic_vector(3 downto 0);
@@ -557,22 +563,31 @@ end component;
   signal RegWrite, ALUSrc, MemtoReg, PCSrc : std_logic;
   signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
   signal ALUFlags : std_logic_vector(3 downto 0);
+
+  -- signal FlagW : std_logic_vector
+  signal PCS, RegW, MemW : std_logic;
+
 begin
-  cont : controller port MAP(
+  cont : controller port map(
     clk, reset, instr(31 downto 12),
-    ALUFlags, RegSrc, RegWrite, ImmSrc,
-    ALUSrc, ALUControl, MemWrite,
-    MemtoReg, PCSrc);
+    ALUFlags, 
     
-  dp : datapath port MAP(
+    RegSrc, RegW,--RegWrite, 
+    ImmSrc,
+    ALUSrc, ALUControl, MemW,--MemWrite,
+    MemtoReg, PCS--PCSrc
+  );
+
+  dp : datapath port map(
     clk, reset, RegSrc, RegWrite, ImmSrc,
     ALUSrc, ALUControl, MemtoReg, PCSrc,
     ALUFlags, PC, instr, ALUResult,
     WriteData, ReadData);
 
-  cl : condlogic port MAP(
+  cl : cond_unit port map(
     clk, reset, instr(31 downto 28),
-    ALUFlags, FlagW, PCS, RegW, MemW,
+    ALUFlags, FlagW, 
+    PCS, RegW, MemW, -- entradas transplantadas
     PCSrc, RegWrite, MemWrite);
 end;
 
@@ -618,7 +633,7 @@ architecture struct OF controller is
   signal PCS, RegW, MemW : std_logic;
 
 begin
-  dec : decoder port MAP(
+  dec : decoder port map(
     instr(27 downto 26), instr(25 downto 20),
     instr(15 downto 12), FlagW, PCS,
     RegW, MemW, MemtoReg, ALUSrc, ImmSrc,
@@ -685,7 +700,7 @@ end;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-entity condlogic is -- Conditional logic
+entity cond_unit is -- Conditional logic
   port (
     clk, reset : in std_logic;
 
@@ -698,7 +713,7 @@ entity condlogic is -- Conditional logic
     MemWrite : out std_logic);
 end;
 
-architecture behave OF condlogic is
+architecture behave OF cond_unit is
   component condcheck
     port (
       Cond : in std_logic_vector(3 downto 0);
@@ -715,15 +730,15 @@ architecture behave OF condlogic is
   signal Flags : std_logic_vector(3 downto 0);
   signal CondEx : std_logic;
 begin
-  flagreg1 : flopenr GENERIC MAP(2)
-  port MAP(
+  flagreg1 : flopenr GENERIC map(2)
+  port map(
     clk, reset, FlagWrite(1),
     ALUFlags(3 downto 2), Flags(3 downto 2));
-  flagreg0 : flopenr GENERIC MAP(2)
-  port MAP(
+  flagreg0 : flopenr GENERIC map(2)
+  port map(
     clk, reset, FlagWrite(0),
     ALUFlags(1 downto 0), Flags(1 downto 0));
-  cc : condcheck port MAP(Cond, Flags, CondEx);
+  cc : condcheck port map(Cond, Flags, CondEx);
 
   FlagWrite <= FlagW AND (CondEx, CondEx);
   RegWrite <= RegW AND CondEx;
@@ -832,30 +847,30 @@ architecture struct OF datapath is
   signal RA1, RA2 : std_logic_vector(3 downto 0);
 begin
   -- next PC logic
-  pcmux : mux2 GENERIC MAP(32)
-  port MAP(PCPlus4, Result, PCSrc, PCNext);
-  pcreg : flopr GENERIC MAP(32) port MAP(clk, reset, PCNext, PC);
-  pcadd1 : adder port MAP(PC, X"00000004", PCPlus4);
-  pcadd2 : adder port MAP(PCPlus4, X"00000004", PCPlus8);
+  pcmux : mux2 GENERIC map(32)
+  port map(PCPlus4, Result, PCSrc, PCNext);
+  pcreg : flopr GENERIC map(32) port map(clk, reset, PCNext, PC);
+  pcadd1 : adder port map(PC, X"00000004", PCPlus4);
+  pcadd2 : adder port map(PCPlus4, X"00000004", PCPlus8);
 
   -- register file logic
-  ra1mux : mux2 GENERIC MAP(4)
-  port MAP(instr(19 downto 16), "1111", RegSrc(0), RA1);
-  ra2mux : mux2 GENERIC MAP(
-    4) port MAP(instr(3 downto 0),
+  ra1mux : mux2 GENERIC map(4)
+  port map(instr(19 downto 16), "1111", RegSrc(0), RA1);
+  ra2mux : mux2 GENERIC map(
+    4) port map(instr(3 downto 0),
     instr(15 downto 12), RegSrc(1), RA2);
-  rf : regfile port MAP(
+  rf : regfile port map(
     clk, RegWrite, RA1, RA2,
     instr(15 downto 12), Result,
     PCPlus8, SrcA, WriteData);
-  resmux : mux2 GENERIC MAP(32)
-  port MAP(ALUResult, ReadData, MemtoReg, Result);
-  ext : extend port MAP(instr(23 downto 0), ImmSrc, ExtImm);
+  resmux : mux2 GENERIC map(32)
+  port map(ALUResult, ReadData, MemtoReg, Result);
+  ext : extend port map(instr(23 downto 0), ImmSrc, ExtImm);
 
   -- ALU logic
-  srcbmux : mux2 GENERIC MAP(32)
-  port MAP(WriteData, ExtImm, ALUSrc, SrcB);
-  i_alu : alu port MAP(SrcA, SrcB, ALUControl, ALUResult, ALUFlags);
+  srcbmux : mux2 GENERIC map(32)
+  port map(WriteData, ExtImm, ALUSrc, SrcB);
+  i_alu : alu port map(SrcA, SrcB, ALUControl, ALUResult, ALUFlags);
 end;
 
 library IEEE;

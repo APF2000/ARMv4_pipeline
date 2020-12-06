@@ -444,7 +444,7 @@ architecture struct OF arm is
   end component; 
   
 
-entity partial_IF_ID is
+component partial_IF_ID is
   port (
     clock, reset : in std_logic;
     instrF : in std_logic_vector(31 downto 0);
@@ -452,7 +452,7 @@ entity partial_IF_ID is
 
     instrD : in std_logic_vector(31 downto 0);
   );
-end entity;
+end component;
 
 --------------------------------------------------------------------------
 
@@ -564,7 +564,9 @@ entity controller is -- single cycle control decoder
     clk, reset : in std_logic;
     instr : in std_logic_vector(31 downto 12);
     ALUFlags : in std_logic_vector(3 downto 0);
+
     RegSrc : out std_logic_vector(1 downto 0);
+
     RegWrite : out std_logic;
     ImmSrc : out std_logic_vector(1 downto 0);
     ALUSrc : out std_logic;
@@ -584,12 +586,15 @@ architecture struct OF controller is
       Op : in std_logic_vector(1 downto 0);
       Funct : in std_logic_vector(5 downto 0);
       Rd : in std_logic_vector(3 downto 0);
+
       FlagW : out std_logic_vector(1 downto 0);
+
       PCS, RegW, MemW : out std_logic;
       MemtoReg, ALUSrc : out std_logic;
       ImmSrc, RegSrc : out std_logic_vector(1 downto 0);
       ALUControl : out std_logic_vector(1 downto 0));
   end component;
+
   component condlogic
     port (
       clk, reset : in std_logic;
@@ -601,18 +606,25 @@ architecture struct OF controller is
       PCSrc, RegWrite : out std_logic;
       MemWrite : out std_logic);
   end component;
+
   signal FlagW : std_logic_vector(1 downto 0);
   signal PCS, RegW, MemW : std_logic;
+
 begin
   dec : decoder port MAP(
     instr(27 downto 26), instr(25 downto 20),
     instr(15 downto 12), FlagW, PCS,
     RegW, MemW, MemtoReg, ALUSrc, ImmSrc,
     RegSrc, ALUControl);
-  cl : condlogic port MAP(
-    clk, reset, instr(31 downto 28),
-    ALUFlags, FlagW, PCS, RegW, MemW,
-    PCSrc, RegWrite, MemWrite);
+
+   PCSrc <= PCS; 
+   RegWrite <= RegW; 
+   MemWrite <= MemW; 
+
+  --cl : condlogic port MAP(
+  --  clk, reset, instr(31 downto 28),
+  --  ALUFlags, FlagW, PCS, RegW, MemW,
+  --  PCSrc, RegWrite, MemWrite);
 end;
 
 library IEEE;

@@ -540,6 +540,19 @@ component hazard_unit is
   );
 end component;
 
+-------------------------------------------------------
+
+component condlogic
+port (
+  clk, reset : in std_logic;
+  Cond : in std_logic_vector(3 downto 0);
+  ALUFlags : in std_logic_vector(3 downto 0);
+  FlagW : in std_logic_vector(1 downto 0);
+  PCS, RegW, MemW : in std_logic;
+
+  PCSrc, RegWrite : out std_logic;
+  MemWrite : out std_logic);
+end component;
 
   signal RegWrite, ALUSrc, MemtoReg, PCSrc : std_logic;
   signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
@@ -550,11 +563,17 @@ begin
     ALUFlags, RegSrc, RegWrite, ImmSrc,
     ALUSrc, ALUControl, MemWrite,
     MemtoReg, PCSrc);
+    
   dp : datapath port MAP(
     clk, reset, RegSrc, RegWrite, ImmSrc,
     ALUSrc, ALUControl, MemtoReg, PCSrc,
     ALUFlags, PC, instr, ALUResult,
     WriteData, ReadData);
+
+  cl : condlogic port MAP(
+    clk, reset, instr(31 downto 28),
+    ALUFlags, FlagW, PCS, RegW, MemW,
+    PCSrc, RegWrite, MemWrite);
 end;
 
 library IEEE;
@@ -595,18 +614,6 @@ architecture struct OF controller is
       ALUControl : out std_logic_vector(1 downto 0));
   end component;
 
-  component condlogic
-    port (
-      clk, reset : in std_logic;
-      Cond : in std_logic_vector(3 downto 0);
-      ALUFlags : in std_logic_vector(3 downto 0);
-      FlagW : in std_logic_vector(1 downto 0);
-      PCS, RegW, MemW : in std_logic;
-
-      PCSrc, RegWrite : out std_logic;
-      MemWrite : out std_logic);
-  end component;
-
   signal FlagW : std_logic_vector(1 downto 0);
   signal PCS, RegW, MemW : std_logic;
 
@@ -620,11 +627,6 @@ begin
    PCSrc <= PCS; 
    RegWrite <= RegW; 
    MemWrite <= MemW; 
-
-  --cl : condlogic port MAP(
-  --  clk, reset, instr(31 downto 28),
-  --  ALUFlags, FlagW, PCS, RegW, MemW,
-  --  PCSrc, RegWrite, MemWrite);
 end;
 
 library IEEE;

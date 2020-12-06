@@ -570,27 +570,31 @@ end component;
   signal PCS, RegW, MemW : std_logic;
   signal condE : std_logic_vector(3 downto 0);
 
+  signal RegWriteD, MemWriteD, PCSrcD : std_logic;
+  signal RegWriteE, MemWriteE, PCSrcE : std_logic;
+
 begin
   cont : controller port map(
     clk, reset, instr(31 downto 12),
     --ALUFlags, 
     
-    RegSrc, RegW,--RegWrite, 
+    RegSrc, RegWriteD,--RegWrite, 
     ImmSrc,
-    ALUSrc, ALUControl, MemW,--MemWrite,
-    MemtoReg, PCS--PCSrc
+    ALUSrc, ALUControl, MemWriteD,--MemWrite,
+    MemtoReg, PCSrcD--PCSrc
   );
 
   dp : datapath port map(
     clk, reset, RegSrc, RegWrite, ImmSrc,
     ALUSrc, ALUControl, MemtoReg, PCSrc,
     ALUFlags, PC, instr, ALUResult,
-    WriteData, ReadData);
+    WriteData, ReadData
+  );
 
   cl : cond_unit port map(
     clk, reset, condE,--instr(31 downto 28),
     ALUFlags, FlagWriteE, 
-    PCS, RegW, MemW, -- entradas transplantadas
+    PCSrcE, RegWriteE, MemWriteE, -- entradas transplantadas
     PCSrc, RegWrite, MemWrite
   );
 end;

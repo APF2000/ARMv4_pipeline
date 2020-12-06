@@ -422,6 +422,9 @@ architecture struct OF arm is
       MemWrite : out std_logic;
       MemtoReg : out std_logic;
       PCSrc : out std_logic);
+    
+      -- Sinais a mais pra poder controlar o fluxo das instrucoes
+      FlagWrite, Branch : out std_logic
   end component;
   component datapath
     port (

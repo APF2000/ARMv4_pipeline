@@ -12,19 +12,19 @@
 -- when the value 7 is written to address 100 (0x64)
 ---------------------------------------------------------------
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity testbench is
 end;
 
 architecture test OF testbench is
-  COMPONENT top
+  component top
     port (
       clk, reset : in std_logic;
       WriteData, DatAadr : out std_logic_vector(31 downto 0);
       MemWrite : out std_logic);
-  end COMPONENT;
+  end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
   signal clk, reset, MemWrite : std_logic;
 begin
@@ -62,9 +62,9 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity top is -- top-level design for testing
   port (
     clk, reset : in std_logic;
@@ -73,7 +73,7 @@ entity top is -- top-level design for testing
 end;
 
 architecture test OF top is
-  COMPONENT arm
+  component arm
     port (
       clk, reset : in std_logic;
       PC : out std_logic_vector(31 downto 0);
@@ -81,18 +81,18 @@ architecture test OF top is
       MemWrite : out std_logic;
       ALUResult, WriteData : out std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0));
-  end COMPONENT;
-  COMPONENT imem
+  end component;
+  component imem
     port (
       a : in std_logic_vector(31 downto 0);
       rd : out std_logic_vector(31 downto 0));
-  end COMPONENT;
-  COMPONENT dmem
+  end component;
+  component dmem
     port (
       clk, we : in std_logic;
       a, wd : in std_logic_vector(31 downto 0);
       rd : out std_logic_vector(31 downto 0));
-  end COMPONENT;
+  end component;
   signal PC, instr,
   ReadData : std_logic_vector(31 downto 0);
 begin
@@ -108,19 +108,31 @@ end;
 
 -------------------------------------------------------------------------
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE STD.TEXTIO.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity partial_IF_ID is
   port (
     clock, reset : in std_logic;
     instrF : in std_logic_vector(31 downto 0);
+    stallD, flushD : in std_logic;
 
     instrD : in std_logic_vector(31 downto 0);
   );
 end entity;
+
+architecture arch of partial_IF_ID is
+
+  signal s_instr : std_logic_vector(31 downto 0);
+  signal s_stall, s_flush : std_logic;
+
+begin
+
+  instrD <= instrF;
+  
+end architecture;
 
 --------------------------------------------------------------------------
 
@@ -135,6 +147,7 @@ entity partial_ID_EX is
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : out std_logic_vector();--[ver tamanho]
+    FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
@@ -149,46 +162,46 @@ end entity;
 
 architecture arch OF partial_ID_EX is
 
-    signal s_PCSrcD, s_RegWriteD : std_logic;
-    signal s_MemtoRegD, s_MemWriteD : std_logic;
-    signal s_ALUControlD, s_FlagWriteD : std_logic_vector(1 downto 0);
-    signal s_BranchD, s_ALUSrcD : std_logic;
-    signal s_RD1D, s_RD2D, s_extendD : std_logic_vector(31 downto 0)
+    signal s_PCSrc, s_RegWrite : std_logic;
+    signal s_MemtoReg, s_MemWrite : std_logic;
+    signal s_ALUControl, s_FlagWrite : std_logic_vector(1 downto 0);
+    signal s_Branch, s_ALUSrc : std_logic;
+    signal s_R1D, s_R2D, s_extend : std_logic_vector(31 downto 0)
     signal s_WA3D : std_logic_vector(3 downto 0);
-    signal s_CondD: std_logic_vector(3 downto 0);
-    signal s_FlagsD : std_logic_vector();--[ver tamanho]
+    signal s_Cond: std_logic_vector(3 downto 0);
+    --signal s_Flags : std_logic_vector();--[ver tamanho]
 
 begin
     
-   s_PCSrcD <= PCSrcD;
-   s_RegWriteD <= RegWriteD;
-   s_MemtoRegD <= MemtoRegD;
-   s_MemWriteD <= MemWriteD;
-   s_ALUControlD <= ALUControlD;
-   s_FlagWriteD <= FlagWriteD;
-   s_BranchD <= BranchD;
-   s_ALUSrcD <= ALUSrcD
-   s_RD1D <= RD1D;
-   s_RD2D <= RD2D;
-   s_extendD <= extendD;
+   s_PCSrc <= PCSrcD;
+   s_RegWrite <= RegWriteD;
+   s_MemtoReg <= MemtoRegD;
+   s_MemWrite <= MemWriteD;
+   s_ALUControl <= ALUControlD;
+   s_FlagWrite <= FlagWriteD;
+   s_Branch <= BranchD;
+   s_ALUSrc <= ALUSrcD
+   s_R1D <= RD1D;
+   s_R2D <= RD2D;
+   s_extend <= extendD;
    s_WA3D <= WA3D;
-   s_CondD <= CondD;
-   s_FlagsD <=FlagsD;
+   s_Cond <= CondD;
+   s_Flags <=FlagsD;
 
-   PCSrcE <= s_PCSrcD
-   RegWriteE <= s_RegWriteD
-   MemtoRegE <= s_MemtoRegD
-   MemWriteE <= s_MemWriteD
-   ALUControlE <= s_ALUControlD
-   FlagWriteE <= s_FlagWriteD 
-   BranchE <= s_BranchD 
-   ALUSrcE <= s_ALUSrcD 
-   RD1E <= s_RD1D
-   RD2E <= s_RD2D
-   extendE <= s_extendD 
+   PCSrcE <= s_PCSrc
+   RegWriteE <= s_RegWrite
+   MemtoRegE <= s_MemtoReg
+   MemWriteE <= s_MemWrite
+   ALUControlE <= s_ALUControl
+   FlagWriteE <= s_FlagWrite 
+   BranchE <= s_Branch 
+   ALUSrcE <= s_ALUSrc 
+   RD1E <= s_R1D
+   RD2E <= s_R2D
+   extendE <= s_extend 
    WA3E <= s_WA3D
-   CondE <= s_CondD
-   FlagsE <= s_FlagsD 
+   CondE <= s_Cond
+   FlagsE <= s_Flags 
 
 end architecture;
 
@@ -298,10 +311,10 @@ entity hazard_unit is
   );
 end entity;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE STD.TEXTIO.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity dmem is -- data memory
   port (
     clk, we : in std_logic;
@@ -328,10 +341,10 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE STD.TEXTIO.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity imem is -- instruction memory
   port (
     a : in std_logic_vector(31 downto 0);
@@ -383,8 +396,8 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity arm is -- single cycle processor
   port (
     clk, reset : in std_logic;
@@ -396,7 +409,7 @@ entity arm is -- single cycle processor
 end;
 
 architecture struct OF arm is
-  COMPONENT controller
+  component controller
     port (
       clk, reset : in std_logic;
       instr : in std_logic_vector(31 downto 12);
@@ -409,8 +422,8 @@ architecture struct OF arm is
       MemWrite : out std_logic;
       MemtoReg : out std_logic;
       PCSrc : out std_logic);
-  end COMPONENT;
-  COMPONENT datapath
+  end component;
+  component datapath
     port (
       clk, reset : in std_logic;
       RegSrc : in std_logic_vector(1 downto 0);
@@ -425,7 +438,106 @@ architecture struct OF arm is
       instr : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0));
-  end COMPONENT;
+  end component; 
+  
+
+entity partial_IF_ID is
+  port (
+    clock, reset : in std_logic;
+    instrF : in std_logic_vector(31 downto 0);
+    stallD, flushD : in std_logic;
+
+    instrD : in std_logic_vector(31 downto 0);
+  );
+end entity;
+
+--------------------------------------------------------------------------
+
+component partial_ID_EX is
+  port (
+    clock, reset : in std_logic;
+    PCSrcD, RegWriteD : in std_logic;
+    MemtoRegD, MemWriteD : in std_logic;
+    ALUControlD, FlagWriteD : in std_logic_vector(1 downto 0);
+    BranchD, ALUSrcD : in std_logic;
+    RD1D, RD2D, extendD : in std_logic_vector(31 downto 0)
+    WA3D : in std_logic_vector(3 downto 0);
+    CondD: in std_logic_vector(3 downto 0);
+    FlagsD : out std_logic_vector();--[ver tamanho]
+    FLushE : in std_logic;
+
+    PCSrcE, RegWriteE : out std_logic;
+    MemtoRegE, MemWriteE : out std_logic;
+    ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
+    BranchE, ALUSrcE : out std_logic
+    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0)
+    WA3E : in std_logic_vector(3 downto 0)
+    CondE : in std_logic_vector(3 downto 0);
+    FlagsE : out std_logic_vector();--[ver tamanho]
+  );
+end component;
+
+------------------------------------------------------------------
+
+component partial_EX_MEM is
+  port (
+    clock, reset : in std_logic;
+
+    PCSrcE, RegWriteE, MemtoRegE, MemWriteE : in std_logic; -- Sinais combinatorios
+    ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
+    WA3E : in std_logic_vector(3 downto 0)
+  
+    PCSrcM, RegWriteM, MemtoRegM, MemWriteM : in std_logic; -- Sinais combinatorios
+    ALUResultm, WriteDataM : in std_logic_vector(31 downto 0);
+    WA3M : in std_logic_vector(3 downto 0)
+  );
+end component;
+
+
+--------------------------------------------------------
+
+component partial_MEM_WB is
+  port (
+    clock : in std_logic;
+    
+    PCSrcM : in std_logic;
+    RegWriteM : in std_logic;
+    MemtoRegM : in std_logic;
+    ALUOutM   : in std_logic_vector(31 downto 0);
+    WA3M      : in std_logic_vector(31 downto 0);
+    RD      : in std_logic_vector(31 downto 0);
+
+    PCSrcW : out std_logic;
+    RegWriteW : out std_logic;
+    MemtoRegW : out std_logic;
+    ReadDataW : out std_logic;
+    ALUOutW   : out std_logic_vector(31 downto 0);
+    WA3W      : out std_logic_vector(31 downto 0);
+  );
+end component;
+
+---------------------------------------------------------
+
+component hazard_unit is
+  port (
+    clock : in std_logic;
+    reset : in std_logic;
+    RA1E : in std_logic_vector(31 downto 0);
+    RA2E : in std_logic_vector(31 downto 0);
+    WA3M : in std_logic_vector(31 downto 0);
+    RegWriteM : in std_logic;
+    RegWriteW : in std_logic;
+    MemToRegE : in std_logic;
+    StallF : out std_logic;
+    StallD : out std_logic;
+    FlushD : out std_logic;
+    FlushE : out std_logic;
+    ForwardAE : out std_logic_vector(1 downto 0);
+    ForwardBE : out std_logic_vector(1 downto 0);
+  );
+end component;
+
+
   signal RegWrite, ALUSrc, MemtoReg, PCSrc : std_logic;
   signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
   signal ALUFlags : std_logic_vector(3 downto 0);
@@ -442,8 +554,8 @@ begin
     WriteData, ReadData);
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity controller is -- single cycle control decoder
   port (
     clk, reset : in std_logic;
@@ -456,11 +568,15 @@ entity controller is -- single cycle control decoder
     ALUControl : out std_logic_vector(1 downto 0);
     MemWrite : out std_logic;
     MemtoReg : out std_logic;
-    PCSrc : out std_logic);
+    PCSrc : out std_logic;
+    
+    -- Sinais a mais pra poder controlar o fluxo das instrucoes
+    FlagWrite, Branch : out std_logic
+  );
 end;
 
 architecture struct OF controller is
-  COMPONENT decoder
+  component decoder
     port (
       Op : in std_logic_vector(1 downto 0);
       Funct : in std_logic_vector(5 downto 0);
@@ -470,17 +586,18 @@ architecture struct OF controller is
       MemtoReg, ALUSrc : out std_logic;
       ImmSrc, RegSrc : out std_logic_vector(1 downto 0);
       ALUControl : out std_logic_vector(1 downto 0));
-  end COMPONENT;
-  COMPONENT condlogic
+  end component;
+  component condlogic
     port (
       clk, reset : in std_logic;
       Cond : in std_logic_vector(3 downto 0);
       ALUFlags : in std_logic_vector(3 downto 0);
       FlagW : in std_logic_vector(1 downto 0);
       PCS, RegW, MemW : in std_logic;
+
       PCSrc, RegWrite : out std_logic;
       MemWrite : out std_logic);
-  end COMPONENT;
+  end component;
   signal FlagW : std_logic_vector(1 downto 0);
   signal PCS, RegW, MemW : std_logic;
 begin
@@ -495,8 +612,8 @@ begin
     PCSrc, RegWrite, MemWrite);
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity decoder is -- main control decoder
   port (
     Op : in std_logic_vector(1 downto 0);
@@ -515,7 +632,7 @@ architecture behave OF decoder is
   signal op2 : std_logic_vector(3 downto 0);
 begin
   op2 <= (Op, Funct(5), Funct(0));
-  PROCESS (ALL) begin -- Main Decoder
+  PROCESS (all) begin -- Main Decoder
     CASE ? (op2) is
       WHEN "000-" => controls <= "0000001001";
       WHEN "001-" => controls <= "0000101001";
@@ -529,7 +646,7 @@ begin
   (RegSrc, ImmSrc, ALUSrc, MemtoReg, RegW, MemW,
   Branch, ALUOp) <= controls;
 
-  PROCESS (ALL) begin -- ALU Decoder
+  PROCESS (all) begin -- ALU Decoder
     IF (ALUOp) THEN
       CASE Funct(4 downto 1) is
         WHEN "0100" => ALUControl <= "00"; -- ADD
@@ -549,32 +666,34 @@ begin
   PCS <= ((AND Rd) AND RegW) OR Branch;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity condlogic is -- Conditional logic
   port (
     clk, reset : in std_logic;
+
     Cond : in std_logic_vector(3 downto 0);
     ALUFlags : in std_logic_vector(3 downto 0);
     FlagW : in std_logic_vector(1 downto 0);
     PCS, RegW, MemW : in std_logic;
+
     PCSrc, RegWrite : out std_logic;
     MemWrite : out std_logic);
 end;
 
 architecture behave OF condlogic is
-  COMPONENT condcheck
+  component condcheck
     port (
       Cond : in std_logic_vector(3 downto 0);
       Flags : in std_logic_vector(3 downto 0);
       CondEx : out std_logic);
-  end COMPONENT;
-  COMPONENT flopenr GENERIC (width : inTEGER);
+  end component;
+  component flopenr GENERIC (width : inTEGER);
     port (
       clk, reset, en : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
-  end COMPONENT;
+  end component;
   signal FlagWrite : std_logic_vector(1 downto 0);
   signal Flags : std_logic_vector(3 downto 0);
   signal CondEx : std_logic;
@@ -595,8 +714,8 @@ begin
   PCSrc <= PCS AND CondEx;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity condcheck is
   port (
     Cond : in std_logic_vector(3 downto 0);
@@ -610,7 +729,7 @@ begin
   (neg, zero, carry, overflow) <= Flags;
   ge <= (neg XNOR overflow);
 
-  PROCESS (ALL) begin -- Condition checking
+  PROCESS (all) begin -- Condition checking
     CASE Cond is
       WHEN "0000" => CondEx <= zero;
       WHEN "0001" => CondEx <= NOT zero;
@@ -632,8 +751,8 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity datapath is
   port (
     clk, reset : in std_logic;
@@ -652,44 +771,44 @@ entity datapath is
 end;
 
 architecture struct OF datapath is
-  COMPONENT alu
+  component alu
     port (
       a, b : in std_logic_vector(31 downto 0);
       ALUControl : in std_logic_vector(1 downto 0);
       Result : BUFFER std_logic_vector(31 downto 0);
       ALUFlags : out std_logic_vector(3 downto 0));
-  end COMPONENT;
-  COMPONENT regfile
+  end component;
+  component regfile
     port (
       clk : in std_logic;
       we3 : in std_logic;
       ra1, ra2, wa3 : in std_logic_vector(3 downto 0);
       wd3, r15 : in std_logic_vector(31 downto 0);
       rd1, rd2 : out std_logic_vector(31 downto 0));
-  end COMPONENT;
-  COMPONENT adder
+  end component;
+  component adder
     port (
       a, b : in std_logic_vector(31 downto 0);
       y : out std_logic_vector(31 downto 0));
-  end COMPONENT;
-  COMPONENT extend
+  end component;
+  component extend
     port (
       instr : in std_logic_vector(23 downto 0);
       ImmSrc : in std_logic_vector(1 downto 0);
       ExtImm : out std_logic_vector(31 downto 0));
-  end COMPONENT;
-  COMPONENT flopr GENERIC (width : inTEGER);
+  end component;
+  component flopr GENERIC (width : inTEGER);
     port (
       clk, reset : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
-  end COMPONENT;
-  COMPONENT mux2 GENERIC (width : inTEGER);
+  end component;
+  component mux2 GENERIC (width : inTEGER);
     port (
       d0, d1 : in std_logic_vector(width - 1 downto 0);
       s : in std_logic;
       y : out std_logic_vector(width - 1 downto 0));
-  end COMPONENT;
+  end component;
   signal PCNext, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
   signal ExtImm, Result : std_logic_vector(31 downto 0);
   signal SrcA, SrcB : std_logic_vector(31 downto 0);
@@ -722,9 +841,9 @@ begin
   i_alu : alu port MAP(SrcA, SrcB, ALUControl, ALUResult, ALUFlags);
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity regfile is -- three-port register file
   port (
     clk : in std_logic;
@@ -746,7 +865,7 @@ begin
       end IF;
     end IF;
   end PROCESS;
-  PROCESS (ALL) begin
+  PROCESS (all) begin
     IF (to_integer(ra1) = 15) THEN
       rd1 <= r15;
     ELSE
@@ -760,9 +879,9 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
-USE IEEE.NUMERIC_STD_UNSIGNED.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity adder is -- adder
   port (
     a, b : in std_logic_vector(31 downto 0);
@@ -774,8 +893,8 @@ begin
   y <= a + b;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity extend is
   port (
     instr : in std_logic_vector(23 downto 0);
@@ -785,7 +904,7 @@ end;
 
 architecture behave OF extend is
 begin
-  PROCESS (ALL) begin
+  PROCESS (all) begin
     CASE ImmSrc is
       WHEN "00" => ExtImm <= (X"000000", instr(7 downto 0));
       WHEN "01" => ExtImm <= (X"00000", instr(11 downto 0));
@@ -796,8 +915,8 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity flopenr is -- flip-flop with enable and asynchronous reset
   GENERIC (width : inTEGER);
   port (
@@ -819,8 +938,8 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity flopr is -- flip-flop with asynchronous reset
   GENERIC (width : inTEGER);
   port (
@@ -840,8 +959,8 @@ begin
   end PROCESS;
 end;
 
-LIBRARY IEEE;
-USE IEEE.std_logic_1164.ALL;
+library IEEE;
+use IEEE.std_logic_1164.all;
 entity mux2 is -- two-input multiplexer
   GENERIC (width : inTEGER);
   port (

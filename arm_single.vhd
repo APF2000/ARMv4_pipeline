@@ -640,6 +640,102 @@ begin
     PCSrcE, RegWriteE, MemWriteE, -- entradas transplantadas
     PCSrc, RegWrite, MemWrite
   );
+
+  inst_partial_IF_ID : partial_IF_ID port map (
+      clock => clock,
+	  	reset => reset,
+      instrF => instrF,
+      stallD => stallD,
+			flushD => flushD,
+  
+      instrD => instrD
+    );
+  end component;
+  
+  --------------------------------------------------------------------------
+  
+  inst_partial_ID_EX : partial_ID_EX port map (
+      clock => clock,
+			reset => reset,
+      PCSrcD => PCSrcD,
+			RegWriteD => RegWriteD,
+      MemtoRegD => MemtoRegD,
+			MemWriteD => MemWriteD,
+      ALUControlD => ALUControlD,
+			FlagWriteD => FlagWriteD,
+      BranchD => BranchD,
+			ALUSrcD => ALUSrcD,
+      RD1D => D,
+			RD2D => D,
+			extendD => extendD,
+      WA3D => D,
+      CondD => CondD,
+      FlagsD => FlagsD,--[ver tamanho]
+      FLushE => FLushE,
+  
+      PCSrcE => PCSrcE,
+			RegWriteE => RegWriteE,
+      MemtoRegE => MemtoRegE,
+			MemWriteE => MemWriteE,
+      ALUControlE => ALUControlE,
+			FlagWriteE => FlagWriteE,
+      BranchE => BranchE,
+			ALUSrcE => ALUSrcE,
+      RD1E => E,
+			RD2E => E,
+			extendE => extendE,
+      WA3E => E,
+      CondE => CondE,
+
+      FlagsE => FlagsE--[ver tamanho]
+    );
+  
+  ------------------------------------------------------------------
+  
+  inst_partial_EX_MEM : partial_EX_MEM port map (
+      clock => clock,
+			reset => reset,
+  
+      PCSrcE => PCSrcE,
+			RegWriteE => RegWriteE,
+			MemtoRegE => MemtoRegE,
+			MemWriteE => MemWriteE,
+			-- Sinais combinatorios
+      ALUResultE => ALUResultE,
+			WriteDataE => WriteDataE,
+      WA3E => E,
+    
+      PCSrcM => PCSrcM,
+			RegWriteM => RegWriteM,
+			MemtoRegM => MemtoRegM,
+			MemWriteM => MemWriteM,
+			-- Sinais combinatorios
+      ALUResultm => ALUResultm,
+			WriteDataM => WriteDataM,
+      WA3M => M
+    );
+  
+  --------------------------------------------------------
+  
+  inst_partial_MEM_WB : partial_MEM_WB port map (
+      clock => clock,
+      
+      PCSrcM => PCSrcM,
+      RegWriteM => RegWriteM,
+      MemtoRegM => MemtoRegM,
+      ALUOutM => ALUOutM,
+      WA3M => M,
+      RD => RD,
+  
+      PCSrcW => PCSrcW,
+      RegWriteW => RegWriteW,
+      MemtoRegW => MemtoRegW,
+      ReadDataW => ReadDataW,
+      ALUOutW => ALUOutW,
+      WA3W => W
+    );
+  
+
 end;
 
 library IEEE;

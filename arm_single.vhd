@@ -512,7 +512,7 @@ component controller
     port (
       clk, reset : in std_logic;
       instr : in std_logic_vector(31 downto 12);
-      ALUFlags : in std_logic_vector(3 downto 0);
+      --ALUFlags : in std_logic_vector(3 downto 0);
 
       RegSrc : out std_logic_vector(1 downto 0);
       RegWrite : out std_logic;
@@ -563,14 +563,17 @@ end component;
   signal RegWrite, ALUSrc, MemtoReg, PCSrc : std_logic;
   signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
   signal ALUFlags : std_logic_vector(3 downto 0);
+  -- CUIDADO COM A LINHA ACIMA, ELA ESTA AZUL CLARO
 
-  -- signal FlagW : std_logic_vector
+
+  signal FlagWriteE : std_logic;
   signal PCS, RegW, MemW : std_logic;
+  signal condE : std_logic_vector(3 downto 0);
 
 begin
   cont : controller port map(
     clk, reset, instr(31 downto 12),
-    ALUFlags, 
+    --ALUFlags, 
     
     RegSrc, RegW,--RegWrite, 
     ImmSrc,
@@ -585,10 +588,11 @@ begin
     WriteData, ReadData);
 
   cl : cond_unit port map(
-    clk, reset, instr(31 downto 28),
-    ALUFlags, FlagW, 
+    clk, reset, condE,--instr(31 downto 28),
+    ALUFlags, FlagWriteE, 
     PCS, RegW, MemW, -- entradas transplantadas
-    PCSrc, RegWrite, MemWrite);
+    PCSrc, RegWrite, MemWrite
+  );
 end;
 
 library IEEE;
@@ -597,7 +601,7 @@ entity controller is -- single cycle control decoder
   port (
     clk, reset : in std_logic;
     instr : in std_logic_vector(31 downto 12);
-    ALUFlags : in std_logic_vector(3 downto 0);
+    --ALUFlags : in std_logic_vector(3 downto 0);
 
     RegSrc : out std_logic_vector(1 downto 0);
 

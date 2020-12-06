@@ -570,8 +570,51 @@ end component;
   signal PCS, RegW, MemW : std_logic;
   signal condE : std_logic_vector(3 downto 0);
 
-  signal RegWriteD, MemWriteD, PCSrcD : std_logic;
-  signal RegWriteE, MemWriteE, PCSrcE : std_logic;
+  --signal RegWriteD, MemWriteD, PCSrcD : std_logic;
+  --signal RegWriteE, MemWriteE, PCSrcE : std_logic;
+
+  -- Fetch
+  signal instrF std_logic_vector(31 downto 0);
+
+  -- Decode
+  signal stallD, flushD std_logic;
+  signal instrD std_logic_vector(31 downto 0);
+  signal PCSrcD, RegWriteD std_logic;
+  signal MemtoRegD, MemWriteD std_logic;
+  signal ALUControlD, FlagWriteD std_logic_vector(1 downto 0);
+  signal BranchD, ALUSrcD std_logic;
+  signal RD1D, RD2D, extendD std_logic_vector(31 downto 0)
+  signal WA3D std_logic_vector(3 downto 0);
+  signal CondD: in std_logic_vector(3 downto 0);
+  --signal FlagsD std_logic_vector(????);--[ver tamanho]
+  signal FLushE std_logic;
+
+  -- Execute
+  signal PCSrcE, RegWriteE std_logic;
+  signal MemtoRegE, MemWriteE std_logic;
+  signal ALUControlE, FlagWriteE std_logic_vector(1 downto 0);
+  signal BranchE, ALUSrcE std_logic
+  signal RD1E, RD2E, extendE std_logic_vector(31 downto 0)
+  signal WA3E std_logic_vector(3 downto 0)
+  signal CondE std_logic_vector(3 downto 0);
+  signal FlagsE std_logic_vector();--[ver tamanho]
+
+  -- Memory
+  signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM std_logic; -- Sinais combinatorios
+  signal ALUResultm, WriteDataM std_logic_vector(31 downto 0);
+  signal WA3M std_logic_vector(3 downto 0)
+
+  signal ALUOutM std_logic_vector(31 downto 0);
+  signal ReadDataM std_logic_vector(31 downto 0);
+
+  -- Write back
+  signal PCSrcW std_logic;
+  signal RegWriteW std_logic;
+  signal MemtoRegW std_logic;
+  signal ReadDataW std_logic;
+  signal ALUOutW std_logic_vector(31 downto 0);
+  signal WA3W std_logic_vector(3 downto 0);
+
 
 begin
   cont : controller port map(
@@ -593,7 +636,7 @@ begin
 
   cl : cond_unit port map(
     clk, reset, condE,--instr(31 downto 28),
-    ALUFlags, FlagWriteE, 
+    ALUFlags, FlagWriteE,
     PCSrcE, RegWriteE, MemWriteE, -- entradas transplantadas
     PCSrc, RegWrite, MemWrite
   );
@@ -742,6 +785,7 @@ begin
   port map(
     clk, reset, FlagWrite(1),
     ALUFlags(3 downto 2), Flags(3 downto 2));
+
   flagreg0 : flopenr GENERIC map(2)
   port map(
     clk, reset, FlagWrite(0),

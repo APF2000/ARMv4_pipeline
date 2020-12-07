@@ -119,7 +119,7 @@ entity partial_IF_ID is
     instrF : in std_logic_vector(31 downto 0);
     stallD, flushD : in std_logic;
 
-    instrD : in std_logic_vector(31 downto 0);
+    instrD : in std_logic_vector(31 downto 0)
   );
 end entity;
 
@@ -143,7 +143,7 @@ entity partial_ID_EX is
     MemtoRegD, MemWriteD : in std_logic;
     ALUControlD, FlagWriteD : in std_logic_vector(1 downto 0);
     BranchD, ALUSrcD : in std_logic;
-    RD1D, RD2D, extendD : in std_logic_vector(31 downto 0)
+    RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : out std_logic_vector();--[ver tamanho]
@@ -152,9 +152,9 @@ entity partial_ID_EX is
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
     ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
-    BranchE, ALUSrcE : out std_logic
-    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0)
-    WA3E : in std_logic_vector(3 downto 0)
+    BranchE, ALUSrcE : out std_logic;
+    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
+    WA3E : in std_logic_vector(3 downto 0);
     CondE : in std_logic_vector(3 downto 0);
     FlagsE : out std_logic_vector();--[ver tamanho]
   );
@@ -166,7 +166,7 @@ architecture arch OF partial_ID_EX is
     signal s_MemtoReg, s_MemWrite : std_logic;
     signal s_ALUControl, s_FlagWrite : std_logic_vector(1 downto 0);
     signal s_Branch, s_ALUSrc : std_logic;
-    signal s_R1D, s_R2D, s_extend : std_logic_vector(31 downto 0)
+    signal s_R1D, s_R2D, s_extend : std_logic_vector(31 downto 0);
     signal s_WA3D : std_logic_vector(3 downto 0);
     signal s_Cond: std_logic_vector(3 downto 0);
     --signal s_Flags : std_logic_vector();--[ver tamanho]
@@ -180,7 +180,7 @@ begin
    s_ALUControl <= ALUControlD;
    s_FlagWrite <= FlagWriteD;
    s_Branch <= BranchD;
-   s_ALUSrc <= ALUSrcD
+   s_ALUSrc <= ALUSrcD;
    s_R1D <= RD1D;
    s_R2D <= RD2D;
    s_extend <= extendD;
@@ -188,20 +188,20 @@ begin
    s_Cond <= CondD;
    s_Flags <=FlagsD;
 
-   PCSrcE <= s_PCSrc
-   RegWriteE <= s_RegWrite
-   MemtoRegE <= s_MemtoReg
-   MemWriteE <= s_MemWrite
-   ALUControlE <= s_ALUControl
-   FlagWriteE <= s_FlagWrite 
-   BranchE <= s_Branch 
-   ALUSrcE <= s_ALUSrc 
-   RD1E <= s_R1D
-   RD2E <= s_R2D
-   extendE <= s_extend 
-   WA3E <= s_WA3D
-   CondE <= s_Cond
-   FlagsE <= s_Flags 
+   PCSrcE <= s_PCSrc;
+   RegWriteE <= s_RegWrite;
+   MemtoRegE <= s_MemtoReg;
+   MemWriteE <= s_MemWrite;
+   ALUControlE <= s_ALUControl;
+   FlagWriteE <= s_FlagWrite; 
+   BranchE <= s_Branch;
+   ALUSrcE <= s_ALUSrc;
+   RD1E <= s_R1D;
+   RD2E <= s_R2D;
+   extendE <= s_extend; 
+   WA3E <= s_WA3D;
+   CondE <= s_Cond;
+   FlagsE <= s_Flags; 
 
 end architecture;
 
@@ -213,7 +213,7 @@ entity partial_EX_MEM is
 
     PCSrcE, RegWriteE, MemtoRegE, MemWriteE : in std_logic; -- Sinais combinatorios
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
-    WA3E : in std_logic_vector(3 downto 0)
+    WA3E : in std_logic_vector(3 downto 0);
   
     PCSrcM, RegWriteM, MemtoRegM, MemWriteM : in std_logic; -- Sinais combinatorios
     ALUResultm, WriteDataM : in std_logic_vector(31 downto 0);
@@ -224,7 +224,7 @@ end entity;
 architecture arch of partial_EX_MEM is
 
   signal s_PCSrc, s_RegWrite, s_MemtoReg, s_MemWrite : std_logic; -- Sinais combinatorios
-  signal s_ALUResult, s_WriteData, : std_logic_vector(31 downto 0);
+  signal s_ALUResult, s_WriteData : std_logic_vector(31 downto 0);
   signal s_WA3 : std_logic_vector(3 downto 0);
 
 begin
@@ -265,7 +265,7 @@ entity partial_MEM_WB is
     MemtoRegW : out std_logic;
     ReadDataW : out std_logic;
     ALUOutW   : out std_logic_vector(31 downto 0);
-    WA3W      : out std_logic_vector(31 downto 0);
+    WA3W      : out std_logic_vector(31 downto 0)
   );
 end entity;
 
@@ -307,7 +307,7 @@ entity hazard_unit is
     FlushD : out std_logic;
     FlushE : out std_logic;
     ForwardAE : out std_logic_vector(1 downto 0);
-    ForwardBE : out std_logic_vector(1 downto 0);
+    ForwardBE : out std_logic_vector(1 downto 0)
   );
 end entity;
 
@@ -416,7 +416,7 @@ component partial_IF_ID is
     instrF : in std_logic_vector(31 downto 0);
     stallD, flushD : in std_logic;
 
-    instrD : in std_logic_vector(31 downto 0);
+    instrD : in std_logic_vector(31 downto 0)
   );
 end component;
 
@@ -429,7 +429,7 @@ component partial_ID_EX is
     MemtoRegD, MemWriteD : in std_logic;
     ALUControlD, FlagWriteD : in std_logic_vector(1 downto 0);
     BranchD, ALUSrcD : in std_logic;
-    RD1D, RD2D, extendD : in std_logic_vector(31 downto 0)
+    RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : out std_logic_vector();--[ver tamanho]
@@ -438,11 +438,11 @@ component partial_ID_EX is
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
     ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
-    BranchE, ALUSrcE : out std_logic
-    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0)
-    WA3E : in std_logic_vector(3 downto 0)
+    BranchE, ALUSrcE : out std_logic;
+    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
+    WA3E : in std_logic_vector(3 downto 0);
     CondE : in std_logic_vector(3 downto 0);
-    FlagsE : out std_logic_vector();--[ver tamanho]
+    FlagsE : out std_logic_vector()--[ver tamanho]
   );
 end component;
 
@@ -454,7 +454,7 @@ component partial_EX_MEM is
 
     PCSrcE, RegWriteE, MemtoRegE, MemWriteE : in std_logic; -- Sinais combinatorios
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
-    WA3E : in std_logic_vector(3 downto 0)
+    WA3E : in std_logic_vector(3 downto 0);
   
     PCSrcM, RegWriteM, MemtoRegM, MemWriteM : in std_logic; -- Sinais combinatorios
     ALUResultm, WriteDataM : in std_logic_vector(31 downto 0);
@@ -481,7 +481,7 @@ component partial_MEM_WB is
     MemtoRegW : out std_logic;
     ReadDataW : out std_logic;
     ALUOutW   : out std_logic_vector(31 downto 0);
-    WA3W      : out std_logic_vector(31 downto 0);
+    WA3W      : out std_logic_vector(31 downto 0)
   );
 end component;
 
@@ -502,7 +502,7 @@ component hazard_unit is
     FlushD : out std_logic;
     FlushE : out std_logic;
     ForwardAE : out std_logic_vector(1 downto 0);
-    ForwardBE : out std_logic_vector(1 downto 0);
+    ForwardBE : out std_logic_vector(1 downto 0)
   );
 end component;
 
@@ -521,10 +521,11 @@ component controller
       ALUControl : out std_logic_vector(1 downto 0);
       MemWrite : out std_logic;
       MemtoReg : out std_logic;
-      PCSrc : out std_logic);
+      PCSrc : out std_logic;
     
       -- Sinais a mais pra poder controlar o fluxo das instrucoes
       FlagWrite, Branch : out std_logic
+    );
   end component;
 
 -------------------------------------------
@@ -574,46 +575,46 @@ end component;
   --signal RegWriteE, MemWriteE, PCSrcE : std_logic;
 
   -- Fetch
-  signal instrF std_logic_vector(31 downto 0);
+  signal instrF : std_logic_vector(31 downto 0);
 
   -- Decode
-  signal stallD, flushD std_logic;
-  signal instrD std_logic_vector(31 downto 0);
-  signal PCSrcD, RegWriteD std_logic;
-  signal MemtoRegD, MemWriteD std_logic;
-  signal ALUControlD, FlagWriteD std_logic_vector(1 downto 0);
-  signal BranchD, ALUSrcD std_logic;
-  signal RD1D, RD2D, extendD std_logic_vector(31 downto 0)
-  signal WA3D std_logic_vector(3 downto 0);
-  signal CondD: in std_logic_vector(3 downto 0);
-  --signal FlagsD std_logic_vector(????);--[ver tamanho]
-  signal FLushE std_logic;
+  signal stallD, flushD : std_logic;
+  signal instrD : std_logic_vector(31 downto 0);
+  signal PCSrcD, RegWriteD : std_logic;
+  signal MemtoRegD, MemWriteD : std_logic;
+  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
+  signal BranchD, ALUSrcD : std_logic;
+  signal RD1D, RD2D, extendD : std_logic_vector(31 downto 0);
+  signal WA3D : std_logic_vector(3 downto 0);
+  signal CondD: std_logic_vector(3 downto 0);
+  --signal FlagsD : std_logic_vector(????);--[ver tamanho]
+  signal FLushE : std_logic;
 
   -- Execute
-  signal PCSrcE, RegWriteE std_logic;
-  signal MemtoRegE, MemWriteE std_logic;
-  signal ALUControlE, FlagWriteE std_logic_vector(1 downto 0);
-  signal BranchE, ALUSrcE std_logic
-  signal RD1E, RD2E, extendE std_logic_vector(31 downto 0)
-  signal WA3E std_logic_vector(3 downto 0)
-  signal CondE std_logic_vector(3 downto 0);
-  signal FlagsE std_logic_vector();--[ver tamanho]
+  signal PCSrcE, RegWriteE : std_logic;
+  signal MemtoRegE, MemWriteE : std_logic;
+  signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
+  signal BranchE, ALUSrcE : std_logic;
+  signal RD1E, RD2E, extendE : std_logic_vector(31 downto 0);
+  signal WA3E : std_logic_vector(3 downto 0);
+  signal CondE : std_logic_vector(3 downto 0);
+  signal FlagsE : std_logic_vector();--[ver tamanho]
 
   -- Memory
-  signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM std_logic; -- Sinais combinatorios
-  signal ALUResultm, WriteDataM std_logic_vector(31 downto 0);
-  signal WA3M std_logic_vector(3 downto 0)
+  signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios
+  signal ALUResultm, WriteDataM : std_logic_vector(31 downto 0);
+  signal WA3M : std_logic_vector(3 downto 0);
 
-  signal ALUOutM std_logic_vector(31 downto 0);
-  signal ReadDataM std_logic_vector(31 downto 0);
+  signal ALUOutM : std_logic_vector(31 downto 0);
+  signal ReadDataM : std_logic_vector(31 downto 0);
 
   -- Write back
-  signal PCSrcW std_logic;
-  signal RegWriteW std_logic;
-  signal MemtoRegW std_logic;
-  signal ReadDataW std_logic;
-  signal ALUOutW std_logic_vector(31 downto 0);
-  signal WA3W std_logic_vector(3 downto 0);
+  signal PCSrcW : std_logic;
+  signal RegWriteW : std_logic;
+  signal MemtoRegW : std_logic;
+  signal ReadDataW : std_logic;
+  signal ALUOutW : std_logic_vector(31 downto 0);
+  signal WA3W : std_logic_vector(3 downto 0);
 
 
 begin
@@ -649,8 +650,7 @@ begin
 			flushD => flushD,
   
       instrD => instrD
-    );
-  end component;
+  );
   
   --------------------------------------------------------------------------
   

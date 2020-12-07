@@ -50,7 +50,7 @@ begin
 
   -- check that 7 gets written to address 84 
   -- at end of program
-  PROCESS (clk) begin
+  PROCESS (clk, MemWrite, DataAdr, WriteData) begin
     IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
       IF (to_integer(DataAdr) = 100 AND
         to_integer(WriteData) = 7) THEN
@@ -119,7 +119,7 @@ entity partial_IF_ID is
     instrF : in std_logic_vector(31 downto 0);
     stallD, flushD : in std_logic;
 
-    instrD : in std_logic_vector(31 downto 0)
+    instrD : out std_logic_vector(31 downto 0)
   );
 end entity;
 
@@ -135,6 +135,10 @@ begin
 end architecture;
 
 --------------------------------------------------------------------------
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity partial_ID_EX is
   port (
@@ -206,6 +210,10 @@ begin
 end architecture;
 
 ------------------------------------------------------------------
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity partial_EX_MEM is
   port (
@@ -248,6 +256,10 @@ begin
 end architecture;
 
 --------------------------------------------------------
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity partial_MEM_WB is
   port (
@@ -291,6 +303,10 @@ MemtoRegW <= s_MemtoReg;
 
 end architecture;
 
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity hazard_unit is
   port (

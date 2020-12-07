@@ -28,10 +28,10 @@ Z8 !s110 1605997332
 !i10b 1
 Z9 !s108 1605997331.000000
 Z10 !s90 -check_synthesis|-2008|arm_single.vhd|
-!s107 arm_single.vhd|
+Z11 !s107 arm_single.vhd|
 !i113 1
-Z11 o-check_synthesis -2008
-Z12 tExplicit 1 CvgOpt 0
+Z12 o-check_synthesis -2008
+Z13 tExplicit 1 CvgOpt 0
 Abehave
 R2
 R3
@@ -48,10 +48,10 @@ R8
 !i10b 1
 R9
 R10
-Z13 !s107 arm_single.vhd|
-!i113 1
 R11
+!i113 1
 R12
+R13
 Ealu
 R1
 R2
@@ -71,10 +71,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R2
 R3
@@ -91,10 +91,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Earm
 R1
 R3
@@ -113,10 +113,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Astruct
 R3
 R4
@@ -132,10 +132,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Econdcheck
 R1
 R3
@@ -154,10 +154,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R3
 R4
@@ -173,10 +173,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Econdlogic
 R1
 R3
@@ -195,10 +195,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R3
 R4
@@ -214,10 +214,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Econtroller
 R1
 R3
@@ -236,10 +236,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Astruct
 R3
 R4
@@ -255,10 +255,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Edatapath
 R1
 R3
@@ -277,10 +277,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Astruct
 R3
 R4
@@ -296,10 +296,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Edecoder
 R1
 R3
@@ -318,10 +318,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R3
 R4
@@ -337,10 +337,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Edmem
 R1
 R2
@@ -360,10 +360,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R2
 R3
@@ -380,10 +380,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Eextend
 R1
 R3
@@ -402,10 +402,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R3
 R4
@@ -421,10 +421,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Eflopenr
 R1
 R3
@@ -443,10 +443,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Aasynchronous
 R3
 R4
@@ -462,10 +462,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Eflopr
 R1
 R3
@@ -484,10 +484,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Aasynchronous
 R3
 R4
@@ -503,10 +503,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Eimem
 R1
 R2
@@ -526,10 +526,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R2
 R3
@@ -546,10 +546,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Emux2
 R1
 R3
@@ -568,10 +568,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R3
 R4
@@ -587,10 +587,76 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
+Epartial_id_ex
+Z14 w1607380556
+R2
+R3
+R4
+!i122 4
+R0
+R5
+R6
+l0
+L143 1
+VA0:1z?lRJzgGieKfT^[WT3
+!s100 @gXBN:feE:?6onOj;_lU^3
+R7
+33
+Z15 !s110 1607380558
+!i10b 1
+Z16 !s108 1607380558.000000
+R10
+R11
+!i113 1
+R12
+R13
+Epartial_if_id
+R14
+R2
+R3
+R4
+!i122 4
+R0
+R5
+R6
+l0
+L116 1
+V;ML8d0dZz0fKc^]CaYB1B2
+!s100 7b@X_Md:W6m4cbYa=YzDo0
+R7
+33
+R15
+!i10b 1
+R16
+R10
+R11
+!i113 1
+R12
+R13
+Aarch
+R2
+R3
+R4
+Z17 DEx4 work 13 partial_if_id 0 22 ;ML8d0dZz0fKc^]CaYB1B2
+!i122 4
+l131
+Z18 L126 10
+Z19 Vdzn>ni?bf@DKCB18^l6fA0
+Z20 !s100 ClF<d9RL<doaaz:ofI8E;1
+R7
+33
+R15
+!i10b 1
+R16
+R10
+R11
+!i113 1
+R12
+R13
 Eregfile
 R1
 R2
@@ -610,10 +676,10 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Abehave
 R2
 R3
@@ -630,93 +696,93 @@ R8
 !i10b 1
 R9
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Etestbench
-R1
+R14
 R2
 R3
 R4
-!i122 0
+!i122 4
 R0
 R5
 R6
 l0
-L17 1
-V@l=^9zz[CN838`]12SF7U1
-!s100 l]XgGLCX5lEVOkolO77713
+L18 1
+VlD2U<b6iZ:2SiT5OU:AcB2
+!s100 >Fk2MM>oA@HO?[V7Y]1UT1
 R7
 33
-R8
+R15
 !i10b 1
-R9
+R16
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Atest
 R2
 R3
 R4
-DEx4 work 9 testbench 0 22 @l=^9zz[CN838`]12SF7U1
-!i122 0
-l28
-L20 42
-VH9:;iR<kmCLHXKMX3AiVa2
-!s100 DH1XUS0]Uk=gjz:hQeXXW1
+Z21 DEx4 work 9 testbench 0 22 lD2U<b6iZ:2SiT5OU:AcB2
+!i122 4
+l30
+Z22 L21 43
+Z23 V?HhIkGoPhF><FD]fBLDC=2
+Z24 !s100 BED28B^:kdhD89`;8dT=I1
 R7
 33
-R8
+R15
 !i10b 1
-R9
+R16
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Etop
-R1
+R14
 R2
 R3
 R4
-!i122 0
+!i122 4
 R0
 R5
 R6
 l0
-L65 1
-VF68Bal_GBEiQB63m;9X9R0
-!s100 QnNF6FbH]>mi4Ym10CXV92
+L68 1
+VDH2PRL[9ELIV?8NC>V1T82
+!s100 F=Yf4V9kkFPhOKH;;l[zg0
 R7
 33
-R8
+R15
 !i10b 1
-R9
+R16
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13
 Atest
 R2
 R3
 R4
-DEx4 work 3 top 0 22 F68Bal_GBEiQB63m;9X9R0
-!i122 0
-l91
-L71 28
-VQ?Vm?YoFYmBj>g_hh?d3=3
-!s100 d[KGP<?W<8ELoaK9=6W2I1
+Z25 DEx4 work 3 top 0 22 DH2PRL[9ELIV?8NC>V1T82
+!i122 4
+l98
+Z26 L75 33
+Z27 VlN]Vdl1g^d6U0d9O4gJ^b2
+Z28 !s100 Ef<SEQlJMVZaQP6XN8<OZ0
 R7
 33
-R8
+R15
 !i10b 1
-R9
+R16
 R10
-R13
-!i113 1
 R11
+!i113 1
 R12
+R13

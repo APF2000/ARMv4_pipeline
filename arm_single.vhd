@@ -277,7 +277,7 @@ entity partial_MEM_WB is
     MemtoRegW : out std_logic;
     ReadDataW : out std_logic;
     ALUOutW   : out std_logic_vector(31 downto 0);
-    WA3W      : out std_logic_vector(31 downto 0)
+    WA3W      : out std_logic_vector(3 downto 0)
   );
 end entity;
 
@@ -486,7 +486,7 @@ component partial_MEM_WB is
     RegWriteM : in std_logic;
     MemtoRegM : in std_logic;
     ALUOutM   : in std_logic_vector(31 downto 0);
-    WA3M      : in std_logic_vector(31 downto 0);
+    WA3M      : in std_logic_vector(3 downto 0);
     RD      : in std_logic_vector(31 downto 0);
 
     PCSrcW : out std_logic;
@@ -494,7 +494,7 @@ component partial_MEM_WB is
     MemtoRegW : out std_logic;
     ReadDataW : out std_logic;
     ALUOutW   : out std_logic_vector(31 downto 0);
-    WA3W      : out std_logic_vector(31 downto 0)
+    WA3W      : out std_logic_vector(3 downto 0)
   );
 end component;
 
@@ -506,7 +506,7 @@ component hazard_unit is
     reset : in std_logic;
     RA1E : in std_logic_vector(31 downto 0);
     RA2E : in std_logic_vector(31 downto 0);
-    WA3M : in std_logic_vector(31 downto 0);
+    WA3M : in std_logic_vector(3 downto 0);
     RegWriteM : in std_logic;
     RegWriteW : in std_logic;
     MemToRegE : in std_logic;
@@ -580,9 +580,9 @@ end component;
   -- CUIDADO COM A LINHA ACIMA, ELA ESTA AZUL CLARO
 
 
-  signal FlagWriteE : std_logic;
+  --signal FlagWriteE : std_logic;
   signal PCS, RegW, MemW : std_logic;
-  signal condE : std_logic_vector(3 downto 0);
+  --signal condE : std_logic_vector(3 downto 0);
 
   --signal RegWriteD, MemWriteD, PCSrcD : std_logic;
   --signal RegWriteE, MemWriteE, PCSrcE : std_logic;
@@ -600,13 +600,15 @@ end component;
   signal RD1D, RD2D, extendD : std_logic_vector(31 downto 0);
   signal WA3D : std_logic_vector(3 downto 0);
   signal CondD: std_logic_vector(3 downto 0);
-  --signal FlagsD : std_logic_vector(????);--[ver tamanho]
+  signal FlagsD : std_logic_vector(3 downto 0);--[ver tamanho]
   signal FLushE : std_logic;
 
   -- Execute
   signal PCSrcE, RegWriteE : std_logic;
   signal MemtoRegE, MemWriteE : std_logic;
   signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
+  signal ALUResultE : std_logic_vector(31 downto 0);
+  signal WriteDataE : std_logic_vector(31 downto 0);
   signal BranchE, ALUSrcE : std_logic;
   signal RD1E, RD2E, extendE : std_logic_vector(31 downto 0);
   signal WA3E : std_logic_vector(3 downto 0);
@@ -656,7 +658,7 @@ begin
   );
 
   inst_partial_IF_ID : partial_IF_ID port map (
-      clock => clock,
+      clock => clk,
 	  	reset => reset,
       instrF => instrF,
       stallD => stallD,
@@ -668,7 +670,7 @@ begin
   --------------------------------------------------------------------------
   
   inst_partial_ID_EX : partial_ID_EX port map (
-      clock => clock,
+      clock => clk,
 			reset => reset,
       PCSrcD => PCSrcD,
 			RegWriteD => RegWriteD,
@@ -678,10 +680,10 @@ begin
 			FlagWriteD => FlagWriteD,
       BranchD => BranchD,
 			ALUSrcD => ALUSrcD,
-      RD1D => D,
-			RD2D => D,
+      RD1D => RD1D,
+			RD2D => RD2D,
 			extendD => extendD,
-      WA3D => D,
+      WA3D => WA3D,
       CondD => CondD,
       FlagsD => FlagsD,--[ver tamanho]
       FLushE => FLushE,
@@ -694,10 +696,10 @@ begin
 			FlagWriteE => FlagWriteE,
       BranchE => BranchE,
 			ALUSrcE => ALUSrcE,
-      RD1E => E,
-			RD2E => E,
+      RD1E => RD1E,
+			RD2E => RD2E,
 			extendE => extendE,
-      WA3E => E,
+      WA3E => WA3E,
       CondE => CondE,
 
       FlagsE => FlagsE--[ver tamanho]
@@ -706,7 +708,7 @@ begin
   ------------------------------------------------------------------
   
   inst_partial_EX_MEM : partial_EX_MEM port map (
-      clock => clock,
+      clock => clk,
 			reset => reset,
   
       PCSrcE => PCSrcE,
@@ -716,7 +718,7 @@ begin
 			-- Sinais combinatorios
       ALUResultE => ALUResultE,
 			WriteDataE => WriteDataE,
-      WA3E => E,
+      WA3E => WA3E,
     
       PCSrcM => PCSrcM,
 			RegWriteM => RegWriteM,
@@ -725,27 +727,27 @@ begin
 			-- Sinais combinatorios
       ALUResultm => ALUResultm,
 			WriteDataM => WriteDataM,
-      WA3M => M
+      WA3M => WA3M
     );
   
   --------------------------------------------------------
   
   inst_partial_MEM_WB : partial_MEM_WB port map (
-      clock => clock,
+      clock => clk,
       
       PCSrcM => PCSrcM,
       RegWriteM => RegWriteM,
       MemtoRegM => MemtoRegM,
       ALUOutM => ALUOutM,
-      WA3M => M,
-      RD => RD,
+      WA3M => WA3M,
+      RD => ReadDataM,
   
       PCSrcW => PCSrcW,
       RegWriteW => RegWriteW,
       MemtoRegW => MemtoRegW,
       ReadDataW => ReadDataW,
       ALUOutW => ALUOutW,
-      WA3W => W
+      WA3W => WA3W
     );
   
 

@@ -146,7 +146,7 @@ entity partial_ID_EX is
     RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
-    FlagsD : out std_logic_vector();--[ver tamanho]
+    FlagsD : out std_logic_vector(3 downto 0);--[ver tamanho]
     FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
@@ -156,7 +156,7 @@ entity partial_ID_EX is
     RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
     CondE : in std_logic_vector(3 downto 0);
-    FlagsE : out std_logic_vector();--[ver tamanho]
+    FlagsE : out std_logic_vector(3 downto 0)--[ver tamanho]
   );
 end entity;
 
@@ -432,7 +432,7 @@ component partial_ID_EX is
     RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
-    FlagsD : out std_logic_vector();--[ver tamanho]
+    FlagsD : out std_logic_vector(3 downto 0);--[ver tamanho]
     FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
@@ -442,7 +442,7 @@ component partial_ID_EX is
     RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
     CondE : in std_logic_vector(3 downto 0);
-    FlagsE : out std_logic_vector()--[ver tamanho]
+    FlagsE : out std_logic_vector(3 downto 0)--[ver tamanho]
   );
 end component;
 
@@ -598,7 +598,7 @@ end component;
   signal RD1E, RD2E, extendE : std_logic_vector(31 downto 0);
   signal WA3E : std_logic_vector(3 downto 0);
   signal CondE : std_logic_vector(3 downto 0);
-  signal FlagsE : std_logic_vector();--[ver tamanho]
+  signal FlagsE : std_logic_vector(3 downto 0);--[ver tamanho]
 
   -- Memory
   signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios

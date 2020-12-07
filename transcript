@@ -1,5 +1,5 @@
 # vsim -c -do "run -all" testbench 
-# Start time: 19:22:26 on Nov 21,2020
+# Start time: 19:53:41 on Dec 07,2020
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -10,9 +10,6 @@
 # Loading work.arm(struct)
 # Loading work.controller(struct)
 # Loading work.decoder(behave)
-# Loading work.condlogic(behave)
-# Loading work.flopenr(asynchronous)
-# Loading work.condcheck(behave)
 # Loading work.datapath(struct)
 # Loading work.mux2(behave)
 # Loading work.flopr(asynchronous)
@@ -20,58 +17,18 @@
 # Loading work.regfile(behave)
 # Loading work.extend(behave)
 # Loading work.alu(behave)
+# Loading work.cond_unit(behave)
+# Loading work.flopenr(asynchronous)
+# Loading work.condcheck(behave)
+# Loading work.partial_if_id(arch)
+# Loading work.partial_id_ex(arch)
+# Loading work.partial_ex_mem(arch)
+# Loading work.partial_mem_wb(arch)
 # Loading work.imem(behave)
 # Loading work.dmem(behave)
-# run -all
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_imem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 2  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 2  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 30 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 30 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 100 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 100 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 140 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 140 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 190 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 190 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Failure: NO ERRORS: Simulation succeeded
-#    Time: 205 ns  Iteration: 1  Process: /testbench/line__51 File: arm_single.vhd
-# Break in Process line__51 at arm_single.vhd line 55
-# Stopped at arm_single.vhd line 55
-# End time: 19:38:59 on Nov 21,2020, Elapsed time: 0:16:33
-# Errors: 1, Warnings: 23
+# ** Fatal: (vsim-3808) Incompatible modes for port "FlagsD".
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/inst_partial_ID_EX File: arm_single.vhd Line: 688
+# FATAL ERROR while loading design
+# Error loading design
+# End time: 19:53:41 on Dec 07,2020, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0

@@ -269,7 +269,7 @@ entity partial_MEM_WB is
     RegWriteM : in std_logic;
     MemtoRegM : in std_logic;
     ALUOutM   : in std_logic_vector(31 downto 0);
-    WA3M      : in std_logic_vector(31 downto 0);
+    WA3M      : in std_logic_vector(3 downto 0);
     RD      : in std_logic_vector(31 downto 0);
 
     PCSrcW : out std_logic;
@@ -416,6 +416,7 @@ entity arm is -- single cycle processor
     clk, reset : in std_logic;
     PC : out std_logic_vector(31 downto 0);
     instr : in std_logic_vector(31 downto 0);
+    
     MemWrite : out std_logic;
     ALUResult, WriteData : out std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0));
@@ -429,7 +430,7 @@ component partial_IF_ID is
     instrF : in std_logic_vector(31 downto 0);
     stallD, flushD : in std_logic;
 
-    instrD : in std_logic_vector(31 downto 0)
+    instrD : out std_logic_vector(31 downto 0)
   );
 end component;
 
@@ -445,16 +446,16 @@ component partial_ID_EX is
     RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
-    FlagsD : out std_logic_vector(3 downto 0);--[ver tamanho]
+    FlagsD : in std_logic_vector(3 downto 0);--[ver tamanho]
     FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
     ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
     BranchE, ALUSrcE : out std_logic;
-    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
-    WA3E : in std_logic_vector(3 downto 0);
-    CondE : in std_logic_vector(3 downto 0);
+    RD1E, RD2E, extendE : out std_logic_vector(31 downto 0);
+    WA3E : out std_logic_vector(3 downto 0);
+    CondE : out std_logic_vector(3 downto 0);
     FlagsE : out std_logic_vector(3 downto 0)--[ver tamanho]
   );
 end component;
@@ -469,9 +470,9 @@ component partial_EX_MEM is
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
   
-    PCSrcM, RegWriteM, MemtoRegM, MemWriteM : in std_logic; -- Sinais combinatorios
-    ALUResultm, WriteDataM : in std_logic_vector(31 downto 0);
-    WA3M : in std_logic_vector(3 downto 0)
+    PCSrcM, RegWriteM, MemtoRegM, MemWriteM : out std_logic; -- Sinais combinatorios
+    ALUResultm, WriteDataM : out std_logic_vector(31 downto 0);
+    WA3M : out std_logic_vector(3 downto 0)
   );
 end component;
 

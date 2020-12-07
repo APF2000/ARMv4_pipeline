@@ -150,16 +150,16 @@ entity partial_ID_EX is
     RD1D, RD2D, extendD : in std_logic_vector(31 downto 0);
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
-    FlagsD : out std_logic_vector(3 downto 0);--[ver tamanho]
+    FlagsD : in std_logic_vector(3 downto 0);--[ver tamanho]
     FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
     ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
     BranchE, ALUSrcE : out std_logic;
-    RD1E, RD2E, extendE : in std_logic_vector(31 downto 0);
-    WA3E : in std_logic_vector(3 downto 0);
-    CondE : in std_logic_vector(3 downto 0);
+    RD1E, RD2E, extendE : out std_logic_vector(31 downto 0);
+    WA3E : out std_logic_vector(3 downto 0);
+    CondE : out std_logic_vector(3 downto 0);
     FlagsE : out std_logic_vector(3 downto 0)--[ver tamanho]
   );
 end entity;
@@ -173,7 +173,7 @@ architecture arch OF partial_ID_EX is
     signal s_R1D, s_R2D, s_extend : std_logic_vector(31 downto 0);
     signal s_WA3D : std_logic_vector(3 downto 0);
     signal s_Cond: std_logic_vector(3 downto 0);
-    --signal s_Flags : std_logic_vector();--[ver tamanho]
+    signal s_Flags : std_logic_vector(3 downto 0);--[ver tamanho]
 
 begin
     
@@ -190,7 +190,7 @@ begin
    s_extend <= extendD;
    s_WA3D <= WA3D;
    s_Cond <= CondD;
-   s_Flags <=FlagsD;
+   s_Flags <= FlagsD;
 
    PCSrcE <= s_PCSrc;
    RegWriteE <= s_RegWrite;
@@ -223,9 +223,9 @@ entity partial_EX_MEM is
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
   
-    PCSrcM, RegWriteM, MemtoRegM, MemWriteM : in std_logic; -- Sinais combinatorios
-    ALUResultm, WriteDataM : in std_logic_vector(31 downto 0);
-    WA3M : in std_logic_vector(3 downto 0)
+    PCSrcM, RegWriteM, MemtoRegM, MemWriteM : out std_logic; -- Sinais combinatorios
+    ALUResultm, WriteDataM : out std_logic_vector(31 downto 0);
+    WA3M : out std_logic_vector(3 downto 0)
   );
 end entity;
 
@@ -284,9 +284,6 @@ end entity;
 architecture arch OF partial_MEM_WB is
 
   --signal s_clock : std_logic;
-  signal s_PCSrc : std_logic;
-  signal s_RegWrite : std_logic;
-  signal s_MemtoReg : std_logic;
   signal s_PCSrc : std_logic;
   signal s_RegWrite : std_logic;
   signal s_MemtoReg : std_logic;

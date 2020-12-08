@@ -485,7 +485,7 @@ component partial_EX_MEM is
     WA3E : in std_logic_vector(3 downto 0);
   
     PCSrcM, RegWriteM, MemtoRegM, MemWriteM : out std_logic; -- Sinais combinatorios
-    ALUResultm, WriteDataM : out std_logic_vector(31 downto 0);
+    ALUResultM, WriteDataM : out std_logic_vector(31 downto 0);
     WA3M : out std_logic_vector(3 downto 0)
   );
 end component;
@@ -632,7 +632,7 @@ end component;
 
   -- Memory
   signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios
-  signal ALUResultm, WriteDataM : std_logic_vector(31 downto 0);
+  signal ALUResultM, WriteDataM : std_logic_vector(31 downto 0);
   signal WA3M : std_logic_vector(3 downto 0);
 
   signal ALUOutM : std_logic_vector(31 downto 0);
@@ -648,11 +648,32 @@ end component;
 
 
 begin
+
+  PCSrc <= PCSrcW; 
+  RegWrite <= RegWriteW;
+  MemWrite <= MemWriteM;
+
+  CondD <= instrD(31 downto 28);
+  instrF <= instr;
+  ALUResult <= ALUResultM;
+
+  WriteData <= WriteDataM;
+  ReadDataM <= ReadData;
+
+
+  PC <= PC;
+  
+  --WriteData : out std_logic_vector(31 downto 0);
+  --ReadData : in std_logic_vector(31 downto 0));
+
+  --PC : out std_logic_vector(31 downto 0);
+  --instr : in std_logic_vector(31 downto 0);
+
   cont : controller port map(
     clk, reset, instr(31 downto 12),
     --ALUFlags, 
     
-    RegSrc, RegWriteD,--RegWrite, 
+    RegSrc, RegWriteD,--RegWrite,
     ImmSrc,
     ALUSrc, ALUControl, MemWriteD,--MemWrite,
     MemtoReg, PCSrcD--PCSrc
@@ -661,7 +682,7 @@ begin
   dp : datapath port map(
     clk, reset, RegSrc, RegWrite, ImmSrc,
     ALUSrc, ALUControl, MemtoReg, PCSrc,
-    ALUFlags, PC, instr, ALUResult,
+    ALUFlags, PC, instr, ALUResultE,--ALUResult,
     WriteData, ReadData
   );
 
@@ -740,7 +761,7 @@ begin
 			MemtoRegM => MemtoRegM,
 			MemWriteM => MemWriteM,
 			-- Sinais combinatorios
-      ALUResultm => ALUResultm,
+      ALUResultM => ALUResultM,
 			WriteDataM => WriteDataM,
       WA3M => WA3M
     );
@@ -764,7 +785,6 @@ begin
       ALUOutW => ALUOutW,
       WA3W => WA3W
     );
-  
 
 end;
 

@@ -23,14 +23,40 @@ architecture test OF testbench is
     port (
       clk, reset : in std_logic;
       WriteData, DatAadr : out std_logic_vector(31 downto 0);
-      MemWrite : out std_logic);
+      MemWrite : out std_logic;
+
+      db_instrF : out std_logic_vector(31 downto 0);
+      --db_PC : out std_logic_vector(31 downto 0);
+      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+      db_ALUResultE : out std_logic_vector(31 downto 0);
+      db_WriteDataE : out std_logic_vector(31 downto 0);
+      db_ReadDataW : out std_logic_vector(31 downto 0);
+      db_ALUOutW : out std_logic_vector(31 downto 0)  
+    );
   end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
   signal clk, reset, MemWrite : std_logic;
+
+  signal db_instrF : std_logic_vector(31 downto 0);
+    --db_PC : std_logic_vector(31 downto 0);
+  signal db_RD1, db_RD2 : std_logic_vector(31 downto 0);
+  signal db_ALUResultE : std_logic_vector(31 downto 0);
+  signal db_WriteDataE : std_logic_vector(31 downto 0);
+  signal db_ReadDataW : std_logic_vector(31 downto 0);
+  signal db_ALUOutW : std_logic_vector(31 downto 0);  
+
 begin
 
   -- instantiate device to be tested
-  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite);
+  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
+    db_instrF,
+    db_RD1, 
+    db_RD2,
+    db_ALUResultE,
+    db_WriteDataE,
+    db_ReadDataW,
+    db_ALUOutW 
+  );
 
   -- Generate clock with 10 ns period
   PROCESS begin
@@ -60,7 +86,7 @@ begin
       end IF;
     end IF;
   end PROCESS;
-end;
+end architecture;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -69,7 +95,16 @@ entity top is -- top-level design for testing
   port (
     clk, reset : in std_logic;
     WriteData, DataAdr : BUFFER std_logic_vector(31 downto 0);
-    MemWrite : BUFFER std_logic);
+    MemWrite : BUFFER std_logic;
+
+    db_instrF : out std_logic_vector(31 downto 0);
+    --db_PC : out std_logic_vector(31 downto 0);
+    db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+    db_ALUResultE : out std_logic_vector(31 downto 0);
+    db_WriteDataE : out std_logic_vector(31 downto 0);
+    db_ReadDataW : out std_logic_vector(31 downto 0);
+    db_ALUOutW : out std_logic_vector(31 downto 0)    
+  );
 end;
 
 architecture test OF top is
@@ -80,7 +115,16 @@ architecture test OF top is
       instr : in std_logic_vector(31 downto 0);
       MemWrite : out std_logic;
       ALUResult, WriteData : out std_logic_vector(31 downto 0);
-      ReadData : in std_logic_vector(31 downto 0));
+      ReadData : in std_logic_vector(31 downto 0);
+
+      db_instrF : out std_logic_vector(31 downto 0);
+      --db_PC : out std_logic_vector(31 downto 0);
+      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+      db_ALUResultE : out std_logic_vector(31 downto 0);
+      db_WriteDataE : out std_logic_vector(31 downto 0);
+      db_ReadDataW : out std_logic_vector(31 downto 0);
+      db_ALUOutW : out std_logic_vector(31 downto 0)
+    );
   end component;
   component imem
     port (
@@ -100,7 +144,16 @@ begin
   -- instantiate processor and memories
   i_arm : arm port map(
     clk, reset, PC, instr, MemWrite, DataAdr,
-    WriteData, ReadData);
+    WriteData, ReadData,
+    db_instrF,
+    db_RD1,
+    db_RD2,
+    db_ALUResultE,
+    db_WriteDataE,
+    db_ReadDataW,
+    db_ALUOutW
+  );
+
   i_imem : imem port map(PC, instr);
   i_dmem : dmem port map(
     clk, MemWrite, DataAdr,
@@ -433,7 +486,16 @@ entity arm is -- single cycle processor
     
     MemWrite : out std_logic;
     ALUResult, WriteData : out std_logic_vector(31 downto 0);
-    ReadData : in std_logic_vector(31 downto 0));
+    ReadData : in std_logic_vector(31 downto 0);
+
+    db_instrF : out std_logic_vector(31 downto 0);
+    --db_PC : out std_logic_vector(31 downto 0);
+    db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+    db_ALUResultE : out std_logic_vector(31 downto 0);
+    db_WriteDataE : out std_logic_vector(31 downto 0);
+    db_ReadDataW : out std_logic_vector(31 downto 0);
+    db_ALUOutW : out std_logic_vector(31 downto 0)
+  );
 end;
 
 architecture struct OF arm is
@@ -589,7 +651,8 @@ port (
   MemWrite : out std_logic);
 end component;
 
-  signal RegWrite, ALUSrc, MemtoReg, PCSrc : std_logic;
+  signal RegWrite : std_logic;--, ALUSrc, 
+  --signal MemtoReg, PCSrc : std_logic;
   signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
   signal ALUFlags : std_logic_vector(3 downto 0);
   -- CUIDADO COM A LINHA ACIMA, ELA ESTA AZUL CLARO
@@ -619,7 +682,7 @@ end component;
   signal FLushE : std_logic;
 
   -- Execute
-  signal PCSrcE, RegWriteE : std_logic;
+  signal PCSrcE1, PCSrcE2, RegWriteE1, RegWriteE2 : std_logic;
   signal MemtoRegE, MemWriteE1, MemWriteE2 : std_logic;
   signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
   signal ALUResultE : std_logic_vector(31 downto 0);
@@ -649,7 +712,7 @@ end component;
 
 begin
 
-  PCSrc <= PCSrcW; 
+  --PCSrc <= PCSrcW; 
   RegWrite <= RegWriteW;
   MemWrite <= MemWriteM;
 
@@ -662,6 +725,15 @@ begin
 
 
   PC <= PC;
+
+  db_instrF <= instrF;
+  --db_PC <= 
+  db_RD1 <= RD1D; 
+  db_RD2 <= RD2D;
+  db_ALUResultE <= ALUResultE;
+  db_WriteDataE <= WriteDataE;
+  db_ReadDataW <= ReadDataW;
+  db_ALUOutW <= ALUOutW;
   
   --WriteData : out std_logic_vector(31 downto 0);
   --ReadData : in std_logic_vector(31 downto 0));
@@ -670,27 +742,29 @@ begin
   --instr : in std_logic_vector(31 downto 0);
 
   cont : controller port map(
-    clk, reset, instr(31 downto 12),
+    clk, reset, 
+    instr(31 downto 12),
     --ALUFlags, 
     
     RegSrc, RegWriteD,--RegWrite,
     ImmSrc,
-    ALUSrc, ALUControl, MemWriteD,--MemWrite,
-    MemtoReg, PCSrcD--PCSrc
+    ALUSrcD, ALUControlD, MemWriteD,--MemWrite,
+    MemtoRegD, PCSrcD--PCSrc
   );
 
   dp : datapath port map(
-    clk, reset, RegSrc, RegWrite, ImmSrc,
-    ALUSrc, ALUControl, MemtoReg, PCSrc,
-    ALUFlags, PC, instr, ALUResultE,--ALUResult,
-    WriteData, ReadData
+    clk, reset, RegSrc, RegWriteW, ImmSrc,
+    ALUSrcE, ALUControlE,
+    MemtoRegW, PCSrcW,
+    ALUFlags, PC, instrD, ALUResultE,--ALUResult,
+    WriteDataE, ReadDataW
   );
 
   cl : cond_unit port map(
     clk, reset, condE,--instr(31 downto 28),
     ALUFlags, FlagWriteE,
-    PCSrcE, RegWriteE, MemWriteE1, -- entradas transplantadas
-    PCSrc, RegWrite, MemWriteE2--MemWrite
+    PCSrcE1, RegWriteE1, MemWriteE1, -- entradas transplantadas
+    PCSrcE2, RegWriteE2, MemWriteE2--MemWrite
   );
 
   inst_partial_IF_ID : partial_IF_ID port map (
@@ -724,8 +798,8 @@ begin
       FlagsD => FlagsD,--[ver tamanho]
       FLushE => FLushE,
   
-      PCSrcE => PCSrcE,
-			RegWriteE => RegWriteE,
+      PCSrcE => PCSrcE1,
+			RegWriteE => RegWriteE1,
       MemtoRegE => MemtoRegE,
 			MemWriteE => MemWriteE1,
       ALUControlE => ALUControlE,
@@ -747,8 +821,8 @@ begin
       clock => clk,
 			reset => reset,
   
-      PCSrcE => PCSrcE,
-			RegWriteE => RegWriteE,
+      PCSrcE => PCSrcE2,
+			RegWriteE => RegWriteE2,
 			MemtoRegE => MemtoRegE,
 			MemWriteE => MemWriteE2,
 			-- Sinais combinatorios
@@ -786,7 +860,7 @@ begin
       WA3W => WA3W
     );
 
-end;
+end architecture;
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -1039,10 +1113,12 @@ architecture struct OF datapath is
       s : in std_logic;
       y : out std_logic_vector(width - 1 downto 0));
   end component;
+
   signal PCNext, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
   signal ExtImm, Result : std_logic_vector(31 downto 0);
   signal SrcA, SrcB : std_logic_vector(31 downto 0);
   signal RA1, RA2 : std_logic_vector(3 downto 0);
+
 begin
   -- next PC logic
   pcmux : mux2 GENERIC map(32)

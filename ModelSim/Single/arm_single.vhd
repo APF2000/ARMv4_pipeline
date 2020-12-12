@@ -332,7 +332,8 @@ end;
 
 library IEEE; use IEEE.STD_LOGIC_1164.all;
 entity condlogic is -- Conditional logic
-  port(clk, reset:       in  STD_LOGIC;
+  port(
+      clk, reset:       in  STD_LOGIC;
        Cond:             in  STD_LOGIC_VECTOR(3 downto 0);
        ALUFlags:         in  STD_LOGIC_VECTOR(3 downto 0);
        FlagW:            in  STD_LOGIC_VECTOR(1 downto 0);

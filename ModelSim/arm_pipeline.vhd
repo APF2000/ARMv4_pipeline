@@ -709,6 +709,9 @@ end component;
   signal ALUOutW : std_logic_vector(31 downto 0);
   signal WA3W : std_logic_vector(3 downto 0);
 
+  -- Datapath
+  signal s_PC : std_logic_vector(31 downto 0);
+
 
 begin
 
@@ -724,7 +727,7 @@ begin
   ReadDataM <= ReadData;
 
 
-  PC <= PC;
+  PC <= s_PC;
 
   db_instrF <= instrF;
   --db_PC <= 
@@ -756,7 +759,7 @@ begin
     clk, reset, RegSrc, RegWriteW, ImmSrc,
     ALUSrcE, ALUControlE,
     MemtoRegW, PCSrcW,
-    ALUFlags, PC, instrD, ALUResultE,--ALUResult,
+    ALUFlags, s_PC, instrD, ALUResultE,--ALUResult,
     WriteDataE, ReadDataW
   );
 

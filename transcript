@@ -1,5 +1,5 @@
 # vsim -c -do "run -all" testbench 
-# Start time: 20:03:21 on Dec 07,2020
+# Start time: 20:11:40 on Dec 07,2020
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -25,53 +25,17 @@
 # run -all
 # ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
 #    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+# ** Warning: (vsim-7) Failed to open VHDL file "memfile.dat" in r mode.
+# No such file or directory. (errno = ENOENT)
 #    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_imem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 1  Instance: /testbench/dut/i_arm/dp/rf
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 0 ps  Iteration: 2  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 0 ps  Iteration: 2  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 30 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 30 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 100 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 100 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 140 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 140 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
-#    Time: 190 ns  Iteration: 9  Instance: /testbench/dut/i_dmem
-# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
-#    Time: 190 ns  Iteration: 9  Instance: /testbench/dut/i_arm/dp/i_alu
-# ** Failure: NO ERRORS: Simulation succeeded
-#    Time: 205 ns  Iteration: 1  Process: /testbench/line__51 File: arm_single.vhd
-# Break in Process line__51 at arm_single.vhd line 55
-# Stopped at arm_single.vhd line 55
-# End time: 20:03:32 on Dec 07,2020, Elapsed time: 0:00:11
-# Errors: 1, Warnings: 23
+# ** Fatal: (vsim-7) Failed to open VHDL file "memfile.dat" in r mode.
+# No such file or directory. (errno = ENOENT)
+#    Time: 0 ps  Iteration: 0  Process: /testbench/dut/i_imem/line__138 File: ModelSim/arm_single.vhd
+# Fatal error in Process line__138 at ModelSim/arm_single.vhd line 153
+# 
+# HDL call sequence:
+# Stopped at ModelSim/arm_single.vhd 153 Process line__138
+# 
+# Break key hit
+# End time: 20:12:04 on Dec 07,2020, Elapsed time: 0:00:24
+# Errors: 1, Warnings: 2

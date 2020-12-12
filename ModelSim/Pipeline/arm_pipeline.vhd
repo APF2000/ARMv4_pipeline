@@ -246,7 +246,7 @@ begin
    s_extend <= extendD;
    s_WA3D <= WA3D;
    s_Cond <= CondD;
-   s_Flags <= FlagsD;
+   s_Flags <= Flags;
 
    PCSrcE <= s_PCSrc;
    RegWriteE <= s_RegWrite;
@@ -436,7 +436,7 @@ begin
     FILE mem_file : TEXT;
     VARIABLE L : line;
     VARIABLE ch : CHARACTER;
-    VARIABLE i, index, result : inTEGER;
+    VARIABLE i, index, result : integer;
     TYPE ramtype is ARRAY (63 downto 0) OF
     std_logic_vector(31 downto 0);
     VARIABLE mem : ramtype;
@@ -459,7 +459,7 @@ begin
         ELSIF 'A' <= ch AND ch <= 'F' THEN
           result := CHARACTER'pos(ch) - CHARACTER'pos('A') + 10;
         ELSE
-          REport "Format error on line " & inTEGER'image(index)
+          REport "Format error on line " & integer'image(index)
             SEVERITY error;
         end IF;
         mem(index)(35 - i * 4 downto 32 - i * 4) :=
@@ -557,52 +557,47 @@ component controller
       PC : BUFFER std_logic_vector(31 downto 0);
       instr : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
-      ReadData : in std_logic_vector(31 downto 0));
+      ReadData : in std_logic_vector(31 downto 0);
+      MemWrite : out std_logic
+    );
   end component; 
-  
---------------------------------------------------
-
-component cond_unit
-port (
-  clk, reset : in std_logic;
-  Cond : in std_logic_vector(3 downto 0);
-  ALUFlags : in std_logic_vector(3 downto 0);
-  FlagW : in std_logic_vector(1 downto 0);
-  PCS, RegW, MemW : in std_logic;
-
-  PCSrc, RegWrite : out std_logic;
-  MemWrite : out std_logic);
-end component;
-
 
 begin
 
   cont : controller port map(
-    clk, reset, 
-    instr(31 downto 12),
+    clk => clk, 
+    reset => reset, 
+    instr => instr(31 downto 12),
     --ALUFlags, 
-    
-    RegSrc, RegWriteD,--RegWrite,
-    ImmSrc,
-    ALUSrcD, ALUControlD, MemWriteD,--MemWrite,
-    MemtoRegD, PCSrcD--PCSrc
+    RegSrc => RegSrc,
+    RegWrite => RegWriteD,--RegWrite,
+    ImmSrc => ImmSrc,
+    ALUSrc => ALUSrcD, 
+    ALUControl => ALUControlD, 
+    MemWrite => MemWriteD,--MemWrite,
+    MemToReg => MemtoRegD, 
+    PCSrc => PCSrcD--PCSrc
   );
 
-  dp : datapath port map(
-    clk, reset, RegSrc, RegWriteW, ImmSrc,
-    ALUSrcE, ALUControlE,
-    MemtoRegW, PCSrcW,
-    ALUFlags, s_PC, instrD, ALUResultE--,--ALUResult,
-    --WriteDataE, ReadDataW
+  dp : datapath
+  port map (
+    clk => clk, 
+    reset => reset,
+    RegSrc => RegSrc,
+    RegWrite => RegWriteW,
+    ImmSrc => ImmSrc,
+    ALUSrc => ALUSrcE,
+    ALUControl => ALUControlE,
+    MemtoReg => MemtoRegW,
+    PCSrc => PCSrcW,
+    ALUFlags => ALUFlags,
+    PC => s_PC,
+    instr => instrD,
+    ALUResult => ALUResultE, 
+    WriteData => WriteDataE,
+    ReadData => ReadDataW,
+    MemWrite => MemWRite
   );
-
-  cl : cond_unit port map(
-    clk, reset, condE,--instr(31 downto 28),
-    ALUFlags, FlagWriteE,
-    PCSrcE1, RegWriteE1, MemWriteE1, -- entradas transplantadas
-    PCSrcE2, RegWriteE2, MemWriteE2--MemWrite
-  );
-
 end architecture;
 
 library IEEE;
@@ -722,7 +717,9 @@ entity cond_unit is -- Conditional logic
     ALUFlags : in std_logic_vector(3 downto 0);
     FlagW : in std_logic_vector(1 downto 0);
     PCS, RegW, MemW : in std_logic;
+    FlagsE: in std_logic_vector(3 downto 0);
 
+    Flags: out std_logic_vector(3 downto 0);
     PCSrc, RegWrite : out std_logic;
     MemWrite : out std_logic);
 end;
@@ -734,7 +731,7 @@ architecture behave OF cond_unit is
       Flags : in std_logic_vector(3 downto 0);
       CondEx : out std_logic);
   end component;
-  component flopenr GENERIC (width : inTEGER);
+  component flopenr generic (width : integer);
     port (
       clk, reset, en : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
@@ -744,12 +741,12 @@ architecture behave OF cond_unit is
   signal Flags : std_logic_vector(3 downto 0);
   signal CondEx : std_logic;
 begin
-  flagreg1 : flopenr GENERIC map(2)
+  flagreg1 : flopenr generic map(2)
   port map(
     clk, reset, FlagWrite(1),
     ALUFlags(3 downto 2), Flags(3 downto 2));
 
-  flagreg0 : flopenr GENERIC map(2)
+  flagreg0 : flopenr generic map(2)
   port map(
     clk, reset, FlagWrite(0),
     ALUFlags(1 downto 0), Flags(1 downto 0));
@@ -814,10 +811,12 @@ entity datapath is
     PC : BUFFER std_logic_vector(31 downto 0);
     instr : in std_logic_vector(31 downto 0);
     ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
-    ReadData : in std_logic_vector(31 downto 0));
+    ReadData : in std_logic_vector(31 downto 0);
+    MemWrite : out std_logic;
+    FlagWrite : in std_logic_vector(1 downto 0); --confirmar se tamanho esta certo e adicionar na top level entity
+    Branch : in std_logic; --adicionar na top level entity
+  );
 end;
-
-
 
 architecture struct OF datapath is
 
@@ -897,6 +896,20 @@ component partial_MEM_WB is
 end component;
 
 ---------------------------------------------------------
+component cond_unit
+port (
+  clk, reset : in std_logic;
+  Cond : in std_logic_vector(3 downto 0);
+  ALUFlags : in std_logic_vector(3 downto 0);
+  FlagW : in std_logic_vector(1 downto 0);
+  PCS, RegW, MemW : in std_logic;
+  FlagsE: in std_logic_vector(3 downto 0);
+
+  Flags: out std_logic_vector(3 downto 0);
+  PCSrc, RegWrite : out std_logic;
+  MemWrite : out std_logic);
+end component;
+-----------------------------------------------------------
 
   component alu
     port (
@@ -924,23 +937,29 @@ end component;
       ImmSrc : in std_logic_vector(1 downto 0);
       ExtImm : out std_logic_vector(31 downto 0));
   end component;
-  component flopr GENERIC (width : inTEGER);
+  component flopr generic (width : integer);
     port (
       clk, reset : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
   end component;
-  component mux2 GENERIC (width : inTEGER);
+  component mux2 generic (width : integer);
     port (
       d0, d1 : in std_logic_vector(width - 1 downto 0);
       s : in std_logic;
       y : out std_logic_vector(width - 1 downto 0));
   end component;
+  component mux4 generic (width : integer);
+    port (
+      d0, d1, d2, d3 : in std_logic_vector(width - 1 downto 0);
+      s : in std_logic;
+      y : out std_logic_vector(width - 1 downto 0));
+  end component;
 
   signal PCNext, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
-  signal ExtImm, Result : std_logic_vector(31 downto 0);
+  signal ExtImm : std_logic_vector(31 downto 0);
   signal SrcA, SrcB : std_logic_vector(31 downto 0);
-  signal RA1, RA2 : std_logic_vector(3 downto 0);
+  signal RA1D, RA2D : std_logic_vector(3 downto 0);
 
   --WriteData : out std_logic_vector(31 downto 0);
  --ReadData : in std_logic_vector(31 downto 0));
@@ -948,10 +967,12 @@ end component;
  --PC : out std_logic_vector(31 downto 0);
  --instr : in std_logic_vector(31 downto 0);
 
- signal RegWrite : std_logic;--, ALUSrc, 
+ --signal RegWrite : std_logic;--, ALUSrc, 
  --signal MemtoReg, PCSrc : std_logic;
- signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
+ --signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
  signal ALUFlags : std_logic_vector(3 downto 0);
+
+
  -- CUIDADO COM A LINHA ACIMA, ELA ESTA AZUL CLARO
 
 
@@ -975,7 +996,7 @@ end component;
  signal RD1D, RD2D, extendD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
- signal FlagsD : std_logic_vector(3 downto 0);--[ver tamanho]
+ signal Flags : std_logic_vector(3 downto 0);--[ver tamanho]
  signal FLushE : std_logic;
 
  -- Execute
@@ -1005,63 +1026,201 @@ end component;
  signal ReadDataW : std_logic_vector(31 downto 0);
  signal ALUOutW : std_logic_vector(31 downto 0);
  signal WA3W : std_logic_vector(3 downto 0);
+ signal ResultW : std_logic_vector(31 downto 0);
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
  
+ --Registradores de pipeline
+ -------ID-EX
+ signal s_RD1D, s_RD2D, s_extendD : std_logic_vector(31 downto 0);
+ signal s_WA3D : in std_logic_vector(3 downto 0);
 
 begin
   -- next PC logic
-  pcmux : mux2 GENERIC map(32)
-  port map(PCPlus4, Result, PCSrc, PCNext);
-  pcreg : flopr GENERIC map(32) port map(clk, reset, PCNext, PC);
-  pcadd1 : adder port map(PC, X"00000004", PCPlus4);
-  pcadd2 : adder port map(PCPlus4, X"00000004", PCPlus8);
+  pcmux : mux2
+  generic map(width => 32)
+  port map(
+    d0 => PCPlus4, --DEPOIS MUDAR PRO PIPELINE
+    d1 => ResultW,
+    s => PCSrcW,
+    y => PCNext
+  );
 
-  -- register file logic
-  ra1mux : mux2 GENERIC map(4)
-  port map(instr(19 downto 16), "1111", RegSrc(0), RA1);
-  ra2mux : mux2 GENERIC map(
-    4) port map(instr(3 downto 0),
-    instr(15 downto 12), RegSrc(1), RA2);
-  rf : regfile port map(
-    clk, RegWrite, RA1, RA2,
-    instr(15 downto 12), Result,
-    PCPlus8, SrcA, WriteData);
-  resmux : mux2 GENERIC map(32)
-  port map(ALUResult, ReadData, MemtoReg, Result);
-  ext : extend port map(instr(23 downto 0), ImmSrc, ExtImm);
+  pcreg : flopr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para pro enanble
+  generic map(width => 32)
+  port map(
+    clk => clk,
+    reset => reset,
+    d => PCNext,
+    q => PC
+  );
+
+  pcadd1 : adder 
+  port map(
+    a => PC,
+    b => X"00000004",
+    y => PCPlus4
+  );
+  
+  pcadd2 : adder --[MUDAR QUANDO FOR PIPELINE] apaga-lo
+  port map(
+    a => PCPlus4,
+    b => X"00000004",
+    y => PCPlus8
+  );
+
+  -- register file logic [MUDAR QUANDO FOR PIPELINE] Passarao a ser controlados por RegSrcD
+  ra1mux : mux2 
+  generic map(width => 4)
+  port map
+  (
+    d0 => instrD(19 downto 16),
+    d1 => "1111",
+    s => RegSrc(0),
+    y => RA1D
+  );
+
+  ra2mux : mux2 
+  generic map(width => 4)
+  port map(
+    d0 => instrD(3 downto 0),
+    d1 => instrD(15 downto 12),
+    s => RegSrc(1),
+    y => RA2D
+  );
+
+  rf : regfile port map
+  (
+    clk => clk,
+    we3 => RegWrite,
+    ra1 => RA1D,
+    ra2 => RA2D,
+    wa3 => instrD(15 downto 12),
+    wd3 => ResultW,
+    r15 => PCPlus8,
+    rd1 => SrcA, -- [VERIFICAR] Deve entrar em partial_ID_EX
+    rd2 => WriteData -- [VERIFICAR] Deve entrar em partial_ID_EX
+  );
+
+  resmux : mux2 
+  generic map(width => 32)
+  port map
+  (
+    d0 => ALUOutW,--ALUResult,
+    d1 => ReadDataW,--ReadData,
+    s => MemToRegW, -- [VERIFICAR] Sinais devem estar vindo do partial_MEM_WB 
+    y => ResultW
+  );
+  ext : extend
+  port map
+  (
+    instr => instrD(23 downto 0),
+    ImmSrc => ImmSrc, -- [VERIFICAR] sinal ImmSrc vem direto da Control Unit
+    ExtImm => ExtImm -- [VERIFICAR] Passar a saida para partial_ID_EX
+  );
 
   -- ALU logic
-  srcbmux : mux2 GENERIC map(32)
-  port map(WriteData, ExtImm, ALUSrc, SrcB);
-  i_alu : alu port map(SrcA, SrcB, ALUControl, ALUResult, ALUFlags);
+  srcbmux : mux2 
+  generic map(width => 32) --[MUDAR PRO PIPELINE] d0(outro mux intermediario) d1(partial_ID_EX ExtImmE)
+  port map
+  (
+    d0 => WriteData,
+    d1 => ExtImm,
+    s => ALUSrc,
+    y => SrcB
+  );
 
+  /*srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX),d1(ResultW),d2(partial_EX_MEM AluResultM)
+  generic map (width => 32);
+  port map (
+    d0 => WriteData, 
+    d1 => ExtImm, 
+    d2 => (others => '0'), 
+    d3 => (others => '0'),
+    s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
+    y => SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
+  );*/
 
- --PCSrc <= PCSrcW; 
- RegWrite <= RegWriteW;
- MemWrite <= MemWriteM;
+  
+   
+  /*srcamux : mux4 
+  generic map (width => 32);
+  port map 
+  (
+    d0 => WriteData, -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    d1 => ExtImm, -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    d2 => (others => '0'), 
+    d3 => (others => '0'),
+    s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    y => SrcB
+  );*/
+  
 
+  i_alu : alu
+  port map
+  (
+    a => SrcA, 
+    b => SrcB,
+    ALUControl => ALUControl,
+    Result => ALUResultE,--ALUResult,
+    ALUFlags => ALUFlags
+  );
+
+-- Entradas e saidas desta entidade (estao abaixo)
+    --PCSrc <= PCSrcW; 
+    RegWrite <= RegWriteW;
+    MemWrite <= MemWriteM;
+    instrF <= instr;
+
+    ALUResult <= ALUResultM;
+    WriteData <= WriteDataM;
+    ReadDataM <= ReadData;
+    MemWrite <= MemWriteM; --saida do datapath
+
+    PC <= s_PC;
+
+    db_instrF <= instrF;
+    --db_PC <= 
+    db_RD1 <= RD1D; 
+    db_RD2 <= RD2D;
+    db_ALUResultE <= ALUResultE;
+    db_WriteDataE <= WriteDataE;
+    db_ReadDataW <= ReadDataW;
+    db_ALUOutW <= ALUOutW;
+
+ --------------------------------------------------
  CondD <= instrD(31 downto 28);
- instrF <= instr;
- ALUResult <= ALUResultM;
 
- WriteData <= WriteDataM;
- ReadDataM <= ReadData;
+ ---------------------------------------------------------
+ --Registradores de Pipeline
 
 
- PC <= s_PC;
 
- db_instrF <= instrF;
- --db_PC <= 
- db_RD1 <= RD1D; 
- db_RD2 <= RD2D;
- db_ALUResultE <= ALUResultE;
- db_WriteDataE <= WriteDataE;
- db_ReadDataW <= ReadDataW;
- db_ALUOutW <= ALUOutW;
+cl : cond_unit 
+port map
+(
+  clk => clk, 
+  reset => reset,
+  Cond => condE,--instr(31 downto 28),
+  ALUFlags => ALUFlags,
+  FlagW => FlagWriteE,
+  FlagsE => FlagsE, --adicionar sinal e adicionar Flags E na entidade cond_unit
+  
+  Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
+  PCS => PCSrcE1, -- entradas transplantadas
+  RegW => RegWriteE1, -- entradas transplantadas
+  MemW => MemWriteE1,-- entradas transplantadas
 
- inst_partial_IF_ID : partial_IF_ID port map (
+  PCSrc => PCSrcE2, 
+  RegWrite => RegWriteE2,
+  MemWrite => MemWriteE2--MemWrite
+);
+
+
+ inst_partial_IF_ID : partial_IF_ID 
+ port map 
+ (
   clock => clk,
   reset => reset,
   instrF => instrF,
@@ -1073,24 +1232,26 @@ begin
 
 --------------------------------------------------------------------------
 
-inst_partial_ID_EX : partial_ID_EX port map (
+inst_partial_ID_EX : partial_ID_EX
+port map 
+(
   clock => clk,
   reset => reset,
-  PCSrcD => PCSrcD,
-  RegWriteD => RegWriteD,
-  MemtoRegD => MemtoRegD,
-  MemWriteD => MemWriteD,
-  ALUControlD => ALUControlD,
-  FlagWriteD => FlagWriteD,
-  BranchD => BranchD,
-  ALUSrcD => ALUSrcD,
+  PCSrcD => PCSrc,
+  RegWriteD => RegWrite,
+  MemtoRegD => MemtoReg,
+  MemWriteD => MemWrite,
+  ALUControlD => ALUControl,
+  FlagWriteD => FlagWrite,
+  BranchD => Branch,
+  ALUSrcD => ALUSrc,
   RD1D => RD1D,
   RD2D => RD2D,
   extendD => extendD,
   WA3D => WA3D,
   CondD => CondD,
-  FlagsD => FlagsD,--[ver tamanho]
-  FLushE => FLushE,
+  FlagsD => Flags,
+  FLushE => reset --trocar pelo input FlushE do hazard unit
 
   PCSrcE => PCSrcE1,
   RegWriteE => RegWriteE1,
@@ -1106,12 +1267,14 @@ inst_partial_ID_EX : partial_ID_EX port map (
   WA3E => WA3E,
   CondE => CondE,
 
-  FlagsE => FlagsE--[ver tamanho]
+  FlagsE => FlagsE
 );
 
 ------------------------------------------------------------------
 
-inst_partial_EX_MEM : partial_EX_MEM port map (
+inst_partial_EX_MEM : partial_EX_MEM 
+port map 
+(
   clock => clk,
   reset => reset,
 
@@ -1128,20 +1291,23 @@ inst_partial_EX_MEM : partial_EX_MEM port map (
   RegWriteM => RegWriteM,
   MemtoRegM => MemtoRegM,
   MemWriteM => MemWriteM,
+  
   -- Sinais combinatorios
-  ALUResultM => ALUResultM,
+  ALUResultM => ALUOutM,
   WriteDataM => WriteDataM,
   WA3M => WA3M
 );
 
 --------------------------------------------------------
 
-inst_partial_MEM_WB : partial_MEM_WB port map (
+inst_partial_MEM_WB : partial_MEM_WB 
+port map (
   clock => clk,
   
   PCSrcM => PCSrcM,
   RegWriteM => RegWriteM,
   MemtoRegM => MemtoRegM,
+  
   ALUOutM => ALUOutM,
   WA3M => WA3M,
   RD => ReadDataM,
@@ -1233,7 +1399,7 @@ end;
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity flopenr is -- flip-flop with enable and asynchronous reset
-  GENERIC (width : inTEGER);
+  generic (width : integer);
   port (
     clk, reset, en : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
@@ -1256,7 +1422,7 @@ end;
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity flopr is -- flip-flop with asynchronous reset
-  GENERIC (width : inTEGER);
+  generic (width : integer);
   port (
     clk, reset : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
@@ -1277,7 +1443,7 @@ end;
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity mux2 is -- two-input multiplexer
-  GENERIC (width : inTEGER);
+  generic (width : integer);
   port (
     d0, d1 : in std_logic_vector(width - 1 downto 0);
     s : in std_logic;
@@ -1288,4 +1454,26 @@ architecture behave OF mux2 is
 begin
   y <= d1 WHEN s ELSE
     d0;
+end;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+entity mux4 is -- two-input multiplexer
+  generic (width : integer);
+  port (
+    d0, d1, d2, d3 : in std_logic_vector(width - 1 downto 0);
+    s : in std_logic_vector(1 downto 0);
+    y : out std_logic_vector(width - 1 downto 0));
+end;
+
+architecture behave OF mux2 is
+begin
+  with s select
+    y <=
+      d0 when "00",
+      d1 when "01",
+      d2 when "10",
+      d3 when "11",
+      d0 when others;
+  
 end;

@@ -1148,8 +1148,8 @@ begin
   generic map (width => 32);
   port map 
   (
-    d0 => WriteData, -- [MUDAR PRO PIPELINE] utilizar ForwardAE
-    d1 => ExtImm, -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    d0 => WriteData, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX),d1(ResultW),d2(partial_EX_MEM AluResultM)
+    d1 => ExtImm, 
     d2 => (others => '0'), 
     d3 => (others => '0'),
     s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] utilizar ForwardAE

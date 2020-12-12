@@ -562,12 +562,68 @@ component controller
     );
   end component; 
 
+  -- [MUDAR PIPELINE] NEM TODOS OS SINAIS ABAIXO SAO NECESSARIOS AQUI
+  -- PODE TIRAR AS REDUNDANCIAS DEPOIS
+
+ -- Fetch
+ signal instrF : std_logic_vector(31 downto 0);
+
+ -- Decode
+ signal stallD, flushD : std_logic;
+ signal instrD : std_logic_vector(31 downto 0);
+ signal PCSrcD, RegWriteD : std_logic;
+ signal MemtoRegD, MemWriteD : std_logic;
+ signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
+ signal BranchD, ALUSrcD : std_logic;
+ signal RD1D, RD2D, extendD : std_logic_vector(31 downto 0);
+ signal WA3D : std_logic_vector(3 downto 0);
+ signal CondD: std_logic_vector(3 downto 0);
+ signal Flags : std_logic_vector(3 downto 0);--[ver tamanho]
+ signal FLushE : std_logic;
+
+ -- Execute
+ signal PCSrcE1, PCSrcE2, RegWriteE1, RegWriteE2 : std_logic;
+ signal MemtoRegE, MemWriteE1, MemWriteE2 : std_logic;
+ signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
+ signal ALUResultE : std_logic_vector(31 downto 0);
+ signal WriteDataE : std_logic_vector(31 downto 0);
+ signal BranchE, ALUSrcE : std_logic;
+ signal RD1E, RD2E, extendE : std_logic_vector(31 downto 0);
+ signal WA3E : std_logic_vector(3 downto 0);
+ signal CondE : std_logic_vector(3 downto 0);
+ signal FlagsE : std_logic_vector(3 downto 0);--[ver tamanho]
+
+ -- Memory
+ signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios
+ signal ALUResultM, WriteDataM : std_logic_vector(31 downto 0);
+ signal WA3M : std_logic_vector(3 downto 0);
+
+ signal ALUOutM : std_logic_vector(31 downto 0);
+ signal ReadDataM : std_logic_vector(31 downto 0);
+
+ -- Write back
+ signal PCSrcW : std_logic;
+ signal RegWriteW : std_logic;
+ signal MemtoRegW : std_logic;
+ signal ReadDataW : std_logic_vector(31 downto 0);
+ signal ALUOutW : std_logic_vector(31 downto 0);
+ signal WA3W : std_logic_vector(3 downto 0);
+ signal ResultW : std_logic_vector(31 downto 0);
+
+ -- Datapath
+ signal s_PC : std_logic_vector(31 downto 0);
+ 
+ --Registradores de pipeline
+ -------ID-EX
+ signal s_RD1D, s_RD2D, s_extendD : std_logic_vector(31 downto 0);
+ signal s_WA3D : in std_logic_vector(3 downto 0);
+
 begin
 
   cont : controller port map(
     clk => clk, 
     reset => reset, 
-    instr => instr(31 downto 12),
+    instr => instrD(31 downto 12),
     --ALUFlags, 
     RegSrc => RegSrc,
     RegWrite => RegWriteD,--RegWrite,
@@ -1131,7 +1187,7 @@ begin
     y => SrcB
   );
 
-  /*srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX),d1(ResultW),d2(partial_EX_MEM AluResultM)
+  /*srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2D),d1(ResultW),d2(partial_EX_MEM AluResultM)
   generic map (width => 32);
   port map (
     d0 => WriteData, 
@@ -1148,12 +1204,12 @@ begin
   generic map (width => 32);
   port map 
   (
-    d0 => WriteData, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX),d1(ResultW),d2(partial_EX_MEM AluResultM)
+    d0 => WriteData, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1D),d1(ResultW),d2(partial_EX_MEM AluResultM)
     d1 => ExtImm, 
     d2 => (others => '0'), 
     d3 => (others => '0'),
     s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] utilizar ForwardAE
-    y => SrcB
+    y => SrcB -- [MUDAR PRO PIPELINE] saida ira para SrcAE
   );*/
   
 
@@ -1162,9 +1218,9 @@ begin
   (
     a => SrcA, 
     b => SrcB,
-    ALUControl => ALUControl,
+    ALUControl => ALUControl, 
     Result => ALUResultE,--ALUResult,
-    ALUFlags => ALUFlags
+    ALUFlags => ALUFlags --[VERIFICAR] ir para cond unit
   );
 
 -- Entradas e saidas desta entidade (estao abaixo)

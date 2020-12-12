@@ -246,7 +246,7 @@ begin
    s_ExtImm <= ExtImmD;
    s_WA3D <= WA3D;
    s_Cond <= CondD;
-   s_Flags <= Flags;
+   s_Flags <= FlagsD;
 
    PCSrcE <= s_PCSrc;
    RegWriteE <= s_RegWrite;
@@ -537,7 +537,8 @@ component controller
       PCSrc : out std_logic;
     
       -- Sinais a mais pra poder controlar o fluxo das instrucoes
-      FlagWrite, Branch : out std_logic
+      FlagWrite : out std_logic_vector(1 downto 0);
+      Branch : out std_logic
     );
   end component;
 
@@ -558,7 +559,10 @@ component controller
       instr : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0);
-      MemWrite : out std_logic
+      MemWrite : out std_logic;
+      -- [VERIFICAR] TEM QUE ESTAR CONECTADOS QUANDO TIVER O PIPELINE
+      FlagWrite : in std_logic_vector(1 downto 0); --confirmar se tamanho esta certo e adicionar na top level entity
+      Branch : in std_logic
     );
   end component; 
 
@@ -580,6 +584,8 @@ component controller
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
  signal FLushE : std_logic;
+ signal ImmSrcD : std_logic_vector(1 downto 0);
+ signal RegSrcD : std_logic_vector(1 downto 0);
 
  -- Execute
  signal PCSrcE1, PCSrcE2, RegWriteE1, RegWriteE2 : std_logic;
@@ -592,6 +598,7 @@ component controller
  signal WA3E : std_logic_vector(3 downto 0);
  signal CondE : std_logic_vector(3 downto 0);
  signal FlagsE : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
+ signal ALUFlags : std_logic_vector(3 downto 0);
 
  -- Memory
  signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios
@@ -616,7 +623,7 @@ component controller
  --Registradores de pipeline
  -------ID-EX
  signal s_RD1D, s_RD2D, s_extendD : std_logic_vector(31 downto 0);
- signal s_WA3D : in std_logic_vector(3 downto 0);
+ signal s_WA3D : std_logic_vector(3 downto 0);
 
 begin
 
@@ -625,7 +632,7 @@ begin
     reset => reset, 
     instr => instrD(27 downto 12),
     --ALUFlags, 
-    PCSrc => PCSrcD--PCSrc
+    PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
     MemWrite => MemWriteD,--MemWrite, 
@@ -635,28 +642,36 @@ begin
     -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D
     ImmSrc => ImmSrcD,
 
-    RegSrc => RegSrcD
+    RegSrc => RegSrcD,
+
+    FlagWrite => FlagWriteD,
+    Branch => open -- [MUDAR PIPELINE] TEM QUE ENTRAR NO DATAPATH PRA DEFINIR SE E BRANCH OU NAO
   );
 
-  dp : datapath
+  datap : datapath
   port map (
     clk => clk, 
     reset => reset,
 
-    PCSrc => PCSrcD--PCSrc
+    PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
     MemWrite => MemWriteD,--MemWrite, 
     ALUControl => ALUControlD,
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
+    Branch => '0',
     ALUSrc => ALUSrcD,
-    -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D
+    -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D [MUDADO]
+    FlagWrite => FlagWriteD,
     ImmSrc => ImmSrcD,
+    RegSrc => RegSrcD,
 
     ALUFlags => ALUFlags,
 
     PC => s_PC,
-    instr => instrD
+    instr => instrD,
+
+    ReadData => ReadData -- [VERIFICAR] VEM DA RAM, DATA MEMORY
 
     -- [MUDAR PIPELINE] ESTES SINAIS JA ESTAO INTERNAMENTE NO DATAPATH
     /*ALUResult => ALUResultE, 
@@ -685,7 +700,8 @@ entity controller is -- single cycle control decoder
     PCSrc : out std_logic;
     
     -- Sinais a mais pra poder controlar o fluxo das instrucoes
-    FlagWrite, Branch : out std_logic
+    FlagWrite : out std_logic_vector(1 downto 0);-- [VERIFICAR] E BIT OU E VETOR??
+    Branch : out std_logic
   );
 end;
 
@@ -717,6 +733,8 @@ begin
    PCSrc <= PCS; 
    RegWrite <= RegW; 
    MemWrite <= MemW; 
+   FlagWrite <= FlagW; -- [VERIFICAR] QUANDO FIZ ISSO, ENTENDI QUE O FLAGW TINHA QUE SER
+   -- REPASSADO PARA A CONDLOGIC (ASSIM COMO NO MONOCICLO), POR ISSO TEM QUE SE CONECTAR COM A SAIDA
 end;
 
 library IEEE;
@@ -803,20 +821,36 @@ architecture behave OF cond_unit is
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
   end component;
+
   signal FlagWrite : std_logic_vector(1 downto 0);
-  signal Flags : std_logic_vector(3 downto 0);
+  --signal Flags : std_logic_vector(3 downto 0);
   signal CondEx : std_logic;
+
 begin
   flagreg1 : flopenr generic map(2)
   port map(
-    clk, reset, FlagWrite(1),
-    ALUFlags(3 downto 2), Flags(3 downto 2));
+    clk => clk, 
+    reset => reset, 
+    en => FlagWrite(1),
+    d => ALUFlags(3 downto 2), 
+    q => Flags(3 downto 2)
+  );
 
-  flagreg0 : flopenr generic map(2)
+  flagreg0 : flopenr
+  generic map(width => 2)
   port map(
-    clk, reset, FlagWrite(0),
-    ALUFlags(1 downto 0), Flags(1 downto 0));
-  cc : condcheck port map(Cond, Flags, CondEx);
+    clk => clk, 
+    reset => reset, 
+    en => FlagWrite(0),
+    d => ALUFlags(1 downto 0),
+    q => Flags(1 downto 0)
+  );
+
+  cc : condcheck port map(
+    Cond => Cond, 
+    Flags => FlagsE, 
+    CondEx => CondEx
+  );
 
   FlagWrite <= FlagW AND (CondEx, CondEx);
   RegWrite <= RegW AND CondEx;
@@ -879,8 +913,8 @@ entity datapath is
     ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0);
     MemWrite : out std_logic;
-    FlagWrite : in std_logic_vector(1 downto 0); --confirmar se tamanho esta certo e adicionar na top level entity
-    Branch : in std_logic; --adicionar na top level entity
+    FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
+    Branch : in std_logic --adicionar na top level entity
   );
 end;
 
@@ -1108,7 +1142,7 @@ begin
 
 -- Entradas e saidas desta entidade (estao abaixo)
     --PCSrc <= PCSrcW; 
-    RegWrite <= RegWriteW;
+    --RegWrite <= RegWriteW; [VERIFICAR] REGWRITEW TEM QUE IR PRO REGFILE
     MemWrite <= MemWriteM;
     instrF <= instr;
 
@@ -1119,14 +1153,15 @@ begin
 
     PC <= s_PC;
 
-    db_instrF <= instrF;
+    -- [VERIFICAR] DBs todos desconectados
+    --db_instrF <= instrF;
     --db_PC <= 
-    db_RD1 <= RD1D; 
-    db_RD2 <= RD2D;
-    db_ALUResultE <= ALUResultE;
-    db_WriteDataE <= WriteDataE;
-    db_ReadDataW <= ReadDataW;
-    db_ALUOutW <= ALUOutW;
+    --db_RD1 <= RD1D; 
+    --db_RD2 <= RD2D;
+    --db_ALUResultE <= ALUResultE;
+    --db_WriteDataE <= WriteDataE;
+    --db_ReadDataW <= ReadDataW;
+    --db_ALUOutW <= ALUOutW;
 
  --------------------------------------------------
   CondD <= instrD(31 downto 28);
@@ -1197,10 +1232,10 @@ begin
     r15 => PCPlus8, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
-    rd2 => RD2D,--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
+    rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
   );
 
-  resmux : mux2 
+  res_mux : mux2 
   generic map(width => 32)
   port map
   (
@@ -1258,7 +1293,7 @@ begin
   port map
   (
     a => RD1E, -- [MUDAR PRO PIPELINE] Deve vir de SrcAE
-    b => SrcB, -- [MUDAR PRO PIPELINE] Deve vir de SrcBE
+    b => SrcBE, -- [MUDAR PRO PIPELINE] Deve vir de SrcBE
     ALUControl => ALUControlE, -- [VERIFICAR] sinal deve vir de partial_ID_EX AluControlE
     Result => ALUResultE,--ALUResult,
     ALUFlags => ALUFlags --[VERIFICAR] ir para cond unit
@@ -1324,7 +1359,7 @@ port map
   WA3D => WA3D,
   CondD => CondD,
   FlagsD => Flags,
-  FLushE => reset --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
+  FLushE => reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
 
   PCSrcE => PCSrcE1,--[VERIFICAR] Colocar sinais com E1 em algum AND
   RegWriteE => RegWriteE1,

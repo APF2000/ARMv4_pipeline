@@ -559,7 +559,9 @@ component controller
       instr : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0);
-      MemWrite : out std_logic;
+      MemWriteD : in std_logic;
+      MemWriteM : out std_logic;
+      ALUResultM: out std_logic_vector(31 downto 0);
       -- [VERIFICAR] TEM QUE ESTAR CONECTADOS QUANDO TIVER O PIPELINE
       FlagWrite : in std_logic_vector(1 downto 0); --confirmar se tamanho esta certo e adicionar na top level entity
       Branch : in std_logic
@@ -627,6 +629,13 @@ component controller
 
 begin
 
+  -- [VERIFICAR] SINAIS QUE SAEM PRA MEMORIA DE DADOS (RAM)
+
+  PC <= s_PC;
+  MemWrite <= MemWriteM;
+  WriteData <= WriteDataM;
+  ALUResult <= ALUResultM;
+
   cont : controller port map(
     clk => clk, 
     reset => reset, 
@@ -656,7 +665,7 @@ begin
     PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
-    MemWrite => MemWriteD,--MemWrite, 
+    MemWriteD => MemWriteD,--MemWrite, 
     ALUControl => ALUControlD,
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
     Branch => '0',
@@ -671,7 +680,11 @@ begin
     PC => s_PC,
     instr => instrD,
 
-    ReadData => ReadData -- [VERIFICAR] VEM DA RAM, DATA MEMORY
+    ReadData => ReadData, -- [VERIFICAR] VEM DA RAM, DATA MEMORY [e uma entrada]
+
+    MemWriteM => MemWriteM,
+    WriteData => WriteDataM,
+    ALUResult => ALUResultM
 
     -- [MUDAR PIPELINE] ESTES SINAIS JA ESTAO INTERNAMENTE NO DATAPATH
     /*ALUResult => ALUResultE, 
@@ -858,6 +871,10 @@ begin
   PCSrc <= PCS AND CondEx;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- DATAPATH
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity condcheck is
@@ -895,6 +912,10 @@ begin
   end PROCESS;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- DATAPATH
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity datapath is
@@ -912,7 +933,9 @@ entity datapath is
     instr : in std_logic_vector(31 downto 0);
     ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0);
-    MemWrite : out std_logic;
+    MemWriteIn : in std_logic;
+    MemWriteOut : out std_logic;
+    ALUResultOut: out std_logic_vector(31 downto 0);
     FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
     Branch : in std_logic --adicionar na top level entity
   );
@@ -1090,7 +1113,7 @@ end component;
  signal stallD, flushD : std_logic;
  signal instrD : std_logic_vector(31 downto 0);
  signal PCSrcD, RegWriteD : std_logic;
- signal MemtoRegD, MemWriteD : std_logic;
+ signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
  signal BranchD, ALUSrcD : std_logic;
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
@@ -1143,13 +1166,13 @@ begin
 -- Entradas e saidas desta entidade (estao abaixo)
     --PCSrc <= PCSrcW; 
     --RegWrite <= RegWriteW; [VERIFICAR] REGWRITEW TEM QUE IR PRO REGFILE
-    MemWrite <= MemWriteM;
+    --MemWrite <= MemWriteM;
     instrF <= instr;
 
     ALUResult <= ALUResultM;
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
-    MemWrite <= MemWriteM; --saida do datapath
+    MemWriteOut <= MemWriteM; --saida do datapath
 
     PC <= s_PC;
 
@@ -1313,6 +1336,7 @@ port map
   Cond => condE,--instr(31 downto 28),
   ALUFlags => ALUFlags,
   FlagW => FlagWriteE,
+
   FlagsE => FlagsE, --adicionar sinal e adicionar Flags E na entidade cond_unit
   
   Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
@@ -1348,9 +1372,9 @@ port map
   PCSrcD => PCSrc,
   RegWriteD => RegWrite,
   MemtoRegD => MemtoReg,
-  MemWriteD => MemWrite,
+  MemWriteD => MemWriteIn,
   ALUControlD => ALUControl,
-  FlagWriteD => FlagWrite,
+  FlagWriteD => FlagWrite, -- vem do controller (UC)
   BranchD => Branch,
   ALUSrcD => ALUSrc,
   RD1D => RD1D,

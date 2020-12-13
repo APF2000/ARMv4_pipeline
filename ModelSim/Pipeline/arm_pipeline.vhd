@@ -476,6 +476,10 @@ begin
   end PROCESS;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- ARM
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity arm is -- single cycle processor
@@ -559,12 +563,12 @@ component controller
       instr : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0);
-      MemWriteD : in std_logic;
-      MemWriteM : out std_logic;
-      ALUResultM: out std_logic_vector(31 downto 0);
+      MemWriteIn : in std_logic;
+      MemWriteOut : out std_logic;
+      ALUResultOut: out std_logic_vector(31 downto 0);
       -- [VERIFICAR] TEM QUE ESTAR CONECTADOS QUANDO TIVER O PIPELINE
-      FlagWrite : in std_logic_vector(1 downto 0); --confirmar se tamanho esta certo e adicionar na top level entity
-      Branch : in std_logic
+      FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
+      Branch : in std_logic --adicionar na top level entity
     );
   end component; 
 
@@ -665,7 +669,7 @@ begin
     PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
-    MemWriteD => MemWriteD,--MemWrite, 
+    MemWriteIn => MemWriteD,--MemWrite, 
     ALUControl => ALUControlD,
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
     Branch => '0',
@@ -682,7 +686,7 @@ begin
 
     ReadData => ReadData, -- [VERIFICAR] VEM DA RAM, DATA MEMORY [e uma entrada]
 
-    MemWriteM => MemWriteM,
+    MemWriteOut => MemWriteM,
     WriteData => WriteDataM,
     ALUResult => ALUResultM
 
@@ -694,6 +698,10 @@ begin
   );
 end architecture;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- CONTROLLER
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity controller is -- single cycle control decoder
@@ -750,6 +758,10 @@ begin
    -- REPASSADO PARA A CONDLOGIC (ASSIM COMO NO MONOCICLO), POR ISSO TEM QUE SE CONECTAR COM A SAIDA
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- DECODER
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity decoder is -- main control decoder
@@ -804,6 +816,10 @@ begin
   PCS <= ((AND Rd) AND RegW) OR Branch;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- COND_UNIT
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity cond_unit is -- Conditional logic
@@ -873,7 +889,7 @@ end;
 
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
--- DATAPATH
+-- CONDCHECK
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;

@@ -555,19 +555,19 @@ begin
 
   -- check that 7 gets written to address 84 
   -- at end of program
-  fim_sim : PROCESS 
+  verif : PROCESS 
   (clock,   reset,   RA1E,   RA2E,   WA3M,   
     RegWriteM,   RegWriteW,   MemToRegE, s_simulando, PCWrPendingF,
 	 PCSrcW, BranchTakenE, Match)
   begin
     IF (clk'event AND clk = '0') THEN
       IF (s_simulando = '1') THEN			
-			if(Match(2) and RegWriteM) then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
-			if(Match(3) and RegWriteM) then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
+			if(Match(2) and RegWriteM = '1') then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
+			if(Match(3) and RegWriteM = '1') then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
 			else then assert ( ForwardAE = "00" ) report "ForwardA errado" severity error end if;
 			
-			if(Match(2) and RegWriteM) then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
-			if(Match(3) and RegWriteM) then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
+			if(Match(2) and RegWriteM = '1') then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
+			if(Match(3) and RegWriteM = '1') then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
 			else then assert ( ForwardBE = "00" ) report "ForwardB errado" severity error end if;
 			
         --REport "NO ERRORS: Simulation succeeded" SEVERITY note;
@@ -587,11 +587,14 @@ begin
 	 
 	 s_simulando <= '1';
 	 
+	 ------------------------
+	 --  Teste1
+	 ------------------------
 	 RA1E <= X"A";
-	 RA2E <= X"B";
+	 RA2E <= X"2"; -- conflito com wa3m
 	 
 	 RA1D <= X"C";
-	 RA2D <= X"D";
+	 RA2D <= X"3"; -- conflito com wa3w
 	 
 	RegWriteM <= '1';
 	RegWriteW <= '0';
@@ -601,13 +604,92 @@ begin
 	
 	PCSrcW <= '0'; -- Sem branch
 	PCSrcD <= '0';
-	PCSrcE <= '0'; 
+	PCSrcE <= '0';
 	PCSrcM <= '0';	 
 	BranchTakenE <= '0';
 
 	WA3E <= x"1"; -- Endereco de write back da instr
-	WA3M <= x"2";
-	WA3W <= x"3";
+	
+	WA3M <= x"2"; -- Hazard
+	WA3W <= x"3"; -- Hazard
+	
+	 ------------------------
+	 --  Teste2
+	 ------------------------
+	 RA1E <= X"A";
+	 RA2E <= X"2"; -- conflito com wa3m
+	 
+	 RA1D <= X"C";
+	 RA2D <= X"3"; -- conflito com wa3w
+	 
+	RegWriteM <= '1';
+	RegWriteW <= '0';
+	MemToRegE <= '1';
+
+	PCWrPendingF <= '0'; -- ???
+	
+	PCSrcW <= '0'; -- Sem branch
+	PCSrcD <= '0';
+	PCSrcE <= '0';
+	PCSrcM <= '0';	 
+	BranchTakenE <= '0';
+
+	WA3E <= x"1"; -- Endereco de write back da instr
+	
+	WA3M <= x"2"; -- Hazard
+	WA3W <= x"3"; -- Hazard
+	
+	 ------------------------
+	 --  Teste3
+	 ------------------------
+	 RA1E <= X"A";
+	 RA2E <= X"2"; -- conflito com wa3m
+	 
+	 RA1D <= X"C";
+	 RA2D <= X"3"; -- conflito com wa3w
+	 
+	RegWriteM <= '1';
+	RegWriteW <= '0';
+	MemToRegE <= '1';
+
+	PCWrPendingF <= '0'; -- ???
+	
+	PCSrcW <= '0'; -- Sem branch
+	PCSrcD <= '0';
+	PCSrcE <= '0';
+	PCSrcM <= '0';	 
+	BranchTakenE <= '0';
+
+	WA3E <= x"1"; -- Endereco de write back da instr
+	
+	WA3M <= x"2"; -- Hazard
+	WA3W <= x"3"; -- Hazard
+	
+	 ------------------------
+	 --  Teste4
+	 ------------------------
+	 RA1E <= X"A";
+	 RA2E <= X"2"; -- conflito com wa3m
+	 
+	 RA1D <= X"C";
+	 RA2D <= X"3"; -- conflito com wa3w
+	 
+	RegWriteM <= '1';
+	RegWriteW <= '0';
+	MemToRegE <= '1';
+
+	PCWrPendingF <= '0'; -- ???
+	
+	PCSrcW <= '0'; -- Sem branch
+	PCSrcD <= '0';
+	PCSrcE <= '0';
+	PCSrcM <= '0';	 
+	BranchTakenE <= '0';
+
+	WA3E <= x"1"; -- Endereco de write back da instr
+	
+	WA3M <= x"2"; -- Hazard
+	WA3W <= x"3"; -- Hazard
 
 	 s_simulando <= '0';	
 	 

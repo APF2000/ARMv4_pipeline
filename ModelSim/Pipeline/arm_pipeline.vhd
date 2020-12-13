@@ -43,19 +43,19 @@ architecture test OF testbench is
   signal db_ALUResultE : std_logic_vector(31 downto 0);
   signal db_WriteDataE : std_logic_vector(31 downto 0);
   signal db_ReadDataW : std_logic_vector(31 downto 0);
-  signal db_ALUOutW : std_logic_vector(31 downto 0);  
+  signal db_ALUOutW : std_logic_vector(31 downto 0);
 
 begin
 
   -- instantiate device to be tested
   dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
     db_instrF,
-    db_RD1, 
+    db_RD1,
     db_RD2,
     db_ALUResultE,
     db_WriteDataE,
     db_ReadDataW,
-    db_ALUOutW 
+    db_ALUOutW
   );
 
   -- Generate clock with 10 ns period
@@ -74,7 +74,7 @@ begin
     WAIT;
   end PROCESS;
 
-  -- check that 7 gets written to address 84 
+  -- check that 7 gets written to address 84
   -- at end of program
   PROCESS (clk, MemWrite, DataAdr, WriteData) begin
     IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
@@ -110,7 +110,7 @@ architecture tb of tb_top_2 is
       db_ALUResultE : out std_logic_vector(31 downto 0);
       db_WriteDataE : out std_logic_vector(31 downto 0);
       db_ReadDataW : out std_logic_vector(31 downto 0);
-      db_ALUOutW : out std_logic_vector(31 downto 0)  
+      db_ALUOutW : out std_logic_vector(31 downto 0)
     );
   end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
@@ -122,19 +122,19 @@ architecture tb of tb_top_2 is
   signal db_ALUResultE : std_logic_vector(31 downto 0);
   signal db_WriteDataE : std_logic_vector(31 downto 0);
   signal db_ReadDataW : std_logic_vector(31 downto 0);
-  signal db_ALUOutW : std_logic_vector(31 downto 0);  
+  signal db_ALUOutW : std_logic_vector(31 downto 0);
 
 begin
 
   -- instantiate device to be tested
   dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
     db_instrF,
-    db_RD1, 
+    db_RD1,
     db_RD2,
     db_ALUResultE,
     db_WriteDataE,
     db_ReadDataW,
-    db_ALUOutW 
+    db_ALUOutW
   );
 
   -- Generate clock with 10 ns period
@@ -153,7 +153,7 @@ begin
     WAIT;
   end PROCESS;
 
-  -- check that 7 gets written to address 84 
+  -- check that 7 gets written to address 84
   -- at end of program
   PROCESS (clk, MemWrite, DataAdr, WriteData) begin
     IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
@@ -185,7 +185,7 @@ entity top is -- top-level design for testing
     db_ALUResultE : out std_logic_vector(31 downto 0);
     db_WriteDataE : out std_logic_vector(31 downto 0);
     db_ReadDataW : out std_logic_vector(31 downto 0);
-    db_ALUOutW : out std_logic_vector(31 downto 0)    
+    db_ALUOutW : out std_logic_vector(31 downto 0)
   );
 end;
 
@@ -224,24 +224,24 @@ architecture test OF top is
   ReadData : std_logic_vector(31 downto 0);
 begin
   -- instantiate processor and memories
-  i_arm : arm 
+  i_arm : arm
   port map
   (
-    clk => clk, 
-    reset => reset, 
-    PC => PC, 
-    instr => instr, 
-    MemWrite => MemWrite, 
-    ALUResult => DataAdr,  
-    WriteData => WriteData, 
-    ReadData => ReadData, 
+    clk => clk,
+    reset => reset,
+    PC => PC,
+    instr => instr,
+    MemWrite => MemWrite,
+    ALUResult => DataAdr,
+    WriteData => WriteData,
+    ReadData => ReadData,
 
-    db_instrF => db_instrF, 
-    db_RD1 => db_RD1,  
-    db_RD2 => db_RD2, 
-    db_ALUResultE => db_ALUResultE, 
-    db_WriteDataE => db_WriteDataE, 
-    db_ReadDataW => db_ReadDataW, 
+    db_instrF => db_instrF,
+    db_RD1 => db_RD1,
+    db_RD2 => db_RD2,
+    db_ALUResultE => db_ALUResultE,
+    db_WriteDataE => db_WriteDataE,
+    db_ReadDataW => db_ReadDataW,
     db_ALUOutW =>  db_ALUOutW
   );
 
@@ -251,10 +251,10 @@ begin
   );
 
   i_dmem : dmem port map(
-    clk => clk, 
-    we => MemWrite, 
+    clk => clk,
+    we => MemWrite,
     a => DataAdr,
-    wd => WriteData, 
+    wd => WriteData,
     rd => ReadData
   );
 end;
@@ -287,7 +287,7 @@ architecture arch of partial_IF_ID is
 begin
 
   instrD <= instrF;
-  
+
 end architecture;
 
 --------------------------------------------------------------------------
@@ -311,7 +311,7 @@ entity partial_ID_EX is
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : in std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
-    
+
     FLushE : in std_logic;
 
     PCSrcE, RegWriteE : out std_logic;
@@ -337,7 +337,7 @@ architecture arch OF partial_ID_EX is
     signal s_Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
 
 begin
-    
+
    s_PCSrc <= PCSrcD;
    s_RegWrite <= RegWriteD;
    s_MemtoReg <= MemtoRegD;
@@ -358,15 +358,15 @@ begin
    MemtoRegE <= s_MemtoReg;
    MemWriteE <= s_MemWrite;
    ALUControlE <= s_ALUControl;
-   FlagWriteE <= s_FlagWrite; 
+   FlagWriteE <= s_FlagWrite;
    BranchE <= s_Branch;
    ALUSrcE <= s_ALUSrc;
    RD1E <= s_RD1D;
    RD2E <= s_RD2D;
-   ExtImmE <= s_ExtImm; 
+   ExtImmE <= s_ExtImm;
    WA3E <= s_WA3D;
    CondE <= s_Cond;
-   FlagsE <= s_Flags; 
+   FlagsE <= s_Flags;
 
 end architecture;
 
@@ -386,7 +386,7 @@ entity partial_EX_MEM is
     PCSrcE, RegWriteE, MemtoRegE, MemWriteE : in std_logic; -- Sinais combinatorios
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
-  
+
     PCSrcM, RegWriteM, MemtoRegM, MemWriteM : out std_logic; -- Sinais combinatorios
     ALUResultM, WriteDataM : out std_logic_vector(31 downto 0);
     WA3M : out std_logic_vector(3 downto 0)
@@ -402,16 +402,16 @@ architecture arch of partial_EX_MEM is
 begin
 
   s_PCSrc <= PCSrcE;
-  s_RegWrite <= RegWriteE; 
-  s_MemtoReg <= MemtoRegE; 
+  s_RegWrite <= RegWriteE;
+  s_MemtoReg <= MemtoRegE;
   s_MemWrite <= MemWriteE;
   s_ALUResult <= ALUResultE;
   s_WriteData <= WriteDataE;
   s_WA3 <= WA3E;
-  
+
   PCSrcM <= s_PCSrc;
-  RegWriteM <=  s_RegWrite; 
-  MemtoRegM <=  s_MemtoReg; 
+  RegWriteM <=  s_RegWrite;
+  MemtoRegM <=  s_MemtoReg;
   MemWriteM <= s_MemWrite;
   ALUResultM <= s_ALUResult;
   WriteDataM <= s_WriteData;
@@ -431,7 +431,7 @@ use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity partial_MEM_WB is
   port (
     clock : in std_logic;
-    
+
     PCSrcM : in std_logic;
     RegWriteM : in std_logic;
     MemtoRegM : in std_logic;
@@ -460,7 +460,7 @@ architecture arch OF partial_MEM_WB is
 
 begin
 
-  s_PCSrc <= PCSrcM; 
+  s_PCSrc <= PCSrcM;
   s_RegWrite <= RegWriteM;
   s_MemtoReg <= MemtoRegM;
 
@@ -486,10 +486,10 @@ use IEEE.std_logic_1164.all;
 use STD.TEXTIO.all;
 use IEEE.NUMERIC_STD_UNSIGNED.all;
 
-entity 
+entity
 
 entity hazard_unit is
- 
+
 end entity;
 
 architecture arch of tb_hazard_unit is
@@ -498,30 +498,30 @@ architecture arch of tb_hazard_unit is
 			 clock : in std_logic;
 			 reset : in std_logic;
 			 Match : in std_logic_vector(4 downto 0);
-			 
+
 			 PCWrPendingF : in std_LOGIC;
 			 PCSrcW : in std_logic;
 			 BranchTakenE : in std_LOGIC;
-			 
+
 			RegWriteM : in std_logic;
 			RegWriteW : in std_logic;
 			MemToRegE : in std_logic;
-		 
+
 			 StallF : out std_logic;
 			 StallD : out std_logic;
-			 
+
 			 FlushD : out std_logic;
 			 FlushE : out std_logic;
 			 ForwardAE : out std_logic_vector(1 downto 0);
 			 ForwardBE : out std_logic_vector(1 downto 0)
 		);
   end component;
-  
+
   component hazard_logic is
 		port (
 		 -- ENTRADAS
 		 clock : in std_logic;
-		 reset : in std_logic;    
+		 reset : in std_logic;
 		 RA1D : in std_logic_vector(3 downto 0);
 		 RA2D : in std_logic_vector(3 downto 0);
 		 RA1E : in std_logic_vector(3 downto 0);
@@ -530,15 +530,15 @@ architecture arch of tb_hazard_unit is
 		 WA3M : in std_logic_vector(3 downto 0);
 		 WA3W : in std_logic_vector(3 downto 0);
 		 PCSrcD : in std_logic;
-		 PCSrcE : in std_logic; 
+		 PCSrcE : in std_logic;
 		 PCSrcM : in std_logic;
-		 -- SAIDAS 
+		 -- SAIDAS
 		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
 		 Match : out std_logic_vector(4 downto 0);
 		 PCWrPendingF: out std_logic
 	  );
 	end component;
-  
+
   signal clock : std_logic;
   signal reset : std_logic;
   signal RegWriteM : std_logic;
@@ -559,17 +559,17 @@ architecture arch of tb_hazard_unit is
   signal WA3M : std_logic_vector(3 downto 0);
   signal WA3W : std_logic_vector(3 downto 0);
   signal PCSrcD : std_logic;
-  signal PCSrcE : std_logic; 
+  signal PCSrcE : std_logic;
   signal PCSrcM : std_logic;
-  -- SAIDAS 
+  -- SAIDAS
   -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
   signal Match : std_logic_vector(4 downto 0);
   signal PCWrPendingF: std_logic;
-  
+
   signal s_simulando : std_logic := '0';
-  
+
   signal Match : std_logic_vector(4 downto 0);
-			 
+
   signal PCWrPendingF : std_LOGIC;
   signal PCSrcW : std_logic;
   signal BranchTakenE : std_LOGIC;
@@ -581,31 +581,31 @@ begin
   		 port (
 			 clock => clock,
 			 reset => reset,
-			 
+
 			 RegWriteM => RegWriteM,
 			 RegWriteW => RegWriteW,
 			 MemToRegE => MemToRegE,
-			 
+
 			 StallF => StallF,
 			 StallD => StallD,
 			 FlushD => FlushD,
 			 FlushE => FlushE,
-			 
+
 			 ForwardAE => ForwardAE,
 			 ForwardBE => ForwardBE,
-			 
+
 			 Match => Match,
-			 
+
 			 PCWrPendingF => PCWrPendingF,
 			 PCSrcW => PCSrcW,
 			 BranchTakenE => BranchTakenE
 		);
-		
+
 	h_logic : hazard_logic
 	port map (
 		 -- ENTRADAS
 		 clock => clock,
-		 reset > reset,    
+		 reset > reset,
 		 RA1D => RA1D,
 		 RA2D => RA2D,
 		 RA1E => RA1E,
@@ -614,9 +614,9 @@ begin
 		 WA3M => WA3M,
 		 WA3W => WA3W,
 		 PCSrcD => PCSrcD,
-		 PCSrcE => PCSrcE, 
+		 PCSrcE => PCSrcE,
 		 PCSrcM => PCSrcM,
-		 -- SAIDAS 
+		 -- SAIDAS
 		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
 		 Match => Match,
 		 PCWrPendingF => PCWrPendingF
@@ -631,24 +631,24 @@ begin
   end PROCESS;
 
 
-  -- check that 7 gets written to address 84 
+  -- check that 7 gets written to address 84
   -- at end of program
-  verif : PROCESS 
-  (clock,   reset,   RA1E,   RA2E,   WA3M,   
+  verif : PROCESS
+  (clock,   reset,   RA1E,   RA2E,   WA3M,
     RegWriteM,   RegWriteW,   MemToRegE, s_simulando, PCWrPendingF,
 	 PCSrcW, BranchTakenE, Match)
   begin
     IF (clk'event AND clk = '0') THEN
-      IF (s_simulando = '1') THEN			
+      IF (s_simulando = '1') THEN
 			if(Match(2) and RegWriteM = '1') then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
 			if(Match(3) and RegWriteM = '1') then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
 			else then assert ( ForwardAE = "00" ) report "ForwardA errado" severity error end if;
-			
+
 			if(Match(2) and RegWriteM = '1') then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
 			if(Match(3) and RegWriteM = '1') then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
 			else then assert ( ForwardBE = "00" ) report "ForwardB errado" severity error end if;
-			
-			
+
+
 			assert (PCWrPendingF = PCSrcD or PCSrcE or PCSrcM) report "PCWr errado" severity error;
 			assert (FlushD = PCWrPendingF or PCSrcW or BranchTakenE) report "FlushD errado" severity error;
 --			StallD = LDRstall;
@@ -660,95 +660,95 @@ begin
       end IF;
     end IF;
   end PROCESS;
-	
-	main_sim : PROCESS 
-  (clock,   reset,   RA1E,   RA2E,   WA3M,   
+
+	main_sim : PROCESS
+  (clock,   reset,   RA1E,   RA2E,   WA3M,
     RegWriteM,   RegWriteW,   MemToRegE)
 	begin
 	 reset <= '1';
     WAIT FOR 22 ns;
     reset <= '0';
     WAIT;
-	 
+
 	 s_simulando <= '1';
-	 
+
 	 ------------------------
 	 --  Teste1 : ID: ADD, EX: ADD, MEM: ADD
 	 ------------------------
 	 RA1E <= X"A";
 	 RA2E <= X"3"; -- conflito com wa3w
-	 
+
 	 RA1D <= X"C";
 	 RA2D <= X"2"; -- conflito com wa3m
-	 
+
 	RegWriteM <= '1';
 	RegWriteW <= '1';
 	MemToRegE <= '1';
-	
+
 	PCSrcW <= '0'; -- Sem branch
 	PCSrcD <= '0';
 	PCSrcE <= '0';
-	PCSrcM <= '0';	 
+	PCSrcM <= '0';
 	BranchTakenE <= '0';
 
 	WA3E <= x"1"; -- Endereco de write back da instr
-	
+
 	WA3M <= x"2"; -- Hazard
 	WA3W <= x"3"; -- Hazard
-	
+
 	assert ( false ) report "Teste 1" severity note;
-	
+
 	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
-	
+
 	-- Esperar terminar instr e apagar o que estava para ir pro EX
 	assert ( StallF = '1' ) report "StallF errado" severity error;
 	assert ( StallD = '1' ) report "StallD errado" severity error;
-	
+
 	assert ( FlushD = '0' ) report "FlushD errado" severity error;
 	assert ( FlushE = '1' ) report "FlushE errado" severity error;
-	
-	
+
+
 	 ------------------------------------------
-	 --  Teste2 IF: SUM, ID: SUM, EX: LDR, MEM: SUM 
+	 --  Teste2 IF: SUM, ID: SUM, EX: LDR, MEM: SUM
 	 ------------------------------------------
 	 RA1E <= X"A";
 	 RA2E <= X"2"; -- conflito com wa3m
-	 
+
 	 RA1D <= X"C";
 	 RA2D <= X"1"; -- conflito com wa3e : livro pag 436
-	 
+
 	RegWriteM <= '1';
 	RegWriteW <= '0';
 	MemToRegE <= '1';
-	
+
 	PCSrcW <= '0'; -- Sem branch
 	PCSrcD <= '0';
 	PCSrcE <= '0';
-	PCSrcM <= '0';	 
+	PCSrcM <= '0';
 	BranchTakenE <= '0';
 
 	WA3E <= x"1"; -- Endereco de write back da instr
-	
+
 	WA3M <= x"2"; -- Hazard
 	WA3W <= x"3"; -- Hazard
-	
+
 	assert ( false ) report "Teste 2" severity error;
-	
+
 	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
-	
+
 	assert ( StallF = '1' ) report "StallF errado" severity error;
 	assert ( StallD = '1' ) report "StallD errado" severity error;
-	
+
 	assert ( FlushD = '0' ) report "FlushD errado" severity error; -- [VERIFICAR] zero ou um ??
 	assert ( FlushE = '1' ) report "FlushE errado" severity error;
-	
+
 
 	---------------------------------------------------------------------
-	
-	 s_simulando <= '0';	
-	 
+
+	 s_simulando <= '0';
+
 	end process;
-	
+
 end architecture;
 
 
@@ -762,14 +762,20 @@ use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 entity hazard_unit is
   port (
+    -- ENTRADAS
     clock : in std_logic;
     reset : in std_logic;
-    RA1E : in std_logic_vector(4 downto 0);
-    RA2E : in std_logic_vector(4 downto 0);
-    WA3M : in std_logic_vector(31 downto 0);
+    -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+    Match : in std_logic_vector(4 downto 0);
+    PCWrPendingF: in std_logic;
+
     RegWriteM : in std_logic;
     RegWriteW : in std_logic;
     MemToRegE : in std_logic;
+
+    PCSrcW : in std_logic;
+    BranchTakenE : in std_logic;
+    -- SAIDAS
     StallF : out std_logic;
     StallD : out std_logic;
     FlushD : out std_logic;
@@ -778,6 +784,110 @@ entity hazard_unit is
     ForwardBE : out std_logic_vector(1 downto 0)
   );
 end entity;
+
+architecture arch_hazard_unit OF hazard_unit is
+
+  signal Match_1E_M : std_logic;
+  signal Match_1E_W : std_logic;
+  signal Match_2E_M : std_logic;
+  signal Match_2E_W : std_logic;
+  signal Match_12D_E: std_logic;
+  signal LDRStall: std_logic;
+
+begin
+  Match_1E_M <= Match(0);
+  Match_1E_W <= Match(1);
+  Match_2E_M <= Match(2);
+  Match_2E_W <= Match(3);
+  Match_12D_E <= Match(4);
+
+  -- Dar um stall quando instrucao LDR e o Reg de escrita em Execution e o mesmo que um dos operandos em Decode
+  LDRStall <= Match_12D_E and MemToRegE;
+
+  -- Saidas
+  StallD <= LDRStall;
+  StallF <= LDRStall or PCWrPendingF;
+  FlushE <= LDRStall or BranchTakenE;
+  FlushD <= PCWrPendingF or PCSrcW or BranchTakenE;
+
+  ForwardAE(1) <= '1' when (Match_1E_M and RegWriteM)
+                      else '0';
+  ForwardAE(0) <= '1' when (Match_1E_W and RegWriteW and (not ForwardAE(1)))
+                      else '0';
+  ForwardBE(1) <= '1' when (Match_2E_M and RegWriteM)
+                      else '0';
+  ForwardBE(0) <= '1' when (Match_2E_W and RegWriteW and (not ForwardBE(1)))
+                      else '0';
+end;
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- HAZARD_LOGIC
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
+
+entity hazard_logic is
+  port (
+    -- ENTRADAS
+    clock : in std_logic;
+    reset : in std_logic;
+    RA1D : in std_logic_vector(3 downto 0);
+    RA2D : in std_logic_vector(3 downto 0);
+    RA1E : in std_logic_vector(3 downto 0);
+    RA2E : in std_logic_vector(3 downto 0);
+    WA3E : in std_logic_vector(3 downto 0);
+    WA3M : in std_logic_vector(3 downto 0);
+    WA3W : in std_logic_vector(3 downto 0);
+    PCSrcD : in std_logic;
+    PCSrcE : in std_logic;
+    PCSrcM : in std_logic;
+    -- SAIDAS
+    -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+    Match : out std_logic_vector(4 downto 0);
+    PCWrPendingF: out std_logic
+  );
+end entity;
+
+architecture arch_hazard_logic OF hazard_logic is
+
+  signal Match_1E_M : std_logic;
+  signal Match_1E_W : std_logic;
+  signal Match_2E_M : std_logic;
+  signal Match_2E_W : std_logic;
+
+  signal Match_12D_E: std_logic;
+  signal Match_12D_Ea: std_logic;
+  signal Match_12D_Eb: std_logic;
+
+
+begin
+  -- Comparar se Reg 1 de Execution e o mesmo que o reg de escrita em Memory
+  Match_1E_M <= '1'when RA1E = WA3M else '0';
+  -- Comparar se Reg 1 de Execution e o mesmo que o reg de escrita em WriteBack
+  Match_1E_W <= '1'when RA1E = WA3W else '0';
+  -- Comparar se Reg 2 de Execution e o mesmo que o reg de escrita em Memory
+  Match_2E_M <= '1'when RA2E = WA3M else '0';
+  -- Comparar se Reg 2 de Execution e o mesmo que o reg de escrita em WriteBack
+  Match_2E_W <= '1'when RA2E = WA3W else '0';
+
+  -- Comparar se Reg 1 de Decode e o mesmo que o reg de escrita em Execution
+  Match_12D_Ea <= '1'when RA1D = WA3E else '0';
+  -- Comparar se Reg 2 de Decode e o mesmo que o reg de escrita em Execution
+  Match_12D_Eb <= '1'when RA2D = WA3E else '0';
+  -- Formar Match_12D_E
+  Match_12D_E <= Match_12D_Ea or Match_12D_Eb;
+
+  -- Quando uma escrita de branch no PC estaria ocorrendo nos estagios Decode ou Execution ou Memory
+  PCWrPendingF <= PCSrcD or PCSrcE or PCSrcM;
+
+  Match(4) <= Match_12D_E;
+  Match(3) <= Match_2E_W;
+  Match(2) <= Match_2E_M;
+  Match(1) <= Match_1E_W;
+  Match(0) <= Match_1E_M;
+end;
 
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -888,7 +998,7 @@ architecture tb of tb_arm is
 		 clk, reset : in std_logic;
 		 PC : out std_logic_vector(31 downto 0);
 		 instr : in std_logic_vector(31 downto 0);
-		 
+
 		 MemWrite : out std_logic;
 		 ALUResult, WriteData : out std_logic_vector(31 downto 0);
 		 ReadData : in std_logic_vector(31 downto 0);
@@ -902,38 +1012,38 @@ architecture tb of tb_arm is
 		 db_ALUOutW : out std_logic_vector(31 downto 0)
 	  );
 	 end component;
-	 
+
 	 signal clk, reset :  std_logic;
 	 signal PC :  std_logic_vector(31 downto 0);
 	 signal instr :  std_logic_vector(31 downto 0);
-	 
+
 	 signal MemWrite :  std_logic;
 	 signal ALUResult, WriteData :  std_logic_vector(31 downto 0);
 	 signal ReadData :  std_logic_vector(31 downto 0);
-	  
+
   begin
-  
-	  dut_arm : arm 
+
+	  dut_arm : arm
 		  port map
 		  (
-			 clk => clk, 
-			 reset => reset, 
-			 PC => PC, 
-			 instr => instr, 
-			 MemWrite => MemWrite, 
-			 ALUResult => DataAdr,  
-			 WriteData => WriteData, 
-			 ReadData => ReadData, 
+			 clk => clk,
+			 reset => reset,
+			 PC => PC,
+			 instr => instr,
+			 MemWrite => MemWrite,
+			 ALUResult => DataAdr,
+			 WriteData => WriteData,
+			 ReadData => ReadData,
 
-			 db_instrF => open, 
-			 db_RD1 => open,  
-			 db_RD2 => open, 
-			 db_ALUResultE => open, 
-			 db_WriteDataE => open, 
-			 db_ReadDataW => open, 
+			 db_instrF => open,
+			 db_RD1 => open,
+			 db_RD2 => open,
+			 db_ALUResultE => open,
+			 db_WriteDataE => open,
+			 db_ReadDataW => open,
 			 db_ALUOutW =>  open
 		  );
-		  
+
 		  -- Generate clock with 10 ns period
 		  PROCESS begin
 			 clk <= '1';
@@ -941,7 +1051,7 @@ architecture tb of tb_arm is
 			 clk <= '0';
 			 WAIT FOR 5 ns;
 		  end PROCESS;
-		  
+
    PROCESS begin
     reset <= '1';
     WAIT FOR 22 ns;
@@ -953,25 +1063,25 @@ architecture tb of tb_arm is
 
   PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
     IF (clk'event AND clk = '0' /*AND MemWrite = /*'1'*/) THEN
-   
+
         --REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
       ELSE THEN
       end IF;
     end IF;
   end PROCESS;
-  
+
   ------------------------
-  -- Instrucoes: 
-  --	
+  -- Instrucoes:
   --
-  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) 
+  --
+  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData )
   begin
 		wait until reset = '0';
-		
-		
-	 
+
+
+
   end PROCESS;
-  
+
  end architecture;
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -984,7 +1094,7 @@ entity arm is -- single cycle processor
     clk, reset : in std_logic;
     PC : out std_logic_vector(31 downto 0);
     instr : in std_logic_vector(31 downto 0);
-    
+
     MemWrite : out std_logic;
     ALUResult, WriteData : out std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0);
@@ -1036,7 +1146,7 @@ component controller
       MemWrite : out std_logic;
       MemtoReg : out std_logic;
       PCSrc : out std_logic;
-    
+
       -- Sinais a mais pra poder controlar o fluxo das instrucoes
       FlagWrite : out std_logic_vector(1 downto 0);
       Branch : out std_logic
@@ -1068,7 +1178,7 @@ component controller
       FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
       Branch : in std_logic --adicionar na top level entity
     );
-  end component; 
+  end component;
 
   -- [MUDAR PIPELINE] NEM TODOS OS SINAIS ABAIXO SAO NECESSARIOS AQUI
   -- PODE TIRAR AS REDUNDANCIAS DEPOIS
@@ -1099,7 +1209,7 @@ component controller
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
- 
+
 
 begin
 
@@ -1113,14 +1223,14 @@ begin
   instrF <= instr;
 
   cont : controller port map(
-    clk => clk, 
-    reset => reset, 
+    clk => clk,
+    reset => reset,
     instr => instrD(27 downto 12),
-    --ALUFlags, 
+    --ALUFlags,
     PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
-    MemWrite => MemWriteD,--MemWrite, 
+    MemWrite => MemWriteD,--MemWrite,
     ALUControl => ALUControlD,
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
     ALUSrc => ALUSrcD,
@@ -1135,13 +1245,13 @@ begin
 
   datap : datapath
   port map (
-    clk => clk, 
+    clk => clk,
     reset => reset,
 
     PCSrc => PCSrcD,--PCSrc
     RegWrite => RegWriteD,--RegWrite,
     MemToReg => MemtoRegD,
-    MemWriteIn => MemWriteD,--MemWrite, 
+    MemWriteIn => MemWriteD,--MemWrite,
     ALUControl => ALUControlD,
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
     Branch => '0',
@@ -1165,7 +1275,7 @@ begin
     ALUOut => ALUResultM
 
     -- [MUDAR PIPELINE] ESTES SINAIS JA ESTAO INTERNAMENTE NO DATAPATH
-    /*ALUResult => ALUResultE, 
+    /*ALUResult => ALUResultE,
     WriteData => WriteDataE,
     ReadData => ReadDataW,
     MemWrite => MemWRite*/
@@ -1193,7 +1303,7 @@ entity controller is -- single cycle control decoder
     MemWrite : out std_logic;
     MemtoReg : out std_logic;
     PCSrc : out std_logic;
-    
+
     -- Sinais a mais pra poder controlar o fluxo das instrucoes
     FlagWrite : out std_logic_vector(1 downto 0);-- [VERIFICAR] E BIT OU E VETOR??
     Branch : out std_logic
@@ -1220,24 +1330,24 @@ architecture struct OF controller is
 
 begin
   dec : decoder port map(
-    Op => instr(27 downto 26), 
+    Op => instr(27 downto 26),
     Funct => instr(25 downto 20),
-    Rd => instr(15 downto 12), 
-    
-    FlagW => FlagW, 
+    Rd => instr(15 downto 12),
+
+    FlagW => FlagW,
     PCS => PCS,
-    RegW => RegW, 
-    MemW => MemW, 
-    MemtoReg => MemToReg, 
-    ALUSrc => ALUSrc, 
+    RegW => RegW,
+    MemW => MemW,
+    MemtoReg => MemToReg,
+    ALUSrc => ALUSrc,
     ImmSrc => ImmSrc,
-    RegSrc => RegSrc, 
+    RegSrc => RegSrc,
     ALUControl => ALUControl
   );
 
-   PCSrc <= PCS; 
-   RegWrite <= RegW; 
-   MemWrite <= MemW; 
+   PCSrc <= PCS;
+   RegWrite <= RegW;
+   MemWrite <= MemW;
    FlagWrite <= FlagW; -- [VERIFICAR] QUANDO FIZ ISSO, ENTENDI QUE O FLAGW TINHA QUE SER
    -- REPASSADO PARA A CONDLOGIC (ASSIM COMO NO MONOCICLO), POR ISSO TEM QUE SE CONECTAR COM A SAIDA
 end;
@@ -1267,7 +1377,7 @@ architecture behave OF decoder is
 begin
 
   op2 <= (Op, Funct(5), Funct(0));
-  
+
   PROCESS (all) begin -- Main Decoder
     CASE ? (op2) is
       WHEN "000-" => controls <= "0000001001";
@@ -1344,26 +1454,26 @@ architecture behave OF cond_unit is
 begin
   flagreg1 : flopenr generic map(2)
   port map(
-    clk => clk, 
-    reset => reset, 
+    clk => clk,
+    reset => reset,
     en => FlagWrite(1),
-    d => ALUFlags(3 downto 2), 
+    d => ALUFlags(3 downto 2),
     q => Flags(3 downto 2)
   );
 
   flagreg0 : flopenr
   generic map(width => 2)
   port map(
-    clk => clk, 
-    reset => reset, 
+    clk => clk,
+    reset => reset,
     en => FlagWrite(0),
     d => ALUFlags(1 downto 0),
     q => Flags(1 downto 0)
   );
 
   cc : condcheck port map(
-    Cond => Cond, 
-    Flags => FlagsE, 
+    Cond => Cond,
+    Flags => FlagsE,
     CondEx => CondEx
   );
 
@@ -1449,6 +1559,57 @@ end;
 
 architecture struct OF datapath is
 
+  component hazard_logic is
+    port (
+      -- ENTRADAS
+      clock : in std_logic;
+      reset : in std_logic;
+      RA1D : in std_logic_vector(3 downto 0);
+      RA2D : in std_logic_vector(3 downto 0);
+      RA1E : in std_logic_vector(3 downto 0);
+      RA2E : in std_logic_vector(3 downto 0);
+      WA3E : in std_logic_vector(3 downto 0);
+      WA3M : in std_logic_vector(3 downto 0);
+      WA3W : in std_logic_vector(3 downto 0);
+      PCSrcD : in std_logic;
+      PCSrcE : in std_logic;
+      PCSrcM : in std_logic;
+      -- SAIDAS
+      -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+      Match : out std_logic_vector(4 downto 0);
+      PCWrPendingF: out std_logic
+    );
+  end component;
+
+  --------------------------------------------------------------------------
+
+  component hazard_unit is
+    port (
+      -- ENTRADAS
+      clock : in std_logic;
+      reset : in std_logic;
+      -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+      Match : in std_logic_vector(4 downto 0);
+      PCWrPendingF: in std_logic;
+
+      RegWriteM : in std_logic;
+      RegWriteW : in std_logic;
+      MemToRegE : in std_logic;
+
+      PCSrcW : in std_logic;
+      BranchTakenE : in std_logic;
+      -- SAIDAS
+      StallF : out std_logic;
+      StallD : out std_logic;
+      FlushD : out std_logic;
+      FlushE : out std_logic;
+      ForwardAE : out std_logic_vector(1 downto 0);
+      ForwardBE : out std_logic_vector(1 downto 0)
+    );
+  end component;
+
+ --------------------------------------------------------------------------
+
   component partial_IF_ID is
   port (
     clock, reset : in std_logic;
@@ -1494,7 +1655,7 @@ component partial_EX_MEM is
     PCSrcE, RegWriteE, MemtoRegE, MemWriteE : in std_logic; -- Sinais combinatorios
     ALUResultE, WriteDataE : in std_logic_vector(31 downto 0);
     WA3E : in std_logic_vector(3 downto 0);
-  
+
     PCSrcM, RegWriteM, MemtoRegM, MemWriteM : out std_logic; -- Sinais combinatorios
     ALUResultM, WriteDataM : out std_logic_vector(31 downto 0);
     WA3M : out std_logic_vector(3 downto 0)
@@ -1507,7 +1668,7 @@ end component;
 component partial_MEM_WB is
   port (
     clock : in std_logic;
-    
+
     PCSrcM : in std_logic;
     RegWriteM : in std_logic;
     MemtoRegM : in std_logic;
@@ -1596,7 +1757,7 @@ end component;
  --PC : out std_logic_vector(31 downto 0);
  --instr : in std_logic_vector(31 downto 0);
 
- --signal RegWrite : std_logic;--, ALUSrc, 
+ --signal RegWrite : std_logic;--, ALUSrc,
  --signal MemtoReg, PCSrc : std_logic;
  --signal RegSrc, ImmSrc, ALUControl : std_logic_vector(1 downto 0);
  --signal ALUFlags : std_logic_vector(3 downto 0); [VERIFICAR] ALUFLAGS TEM QUE SER UMA SAIDA PRA CONDUNIT
@@ -1660,7 +1821,21 @@ end component;
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
- 
+
+ -- Hazards
+ signal Match : std_logic_vector(4 downto 0);
+ signal PCWrPendingF : std_logic;
+
+ signal StallF : std_logic;
+ signal StallD : std_logic;
+ signal FlushD : std_logic;
+ signal FlushE : std_logic;
+
+ signal ForwardAE : std_logic_vector(1 downto 0);
+ signal ForwardBE : std_logic_vector(1 downto 0);
+
+ signal BranchTakenE : std_logic; -- [VERIFICAR] Ligar a hazard unit e a mux do PC
+
  --Registradores de pipeline
  -------ID-EX
  -- [VERIFICAR] PODE SER QUE DE CACA TIRAR ESSE s_WA3D
@@ -1670,7 +1845,7 @@ end component;
 begin
 
 -- Entradas e saidas desta entidade (estao abaixo)
-    --PCSrc <= PCSrcW; 
+    --PCSrc <= PCSrcW;
     --RegWrite <= RegWriteW; [VERIFICAR] REGWRITEW TEM QUE IR PRO REGFILE
     --MemWrite <= MemWriteM;
     instrF <= instrIn;
@@ -1686,8 +1861,8 @@ begin
 
     -- [VERIFICAR] DBs todos desconectados
     --db_instrF <= instrF;
-    --db_PC <= 
-    --db_RD1 <= RD1D; 
+    --db_PC <=
+    --db_RD1 <= RD1D;
     --db_RD2 <= RD2D;
     --db_ALUResultE <= ALUResultE;
     --db_WriteDataE <= WriteDataE;
@@ -1720,21 +1895,21 @@ begin
     q => s_PC
   );
 
-  pcadd1 : adder 
+  pcadd1 : adder
   port map(
     a => s_PC,
     b => X"00000004",
     y => PCPlus4
   );
-  
+
   pcadd2 : adder --[MUDAR QUANDO FOR PIPELINE] apaga-lo
   port map(
     a => PCPlus4,
     b => X"00000004",
     y => PCPlus8
   );
-  
-  ra1mux : mux2 
+
+  ra1mux : mux2
   generic map(width => 4)
   port map
   (
@@ -1744,7 +1919,7 @@ begin
     y => RA1D
   );
 
-  ra2mux : mux2 
+  ra2mux : mux2
   generic map(width => 4)
   port map(
     d0 => instrD(3 downto 0),
@@ -1767,13 +1942,13 @@ begin
     rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
   );
 
-  res_mux : mux2 
+  res_mux : mux2
   generic map(width => 32)
   port map
   (
     d0 => ALUOutW,--ALUResult,
     d1 => ReadDataW,--ReadData,
-    s => MemToRegW, -- [VERIFICAR] Sinais devem estar vindo do partial_MEM_WB 
+    s => MemToRegW, -- [VERIFICAR] Sinais devem estar vindo do partial_MEM_WB
     y => ResultW
   );
   ext : extend
@@ -1785,12 +1960,12 @@ begin
   );
 
   -- ALU logic
-  srcbmux : mux2 
+  srcbmux : mux2
   generic map(width => 32) --[MUDAR PRO PIPELINE] d0(outro mux intermediario) d1(partial_ID_EX ExtImmE)
   port map
   (
     d0 => RD2E,--WriteData, [VERIFICAR] talvez seja o writedata mesmo
-    d1 => ExtImmE, -- [VERIFICAR] 
+    d1 => ExtImmE, -- [VERIFICAR]
     s => ALUSrcE,
     y => SrcBE
   );
@@ -1798,28 +1973,28 @@ begin
   /*srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2D),d1(ResultW),d2(partial_EX_MEM AluResultM)
   generic map (width => 32);
   port map (
-    d0 => WriteData, 
-    d1 => ExtImm, 
-    d2 => (others => '0'), 
+    d0 => WriteData,
+    d1 => ExtImm,
+    d2 => (others => '0'),
     d3 => (others => '0'),
     s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
     y => SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
   );*/
 
-  
-   
-  /*srcamux : mux4 
+
+
+  /*srcamux : mux4
   generic map (width => 32);
-  port map 
+  port map
   (
     d0 => WriteData, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1D),d1(ResultW),d2(partial_EX_MEM AluResultM)
-    d1 => ExtImm, 
-    d2 => (others => '0'), 
+    d1 => ExtImm,
+    d2 => (others => '0'),
     d3 => (others => '0'),
     s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] utilizar ForwardAE
     y => SrcB -- [MUDAR PRO PIPELINE] saida ira para SrcAE
   );*/
-  
+
 
   aluinst : alu
   port map
@@ -1831,36 +2006,87 @@ begin
     ALUFlags => ALUFlags --[VERIFICAR] ir para cond unit
   );
 
+ ---------------------------------------------------------
+ -- Logica para lidar com hazards
+
+ hl : hazard_logic
+ port map
+ (
+     -- ENTRADAS
+     clock => clk,
+     reset => reset,
+     RA1D => RA1D,
+     RA2D => RA2D,
+     RA1E => ,
+     RA2E => ,
+     WA3E => WA3E,
+     WA3M => WA3M,
+     WA3W => WA3W,
+     PCSrcD => PCSrcD,
+     PCSrcE => PCSrcE1,
+     PCSrcM => PCSrcM,
+     -- SAIDAS
+     -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+     Match => Match,
+     PCWrPendingF => PCWrPendingF
+   );
+
+ --------------------------------------------------------------------------
+
+ hu : hazard_unit
+ port map
+ (
+     -- ENTRADAS
+     clock => clk,
+     reset => reset,
+     -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+     Match => Match,
+     PCWrPendingF => PCWrPendingF,
+
+     RegWriteM => RegWriteM,
+     RegWriteW => RegWriteW,
+     MemToRegE => MemToRegE,
+
+     PCSrcW => PCSrcW,
+     BranchTakenE => BranchTakenE,
+     -- SAIDAS
+     StallF => StallF, -- [VERIFICAR] Ligar em enable PC
+     StallD => StallD, -- [VERIFICAR] Ligar em enable IF/ID
+     FlushD => FlushD, -- [VERIFICAR] Ligar em clear IF/ID
+     FlushE => FlushE, -- [VERIFICAR] Ligar em clear ID/EX
+     ForwardAE => ForwardAE, -- [VERIFICAR] Ligar em mux para SrcAE
+     ForwardBE => ForwardBE -- [VERIFICAR] Ligar em mux para SrcBE
+   );
 
  ---------------------------------------------------------
  --Registradores de Pipeline
 
 
 
-cl : cond_unit 
+cl : cond_unit
 port map
 (
-  clk => clk, 
+  clk => clk,
   reset => reset,
   Cond => condE,--instr(31 downto 28),
   ALUFlags => ALUFlags,
   FlagW => FlagWriteE,
 
   FlagsE => FlagsE, --adicionar sinal e adicionar Flags E na entidade cond_unit
-  
+
   Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
   PCS => PCSrcE1, -- entradas transplantadas
   RegW => RegWriteE1, -- entradas transplantadas
   MemW => MemWriteE1,-- entradas transplantadas
 
-  PCSrc => PCSrcE2, 
+  PCSrc => PCSrcE2,
   RegWrite => RegWriteE2,
   MemWrite => MemWriteE2--MemWrite
 );
 
 
- inst_partial_IF_ID : partial_IF_ID 
- port map 
+ inst_partial_IF_ID : partial_IF_ID
+ port map
  (
   clock => clk,
   reset => reset,
@@ -1874,7 +2100,7 @@ port map
 --------------------------------------------------------------------------
 
 inst_partial_ID_EX : partial_ID_EX
-port map 
+port map
 (
   clock => clk,
   reset => reset,
@@ -1913,8 +2139,8 @@ port map
 
 ------------------------------------------------------------------
 
-inst_partial_EX_MEM : partial_EX_MEM 
-port map 
+inst_partial_EX_MEM : partial_EX_MEM
+port map
 (
   clock => clk,
   reset => reset,
@@ -1932,7 +2158,7 @@ port map
   RegWriteM => RegWriteM,
   MemtoRegM => MemtoRegM,
   MemWriteM => MemWriteM,
-  
+
   -- Sinais combinatorios
   ALUResultM => ALUOutM,
   WriteDataM => WriteDataM,
@@ -1941,14 +2167,14 @@ port map
 
 --------------------------------------------------------
 
-inst_partial_MEM_WB : partial_MEM_WB 
+inst_partial_MEM_WB : partial_MEM_WB
 port map (
   clock => clk,
-  
+
   PCSrcM => PCSrcM,
   RegWriteM => RegWriteM,
   MemtoRegM => MemtoRegM,
-  
+
   ALUOutM => ALUOutM,
   WA3M => WA3M,
   RD => ReadDataM,
@@ -1960,7 +2186,7 @@ port map (
   ALUOutW => ALUOutW,
   WA3W => WA3W
 );
- 
+
 end;
 
 library IEEE;
@@ -2120,12 +2346,12 @@ begin
       d2 when "10",
       d3 when "11",
       d0 when others;
-  
+
 end;
 
-library IEEE; use IEEE.STD_LOGIC_1164.all; 
+library IEEE; use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD_UNSIGNED.all;
-entity alu is 
+entity alu is
   port(a, b:       in  STD_LOGIC_VECTOR(31 downto 0);
        ALUControl: in  STD_LOGIC_VECTOR(1 downto 0);
        Result:     buffer STD_LOGIC_VECTOR(31 downto 0);
@@ -2143,9 +2369,9 @@ begin
 
   process(all) begin
     case? ALUControl(1 downto 0) is
-      when "0-"   => result <= sum(31 downto 0); 
-      when "10"   => result <= a and b; 
-      when "11"   => result <= a or b; 
+      when "0-"   => result <= sum(31 downto 0);
+      when "10"   => result <= a and b;
+      when "11"   => result <= a or b;
       when others => result <= (others => '-');
     end case?;
   end process;

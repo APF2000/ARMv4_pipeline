@@ -597,7 +597,8 @@ component controller
       PCSrc : in std_logic;
       ALUFlags : out std_logic_vector(3 downto 0);
       PC : BUFFER std_logic_vector(31 downto 0);
-      instr : in std_logic_vector(31 downto 0);
+      instrIn : in std_logic_vector(31 downto 0);
+      instrOut : in std_logic_vector(31 downto 0);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0);
       MemWriteIn : in std_logic;
@@ -619,7 +620,7 @@ component controller
  signal stallD, flushD : std_logic;
  signal instrD : std_logic_vector(31 downto 0);
  signal PCSrcD, RegWriteD : std_logic;
- signal MemtoRegD, MemWriteD : std_logic;
+ signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
  signal BranchD, ALUSrcD : std_logic;
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
@@ -627,46 +628,18 @@ component controller
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
  signal FLushE : std_logic;
+ signal MemWriteD : std_logic;
  signal ImmSrcD : std_logic_vector(1 downto 0);
- signal RegSrcD : std_logic_vector(1 downto 0);
-
- -- Execute
- signal PCSrcE1, PCSrcE2, RegWriteE1, RegWriteE2 : std_logic;
- signal MemtoRegE, MemWriteE1, MemWriteE2 : std_logic;
- signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
- signal ALUResultE : std_logic_vector(31 downto 0);
- signal WriteDataE : std_logic_vector(31 downto 0);
- signal BranchE, ALUSrcE : std_logic;
- signal RD1E, RD2E, ExtImmE : std_logic_vector(31 downto 0);
- signal WA3E : std_logic_vector(3 downto 0);
- signal CondE : std_logic_vector(3 downto 0);
- signal FlagsE : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
+ signal RegSrcD :  std_logic_vector(1 downto 0);
  signal ALUFlags : std_logic_vector(3 downto 0);
 
  -- Memory
- signal PCSrcM, RegWriteM, MemtoRegM, MemWriteM : std_logic; -- Sinais combinatorios
+ signal MemWriteM : std_logic; -- Sinais combinatorios
  signal ALUResultM, WriteDataM : std_logic_vector(31 downto 0);
- signal WA3M : std_logic_vector(3 downto 0);
-
- signal ALUOutM : std_logic_vector(31 downto 0);
- signal ReadDataM : std_logic_vector(31 downto 0);
-
- -- Write back
- signal PCSrcW : std_logic;
- signal RegWriteW : std_logic;
- signal MemtoRegW : std_logic;
- signal ReadDataW : std_logic_vector(31 downto 0);
- signal ALUOutW : std_logic_vector(31 downto 0);
- signal WA3W : std_logic_vector(3 downto 0);
- signal ResultW : std_logic_vector(31 downto 0);
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
  
- --Registradores de pipeline
- -------ID-EX
- signal s_RD1D, s_RD2D, s_extendD : std_logic_vector(31 downto 0);
- signal s_WA3D : std_logic_vector(3 downto 0);
 
 begin
 
@@ -721,7 +694,8 @@ begin
     ALUFlags => ALUFlags,
 
     PC => s_PC,
-    instr => instrF,
+    instrIn => instrF,
+    instrOut => InstrD,
 
     ReadData => ReadData, -- [VERIFICAR] VEM DA RAM, DATA MEMORY [e uma entrada]
 
@@ -985,7 +959,8 @@ entity datapath is
     PCSrc : in std_logic;
     ALUFlags : out std_logic_vector(3 downto 0);
     PC : BUFFER std_logic_vector(31 downto 0);
-    instr : in std_logic_vector(31 downto 0);
+    instrIn : in std_logic_vector(31 downto 0);
+    instrOut : out std_logic_vector(27 downto 12);
     ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0);
     MemWriteIn : in std_logic;
@@ -1222,7 +1197,7 @@ begin
     --PCSrc <= PCSrcW; 
     --RegWrite <= RegWriteW; [VERIFICAR] REGWRITEW TEM QUE IR PRO REGFILE
     --MemWrite <= MemWriteM;
-    instrF <= instr;
+    instrF <= instrIn;
 
     ALUResult <= ALUResultM;
     WriteData <= WriteDataM;
@@ -1243,6 +1218,7 @@ begin
 
  --------------------------------------------------
   CondD <= instrD(31 downto 28);
+  instrOut <= instrD(27 downto 12);
 
   WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
   WA3D <= instrD(15 downto 12);

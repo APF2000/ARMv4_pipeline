@@ -22,7 +22,7 @@ architecture test OF testbench is
   component top
     port (
       clk, reset : in std_logic;
-      WriteData, DatAadr : out std_logic_vector(31 downto 0);
+      WriteData, DataAdr : out std_logic_vector(31 downto 0);
       MemWrite : out std_logic;
 
       db_instrF : out std_logic_vector(31 downto 0);
@@ -880,13 +880,13 @@ begin
   FlushE <= LDRStall or BranchTakenE;
   FlushD <= PCWrPendingF or PCSrcW or BranchTakenE;
 
-  ForwardAE(1) <= '1' when (Match_1E_M and RegWriteM)
+  ForwardAE(1) <= '1' when ( (Match_1E_M and RegWriteM) = '1')
                       else '0';
-  ForwardAE(0) <= '1' when (Match_1E_W and RegWriteW and (not ForwardAE(1)))
+  ForwardAE(0) <= '1' when ( (Match_1E_W and RegWriteW and (not ForwardAE(1)))= '1' )
                       else '0';
-  ForwardBE(1) <= '1' when (Match_2E_M and RegWriteM)
+  ForwardBE(1) <= '1' when ((Match_2E_M and RegWriteM)='1')
                       else '0';
-  ForwardBE(0) <= '1' when (Match_2E_W and RegWriteW and (not ForwardBE(1)))
+  ForwardBE(0) <= '1' when ( (Match_2E_W and RegWriteW and (not ForwardBE(1))) = '1')
                       else '0';
 end;
 
@@ -1389,7 +1389,10 @@ architecture struct OF controller is
       PCS, RegW, MemW : out std_logic;
       MemtoReg, ALUSrc : out std_logic;
       ImmSrc, RegSrc : out std_logic_vector(1 downto 0);
-      ALUControl : out std_logic_vector(1 downto 0));
+      ALUControl : out std_logic_vector(1 downto 0);
+
+      Branch : out std_logic      
+    );
   end component;
 
   signal FlagW : std_logic_vector(1 downto 0);
@@ -1409,13 +1412,16 @@ begin
     ALUSrc => ALUSrc,
     ImmSrc => ImmSrc,
     RegSrc => RegSrc,
-    ALUControl => ALUControl
+    ALUControl => ALUControl,
+
+    Branch => Branch
   );
 
    PCSrc <= PCS;
    RegWrite <= RegW;
    MemWrite <= MemW;
    FlagWrite <= FlagW; -- [VERIFICAR] QUANDO FIZ ISSO, ENTENDI QUE O FLAGW TINHA QUE SER
+   
    -- REPASSADO PARA A CONDLOGIC (ASSIM COMO NO MONOCICLO), POR ISSO TEM QUE SE CONECTAR COM A SAIDA
 end;
 
@@ -1434,12 +1440,13 @@ entity decoder is -- main control decoder
     PCS, RegW, MemW : out std_logic;
     MemtoReg, ALUSrc : out std_logic;
     ImmSrc, RegSrc : out std_logic_vector(1 downto 0);
+    Branch: out std_logic;
     ALUControl : out std_logic_vector(1 downto 0));
 end;
 
 architecture behave OF decoder is
   signal controls : std_logic_vector(9 downto 0);
-  signal ALUOp, Branch : std_logic;
+  signal ALUOp, s_Branch : std_logic;
   signal op2 : std_logic_vector(3 downto 0);
 begin
 
@@ -1457,7 +1464,7 @@ begin
   end PROCESS;
 
   (RegSrc, ImmSrc, ALUSrc, MemtoReg, RegW, MemW,
-  Branch, ALUOp) <= controls;
+  s_Branch, ALUOp) <= controls;
 
   PROCESS (all) begin -- ALU Decoder
     IF (ALUOp) THEN
@@ -1476,7 +1483,8 @@ begin
     end IF;
   end PROCESS;
 
-  PCS <= ((AND Rd) AND RegW) OR Branch;
+  PCS <= ((AND Rd) AND RegW) OR s_Branch;
+  Branch <= s_Branch;
 end;
 
 
@@ -1837,7 +1845,7 @@ end component;
     q : out std_logic_vector(width - 1 downto 0));
   end component;
 
-  signal PCNext1, PCNext2, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
+  signal PCNext1, PCNext2 : std_logic_vector(31 downto 0);
   signal ExtImm : std_logic_vector(31 downto 0);
   signal SrcAE, SrcBE, SrcB : std_logic_vector(31 downto 0);
   signal RA1D, RA2D : std_logic_vector(3 downto 0);
@@ -1859,7 +1867,8 @@ end component;
 
 
  --signal FlagWriteE : std_logic;
- signal PCS, RegW, MemW : std_logic;
+ --signal PCS, 
+ signal RegW, MemW : std_logic; --[VERIFICAR] PODE SER QUE TENHA TIRADO SINAL A MAIS
  --signal condE : std_logic_vector(3 downto 0);
 
  --signal RegWriteD, MemWriteD, PCSrcD : std_logic;
@@ -1945,11 +1954,13 @@ begin
     --MemWrite <= MemWriteM;
     instrF <= instrIn;
 
-    --[VERIFICAR] LA EM CIMA DIZ QUE ESTE SINAL N SERVE PRA NADA --ALUResult <= ALUResultM; -- [VERIFICAR]?? SSE SINAL E NECESSARIO MESMO    ALUOut E <= ALUOutM;
+    --[VERIFICAR] LA EM CIMA DIZ QUE ESTE SINAL N SERVE PRA NADA --ALUResult <= ALUResultM; -- [VERIFICAR]?? SSE SINAL E NECESSARIO MESMO    
+    ALUOut <= ALUOutM;
 
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
     MemWriteOut <= MemWriteM; --saida do datapath
+    PCSrcD <= PCSrc;
 
     PC <= s_PC;
 

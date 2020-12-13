@@ -281,7 +281,7 @@ end entity;
 
 architecture arch of partial_IF_ID is
 
-  component flopenr is -- flip-flop with enable and asynchronous reset
+  component flopenr -- flip-flop with enable and asynchronous reset
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
@@ -298,13 +298,14 @@ begin
   port map
   (
     clk => clk,
-    reset => reset,
+    reset => s_flush,
     en => s_not_stall,
     d => instrF,
     q => instrD
   );
 
   s_not_stall <= not stallD;
+  s_flush <= flushD or reset;
 
 end architecture;
 
@@ -348,51 +349,67 @@ end entity;
 
 architecture arch OF partial_ID_EX is
 
-    signal s_PCSrc, s_RegWrite : std_logic;
-    signal s_MemtoReg, s_MemWrite : std_logic;
-    signal s_ALUControl, s_FlagWrite : std_logic_vector(1 downto 0);
-    signal s_Branch, s_ALUSrc : std_logic;
-    signal s_RD1D, s_RD2D, s_ExtImm : std_logic_vector(31 downto 0);
-    signal s_WA3D : std_logic_vector(3 downto 0);
-    signal s_Cond: std_logic_vector(3 downto 0);
-    signal s_Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
-    signal s_RA1D, s_RA2D : std_logic_vector(3 downto 0);
+  component flopenr -- flip-flop with enable and asynchronous reset
+  generic (width : integer);
+  port (
+    clk, reset, en : in std_logic;
+    d : in std_logic_vector(width - 1 downto 0);
+    q : out std_logic_vector(width - 1 downto 0));
+  end component;
+
+  signal s_in: std_logic_vector(125 downto 0);
+  signal s_out: std_logic_vector(125 downto 0);
+  signal s_flush : std_logic;
 
 begin
 
-   s_PCSrc <= PCSrcD;
-   s_RegWrite <= RegWriteD;
-   s_MemtoReg <= MemtoRegD;
-   s_MemWrite <= MemWriteD;
-   s_ALUControl <= ALUControlD;
-   s_FlagWrite <= FlagWriteD;
-   s_Branch <= BranchD;
-   s_ALUSrc <= ALUSrcD;
-   s_RD1D <= RD1D;
-   s_RD2D <= RD2D;
-   s_ExtImm <= ExtImmD;
-   s_WA3D <= WA3D;
-   s_Cond <= CondD;
-   s_Flags <= FlagsD;
-   s_RA1D <= RA1D;
-   s_RA2D <= RA2D;
+  flnr_ID_EX : flopenr
+  generic map(width => 126)
+  port map
+  (
+    clk => clk,
+    reset => s_flush,
+    en => '1',
+    d => s_in,
+    q => s_out
+  );
+  s_flush <= flushE or reset;
+  
+  s_in (125 downto 94) <= RD1D;
+  s_in (93 downto 62) <= RD2D;
+  s_in (61 downto 30) <= ExtImmD;
+  s_in (29 downto 26) <= WA3D;
+  s_in (25 downto 22) <= CondD;
+  s_in (21 downto 18) <= FlagsD;
+  s_in (17 downto 14) <= RA1D;
+  s_in (13 downto 10) <= RA2D;
+  s_in (9 downto 8) <= ALUControlD;
+  s_in (7 downto 6) <= FlagWriteD;
+  s_in (5) <= PCSrcD;
+  s_in (4) <= RegWriteD;
+  s_in (3) <= MemtoRegD;
+  s_in (2) <= MemWriteD;
+  s_in (1) <= BranchD;
+  s_in (0) <= ALUSrcD;
 
-   PCSrcE <= s_PCSrc;
-   RegWriteE <= s_RegWrite;
-   MemtoRegE <= s_MemtoReg;
-   MemWriteE <= s_MemWrite;
-   ALUControlE <= s_ALUControl;
-   FlagWriteE <= s_FlagWrite;
-   BranchE <= s_Branch;
-   ALUSrcE <= s_ALUSrc;
-   RD1E <= s_RD1D;
-   RD2E <= s_RD2D;
-   ExtImmE <= s_ExtImm;
-   WA3E <= s_WA3D;
-   CondE <= s_Cond;
-   FlagsE <= s_Flags;
-   RA1E <= s_RA1D;
-   RA2E <= s_RA2D;
+   
+  RD1E <= s_out (125 downto 94);
+  RD2E <= s_out (93 downto 62);
+  ExtImmE <= s_out (61 downto 30);
+  WA3E <= s_out (29 downto 26);
+  CondE <= s_out (25 downto 22);
+  FlagsE <= s_out (21 downto 18);
+  RA1E <= s_out (17 downto 14);
+  RA2E <= s_out (13 downto 10);
+  ALUControlE <= s_out (9 downto 8);
+  FlagWriteE <= s_out (7 downto 6);
+  PCSrcE <= s_out (5);
+  RegWriteE <= s_out (4);
+  MemtoRegE <= s_out (3);
+  MemWriteE <= s_out (2);
+  BranchE <= s_out (1);
+  ALUSrcE <= s_out (0);
+
 
 end architecture;
 
@@ -421,27 +438,45 @@ end entity;
 
 architecture arch of partial_EX_MEM is
 
-  signal s_PCSrc, s_RegWrite, s_MemtoReg, s_MemWrite : std_logic; -- Sinais combinatorios
-  signal s_ALUResult, s_WriteData : std_logic_vector(31 downto 0);
-  signal s_WA3 : std_logic_vector(3 downto 0);
+  component flopenr -- flip-flop with enable and asynchronous reset
+  generic (width : integer);
+  port (
+    clk, reset, en : in std_logic;
+    d : in std_logic_vector(width - 1 downto 0);
+    q : out std_logic_vector(width - 1 downto 0));
+  end component;
+
+  signal s_in: std_logic_vector(71 downto 0);
+  signal s_out: std_logic_vector(71 downto 0);
 
 begin
 
-  s_PCSrc <= PCSrcE;
-  s_RegWrite <= RegWriteE;
-  s_MemtoReg <= MemtoRegE;
-  s_MemWrite <= MemWriteE;
-  s_ALUResult <= ALUResultE;
-  s_WriteData <= WriteDataE;
-  s_WA3 <= WA3E;
+  flnr_EX_MEM : flopenr
+  generic map(width => 72)
+  port map
+  (
+    clk => clk,
+    reset => reset,
+    en => '1',
+    d => s_in,
+    q => s_out
+  );
 
-  PCSrcM <= s_PCSrc;
-  RegWriteM <=  s_RegWrite;
-  MemtoRegM <=  s_MemtoReg;
-  MemWriteM <= s_MemWrite;
-  ALUResultM <= s_ALUResult;
-  WriteDataM <= s_WriteData;
-  WA3M <= s_WA3;
+  s_in (71 downto 40) <= ALUResultE;
+  s_in (39 downto 8) <= WriteDataE;
+  s_in (7 downto 4) <= WA3E; 
+  s_in (3) <= PCSrcE;
+  s_in (2) <= RegWriteE;
+  s_in (1) <= MemtoRegE;
+  s_in (0) <= MemWriteE;
+
+  ALUResultM <= s_out  (71 downto 40);
+  WriteDataM <= s_out  (39 downto 8);
+  WA3M <= s_out  (7 downto 4); 
+  PCSrcM <= s_out  (3);
+  RegWriteM <= s_out  (2);
+  MemtoRegM <= s_out  (1);
+  MemWriteM <= s_out  (0);
 
 end architecture;
 
@@ -475,24 +510,45 @@ entity partial_MEM_WB is
 end entity;
 
 architecture arch OF partial_MEM_WB is
+  
+  component flopenr -- flip-flop with enable and asynchronous reset
+  generic (width : integer);
+  port (
+    clk, reset, en : in std_logic;
+    d : in std_logic_vector(width - 1 downto 0);
+    q : out std_logic_vector(width - 1 downto 0));
+  end component;
 
-  --signal s_clock : std_logic;
-  signal s_PCSrc : std_logic;
-  signal s_RegWrite : std_logic;
-  signal s_MemtoReg : std_logic;
-  signal s_ALUOut : std_logic_vector(31 downto 0);
-  signal s_WA3      : std_logic_vector(3 downto 0);
-  signal s_RD : std_logic_vector(31 downto 0);
+
+  signal s_in: std_logic_vector(70 downto 0);
+  signal s_out: std_logic_vector(70 downto 0);
 
 begin
 
-  s_PCSrc <= PCSrcM;
-  s_RegWrite <= RegWriteM;
-  s_MemtoReg <= MemtoRegM;
+  flnr_MEM_WB : flopenr
+  generic map(width => 71)
+  port map
+  (
+    clk => clk,
+    reset => reset,
+    en => '1',
+    d => s_in,
+    q => s_out
+  );
 
-  s_ALUOut <= ALUOutM;
-  s_WA3 <= WA3M;
-  s_RD <= RD;
+  s_in (70 downto 39) <= ALUOutM;
+  s_in (38 downto 7) <= RD;
+  s_in (6 downto 3) <= WA3M; 
+  s_in (2) <= PCSrcM;
+  s_in (1) <= RegWriteM;
+  s_in (0) <= MemtoRegM;
+
+  ALUOutW <= s_out  (70 downto 39);
+  ReadDataW <= s_out  (38 downto 7);
+  WA3W <= s_out  (6 downto 3); 
+  PCSrcW <= s_out  (2);
+  RegWriteW <= s_out  (1);
+  MemtoRegW <= s_out  (0); 
 ----------------------------------
   PCSrcW <= s_PCSrc;
   RegWriteW <= s_RegWrite;
@@ -1768,23 +1824,33 @@ end component;
       ImmSrc : in std_logic_vector(1 downto 0);
       ExtImm : out std_logic_vector(31 downto 0));
   end component;
-  component flopr generic (width : integer);
+  component flopr 
+  generic (width : integer);
     port (
       clk, reset : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
   end component;
-  component mux2 generic (width : integer);
+  component mux2 
+  generic (width : integer);
     port (
       d0, d1 : in std_logic_vector(width - 1 downto 0);
       s : in std_logic;
       y : out std_logic_vector(width - 1 downto 0));
   end component;
-  component mux4 generic (width : integer);
+  component mux4 
+  generic (width : integer);
     port (
       d0, d1, d2, d3 : in std_logic_vector(width - 1 downto 0);
       s : in std_logic;
       y : out std_logic_vector(width - 1 downto 0));
+  end component;
+  component flopenr -- flip-flop with enable and asynchronous reset
+  generic (width : integer);
+  port (
+    clk, reset, en : in std_logic;
+    d : in std_logic_vector(width - 1 downto 0);
+    q : out std_logic_vector(width - 1 downto 0));
   end component;
 
   signal PCNext1, PCNext2, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
@@ -1871,7 +1937,7 @@ end component;
  signal Match : std_logic_vector(4 downto 0);
  signal PCWrPendingF : std_logic;
 
- signal StallF : std_logic;
+ signal StallF, not_StallF : std_logic;
  signal StallD : std_logic;
  signal FlushD : std_logic;
  signal FlushE : std_logic;
@@ -1895,8 +1961,7 @@ begin
     --MemWrite <= MemWriteM;
     instrF <= instrIn;
 
-    ALUResult <= ALUResultM;
-    ALUOut <= ALUOutM;
+    --[VERIFICAR] LA EM CIMA DIZ QUE ESTE SINAL N SERVE PRA NADA --ALUResult <= ALUResultM; -- [VERIFICAR]?? SSE SINAL E NECESSARIO MESMO    ALUOut E <= ALUOutM;
 
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
@@ -1937,19 +2002,21 @@ begin
   generic map(width => 32)
   port map(
     d0 => PCNext1, --[MUDAR PRO PIPELINE] TEM QUE ADICIONAR UM OUTRO MUX2 ANTES DO PC+4
-    d1 => ResultW, -- [VERIFICAR] CERTINHO DE ONDE VEM
+    d1 => ALUResultE,--ResultW, -- [VERIFICAR] VEM DA ALU MESMO?
     s => BranchTakenE, -- [VERIFICAR] SERA QUE ESSE SINAL TA VINDO DA CONTROL UNIT MESMO?
     y => PCNext2
   );
 
-  pcreg : flopr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
+  pcreg : flopenr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
   generic map(width => 32)
   port map(
     clk => clk,
     reset => reset,
+    en => not_StallF,
     d => PCNext2,
     q => s_PC
   );
+  not_StallF <= not StallF; 
 
   pcadd : adder
   port map(
@@ -1983,6 +2050,7 @@ begin
     we3 => RegWriteW, -- [VERIFICAR] JA ESTA NO DATAPATH O SINAL
     ra1 => RA1D,
     ra2 => RA2D,
+
     wa3 => WA3W,--instrD(15 downto 12), -- [MUDAR PIPELINE] VEM DO WA3W [MUDADO]
     wd3 => ResultW,
     r15 => PCPlus8D, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D [MUDADO] [VERIFICAR] SE VEM DA ALU
@@ -2010,39 +2078,37 @@ begin
   );
 
   -- ALU logic
-  srcbmux : mux2
+  srcBmux2 : mux2
   generic map(width => 32) --[MUDAR PRO PIPELINE] d0(outro mux intermediario) d1(partial_ID_EX ExtImmE)
   port map
   (
-    d0 => SrcB,--WriteData, [VERIFICAR] talvez seja o writedata mesmo
+    d0 => WriteDataE,--SrcB,--WriteData, [VERIFICAR] talvez seja o writedata mesmo
     d1 => ExtImmE, -- [VERIFICAR]
     s => ALUSrcE,
     y => SrcBE
   );
 
-  srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2E),d1(ResultW),d2(partial_EX_MEM AluResultM)
+  srcBmux4 : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2E),d1(ResultW),d2(partial_EX_MEM AluResultM)
   generic map (width => 32);
   port map (
     d0 => RD2E,
     d1 => ResultW,
-    d2 => ALUResultM,
+    d2 => ALUOutM--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
     d3 => (others => '0'),
-    s => ForwardBE -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
-    y => SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
+    s => ForwardBE, -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
+    y => WriteDataE--SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
   );
 
-
-
-  srcamux : mux4
+  srcAmux4 : mux4 -- [OBS] SO TEM UM MUX PRO A MESMO
   generic map (width => 32);
   port map
   (
     d0 => RD1E, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1E),d1(ResultW),d2(partial_EX_MEM AluResultM)
     d1 => ResultW,
-    d2 => ALUResultM,
+    d2 => ALUOutM--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
     d3 => (others => '0'),
     s => ForwardAE -- [MUDAR PRO PIPELINE] utilizar ForwardAE
-    y => SrcAE -- [MUDAR PRO PIPELINE] saida ira para SrcAE
+    y => SrcAE -- [MUDAR PRO PIPELINE] saida ira para SrcAE [MUDADO] [VERIFICAR] DELCARACAO DESSE SINAL
   );
 
 
@@ -2059,12 +2125,13 @@ begin
  ---------------------------------------------------------
  -- Logica para lidar com hazards
 
- hl : hazard_logic
+ hl : hazard_logic  -- [VERIFICAR] SABE LA O QUE TA CONECTADO AQUI
  port map
  (
      -- ENTRADAS
      clock => clk,
      reset => reset,
+
      RA1D => RA1D,
      RA2D => RA2D,
      RA1E => RA1E,
@@ -2075,6 +2142,7 @@ begin
      PCSrcD => PCSrcD,
      PCSrcE => PCSrcE1,
      PCSrcM => PCSrcM,
+     
      -- SAIDAS
      -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
      Match => Match,
@@ -2083,7 +2151,7 @@ begin
 
  --------------------------------------------------------------------------
 
- hu : hazard_unit
+ hu : hazard_unit -- [VERIFICAR] IDEM
  port map
  (
      -- ENTRADAS
@@ -2099,6 +2167,7 @@ begin
 
      PCSrcW => PCSrcW,
      BranchTakenE => BranchTakenE,
+
      -- SAIDAS
      StallF => StallF, -- [VERIFICAR] Ligar em enable PC
      StallD => StallD, -- [VERIFICAR] Ligar em enable IF/ID
@@ -2118,13 +2187,7 @@ port map
 (
   clk => clk,
   reset => reset,
-  Cond => condE,--instr(31 downto 28),
-  ALUFlags => ALUFlags,
-  FlagW => FlagWriteE,
 
-  FlagsE => FlagsE, --adicionar sinal e adicionar Flags E na entidade cond_unit
-
-  Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
   PCS => PCSrcE1, -- entradas transplantadas
   RegW => RegWriteE1, -- entradas transplantadas
   MemW => MemWriteE1,-- entradas transplantadas
@@ -2135,9 +2198,17 @@ port map
 
   Branch => BranchE, -- [VERIFICAR] VEM DOS REGS DE PIPELINE PRA ENTRAR AQUI
   BranchTaken => BranchTakenE -- [VERIFICAR] TEM QUE TER UMA SAIDA BRANCH DA CONDUNIT PRA MANDAR LA PRO MUX DO PC
+
+  Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
+  FlagW => FlagWriteE,
+
+  Cond => condE,--instr(31 downto 28),
+  FlagsE => FlagsE, --adicionar sinal e adicionar Flags E na entidade cond_unit
+  ALUFlags => ALUFlags
 );
 
 
+-- [VERIFICAR] ENTRADAS E SAIDAS DOS REGS DE PIPELINE
  inst_partial_IF_ID : partial_IF_ID
  port map
  (

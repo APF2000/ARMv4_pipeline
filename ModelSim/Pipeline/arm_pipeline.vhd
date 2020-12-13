@@ -523,6 +523,89 @@ end;
 
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- TESTBENCH ARM
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+library IEEE;
+use IEEE.std_logic_1164.all;
+entity tb_arm is -- single cycle processor
+end;
+
+architecture tb of tb_arm is
+
+	component arm is
+	  port (
+		 clk, reset : in std_logic;
+		 PC : out std_logic_vector(31 downto 0);
+		 instr : in std_logic_vector(31 downto 0);
+		 
+		 MemWrite : out std_logic;
+		 ALUResult, WriteData : out std_logic_vector(31 downto 0);
+		 ReadData : in std_logic_vector(31 downto 0);
+
+		 db_instrF : out std_logic_vector(31 downto 0);
+		 --db_PC : out std_logic_vector(31 downto 0);
+		 db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+		 db_ALUResultE : out std_logic_vector(31 downto 0);
+		 db_WriteDataE : out std_logic_vector(31 downto 0);
+		 db_ReadDataW : out std_logic_vector(31 downto 0);
+		 db_ALUOutW : out std_logic_vector(31 downto 0)
+	  );
+	 end component;
+	 
+	 signal clk, reset :  std_logic;
+	 signal PC :  std_logic_vector(31 downto 0);
+	 signal instr :  std_logic_vector(31 downto 0);
+	 
+	 signal MemWrite :  std_logic;
+	 signal ALUResult, WriteData :  std_logic_vector(31 downto 0);
+	 signal ReadData :  std_logic_vector(31 downto 0);
+	  
+  begin
+  
+	  dut_arm : arm 
+		  port map
+		  (
+			 clk => clk, 
+			 reset => reset, 
+			 PC => PC, 
+			 instr => instr, 
+			 MemWrite => MemWrite, 
+			 ALUResult => DataAdr,  
+			 WriteData => WriteData, 
+			 ReadData => ReadData, 
+
+			 db_instrF => open, 
+			 db_RD1 => open,  
+			 db_RD2 => open, 
+			 db_ALUResultE => open, 
+			 db_WriteDataE => open, 
+			 db_ReadDataW => open, 
+			 db_ALUOutW =>  open
+		  );
+		  
+		  -- Generate clock with 10 ns period
+		  PROCESS begin
+			 clk <= '1';
+			 WAIT FOR 5 ns;
+			 clk <= '0';
+			 WAIT FOR 5 ns;
+		  end PROCESS;
+
+
+  -- check that 7 gets written to address 84 
+  -- at end of program
+  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
+    IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
+   
+        REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
+      ELSE THEN
+      end IF;
+    end IF;
+  end PROCESS;
+  
+ end architecture;
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- ARM
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;

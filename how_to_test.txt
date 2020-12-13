@@ -1,6 +1,6 @@
 cd /intelFPGA_lite/20.1/modelsim_ase/linuxaloem
-../../vcom -check_synthesis -2008 arm_single.vhd
-../../vsim -c -do "run -all" testbench
+../../../vcom -check_synthesis -2008 arm_pipeline.vhd
+../../../vsim -c -do "run -all" testbench
 
 E5902060
 

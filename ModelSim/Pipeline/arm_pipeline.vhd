@@ -23,40 +23,16 @@ architecture test OF testbench is
     port (
       clk, reset : in std_logic;
       WriteData, DataAdr : out std_logic_vector(31 downto 0);
-      MemWrite : out std_logic;
-
-      db_instrF : out std_logic_vector(31 downto 0);
-      --db_PC : out std_logic_vector(31 downto 0);
-      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-      db_ALUResultE : out std_logic_vector(31 downto 0);
-      db_WriteDataE : out std_logic_vector(31 downto 0);
-      db_ReadDataW : out std_logic_vector(31 downto 0);
-      db_ALUOutW : out std_logic_vector(31 downto 0)
+      MemWrite : out std_logic
     );
   end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
   signal clk, reset, MemWrite : std_logic;
 
-  signal db_instrF : std_logic_vector(31 downto 0);
-    --db_PC : std_logic_vector(31 downto 0);
-  signal db_RD1, db_RD2 : std_logic_vector(31 downto 0);
-  signal db_ALUResultE : std_logic_vector(31 downto 0);
-  signal db_WriteDataE : std_logic_vector(31 downto 0);
-  signal db_ReadDataW : std_logic_vector(31 downto 0);
-  signal db_ALUOutW : std_logic_vector(31 downto 0);
-
 begin
 
   -- instantiate device to be tested
-  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
-    db_instrF,
-    db_RD1,
-    db_RD2,
-    db_ALUResultE,
-    db_WriteDataE,
-    db_ReadDataW,
-    db_ALUOutW
-  );
+  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite);
 
   -- Generate clock with 10 ns period
   PROCESS begin
@@ -102,40 +78,16 @@ architecture tb of tb_top_2 is
     port (
       clk, reset : in std_logic;
       WriteData, DatAadr : out std_logic_vector(31 downto 0);
-      MemWrite : out std_logic;
-
-      db_instrF : out std_logic_vector(31 downto 0);
-      --db_PC : out std_logic_vector(31 downto 0);
-      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-      db_ALUResultE : out std_logic_vector(31 downto 0);
-      db_WriteDataE : out std_logic_vector(31 downto 0);
-      db_ReadDataW : out std_logic_vector(31 downto 0);
-      db_ALUOutW : out std_logic_vector(31 downto 0)
+      MemWrite : out std_logic
     );
   end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
   signal clk, reset, MemWrite : std_logic;
 
-  signal db_instrF : std_logic_vector(31 downto 0);
-    --db_PC : std_logic_vector(31 downto 0);
-  signal db_RD1, db_RD2 : std_logic_vector(31 downto 0);
-  signal db_ALUResultE : std_logic_vector(31 downto 0);
-  signal db_WriteDataE : std_logic_vector(31 downto 0);
-  signal db_ReadDataW : std_logic_vector(31 downto 0);
-  signal db_ALUOutW : std_logic_vector(31 downto 0);
-
 begin
 
   -- instantiate device to be tested
-  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
-    db_instrF,
-    db_RD1,
-    db_RD2,
-    db_ALUResultE,
-    db_WriteDataE,
-    db_ReadDataW,
-    db_ALUOutW
-  );
+  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite);
 
   -- Generate clock with 10 ns period
   PROCESS begin
@@ -177,15 +129,7 @@ entity top is -- top-level design for testing
   port (
     clk, reset : in std_logic;
     WriteData, DataAdr : BUFFER std_logic_vector(31 downto 0);
-    MemWrite : BUFFER std_logic;
-
-    db_instrF : out std_logic_vector(31 downto 0);
-    --db_PC : out std_logic_vector(31 downto 0);
-    db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-    db_ALUResultE : out std_logic_vector(31 downto 0);
-    db_WriteDataE : out std_logic_vector(31 downto 0);
-    db_ReadDataW : out std_logic_vector(31 downto 0);
-    db_ALUOutW : out std_logic_vector(31 downto 0)
+    MemWrite : BUFFER std_logic
   );
 end;
 
@@ -197,15 +141,7 @@ architecture test OF top is
       instr : in std_logic_vector(31 downto 0);
       MemWrite : out std_logic;
       ALUResult, WriteData : out std_logic_vector(31 downto 0);
-      ReadData : in std_logic_vector(31 downto 0);
-
-      db_instrF : out std_logic_vector(31 downto 0);
-      --db_PC : out std_logic_vector(31 downto 0);
-      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-      db_ALUResultE : out std_logic_vector(31 downto 0);
-      db_WriteDataE : out std_logic_vector(31 downto 0);
-      db_ReadDataW : out std_logic_vector(31 downto 0);
-      db_ALUOutW : out std_logic_vector(31 downto 0)
+      ReadData : in std_logic_vector(31 downto 0)
     );
   end component;
   component imem
@@ -234,15 +170,7 @@ begin
     MemWrite => MemWrite,
     ALUResult => DataAdr,
     WriteData => WriteData,
-    ReadData => ReadData,
-
-    db_instrF => db_instrF,
-    db_RD1 => db_RD1,
-    db_RD2 => db_RD2,
-    db_ALUResultE => db_ALUResultE,
-    db_WriteDataE => db_WriteDataE,
-    db_ReadDataW => db_ReadDataW,
-    db_ALUOutW =>  db_ALUOutW
+    ReadData => ReadData
   );
 
   i_imem : imem port map(
@@ -1071,15 +999,7 @@ architecture tb of tb_arm is
 
 		 MemWrite : out std_logic;
 		 ALUResult, WriteData : out std_logic_vector(31 downto 0);
-		 ReadData : in std_logic_vector(31 downto 0);
-
-		 db_instrF : out std_logic_vector(31 downto 0);
-		 --db_PC : out std_logic_vector(31 downto 0);
-		 db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-		 db_ALUResultE : out std_logic_vector(31 downto 0);
-		 db_WriteDataE : out std_logic_vector(31 downto 0);
-		 db_ReadDataW : out std_logic_vector(31 downto 0);
-		 db_ALUOutW : out std_logic_vector(31 downto 0)
+		 ReadData : in std_logic_vector(31 downto 0)
 	  );
 	 end component;
 
@@ -1105,15 +1025,7 @@ architecture tb of tb_arm is
 			 MemWrite => MemWrite,
 			 ALUResult => DataAdr,
 			 WriteData => WriteData,
-			 ReadData => ReadData,
-
-			 db_instrF => open,
-			 db_RD1 => open,
-			 db_RD2 => open,
-			 db_ALUResultE => open,
-			 db_WriteDataE => open,
-			 db_ReadDataW => open,
-			 db_ALUOutW =>  open
+			 ReadData => ReadData
 		  );
 
 		  -- Generate clock with 10 ns period
@@ -1168,15 +1080,7 @@ entity arm is -- single cycle processor
 
     MemWrite : out std_logic;
     ALUResult, WriteData : out std_logic_vector(31 downto 0);
-    ReadData : in std_logic_vector(31 downto 0);
-
-    db_instrF : out std_logic_vector(31 downto 0);
-    --db_PC : out std_logic_vector(31 downto 0);
-    db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
-    db_ALUResultE : out std_logic_vector(31 downto 0);
-    db_WriteDataE : out std_logic_vector(31 downto 0);
-    db_ReadDataW : out std_logic_vector(31 downto 0);
-    db_ALUOutW : out std_logic_vector(31 downto 0)
+    ReadData : in std_logic_vector(31 downto 0)
   );
 end;
 
@@ -1963,16 +1867,6 @@ begin
     PCSrcD <= PCSrc;
 
     PC <= s_PC;
-
-    -- [VERIFICAR] DBs todos desconectados
-    --db_instrF <= instrF;
-    --db_PC <=
-    --db_RD1 <= RD1D;
-    --db_RD2 <= RD2D;
-    --db_ALUResultE <= ALUResultE;
-    --db_WriteDataE <= WriteDataE;
-    --db_ReadDataW <= ReadDataW;
-    --db_ALUOutW <= ALUOutW;
 
  --------------------------------------------------
   CondD <= instrD(31 downto 28);

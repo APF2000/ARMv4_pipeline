@@ -31,7 +31,7 @@ architecture test OF testbench is
       db_ALUResultE : out std_logic_vector(31 downto 0);
       db_WriteDataE : out std_logic_vector(31 downto 0);
       db_ReadDataW : out std_logic_vector(31 downto 0);
-      db_ALUOutW : out std_logic_vector(31 downto 0)  
+      db_ALUOutW : out std_logic_vector(31 downto 0)
     );
   end component;
   signal WriteData, DataAdr : std_logic_vector(31 downto 0);
@@ -400,6 +400,221 @@ begin
 
 end architecture;
 
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- TESTBENCH HAZARD_UNIT
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+library IEEE;
+use IEEE.std_logic_1164.all;
+use STD.TEXTIO.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
+
+entity 
+
+entity hazard_unit is
+ 
+end entity;
+
+architecture arch of tb_hazard_unit is
+	component hazard_unit is
+		 port (
+			 clock : in std_logic;
+			 reset : in std_logic;
+			 Match : in std_logic_vector(4 downto 0);
+			 
+			 PCWrPendingF : in std_LOGIC;
+			 PCSrcW : in std_logic;
+			 BranchTakenE : in std_LOGIC;
+			 
+			RegWriteM : in std_logic;
+			RegWriteW : in std_logic;
+			MemToRegE : in std_logic;
+		 
+			 StallF : out std_logic;
+			 StallD : out std_logic;
+			 
+			 FlushD : out std_logic;
+			 FlushE : out std_logic;
+			 ForwardAE : out std_logic_vector(1 downto 0);
+			 ForwardBE : out std_logic_vector(1 downto 0)
+		);
+  end component;
+  
+  component hazard_logic is
+		port (
+		 -- ENTRADAS
+		 clock : in std_logic;
+		 reset : in std_logic;    
+		 RA1D : in std_logic_vector(3 downto 0);
+		 RA2D : in std_logic_vector(3 downto 0);
+		 RA1E : in std_logic_vector(3 downto 0);
+		 RA2E : in std_logic_vector(3 downto 0);
+		 WA3E : in std_logic_vector(3 downto 0);
+		 WA3M : in std_logic_vector(3 downto 0);
+		 WA3W : in std_logic_vector(3 downto 0);
+		 PCSrcD : in std_logic;
+		 PCSrcE : in std_logic; 
+		 PCSrcM : in std_logic;
+		 -- SAIDAS 
+		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+		 Match : out std_logic_vector(4 downto 0);
+		 PCWrPendingF: out std_logic
+	  );
+	end component;
+  
+  signal clock : std_logic;
+  signal reset : std_logic;
+  signal RegWriteM : std_logic;
+  signal RegWriteW : std_logic;
+  signal MemToRegE : std_logic;
+  signal StallF : std_logic;
+  signal StallD : std_logic;
+  signal FlushD : std_logic;
+  signal FlushE : std_logic;
+  signal ForwardAE : std_logic_vector(1 downto 0);
+  signal ForwardBE : std_logic_vector(1 downto 0);
+
+  signal RA1D : std_logic_vector(3 downto 0);
+  signal RA2D : std_logic_vector(3 downto 0);
+  signal RA1E : std_logic_vector(3 downto 0);
+  signal RA2E : std_logic_vector(3 downto 0);
+  signal WA3E : std_logic_vector(3 downto 0);
+  signal WA3M : std_logic_vector(3 downto 0);
+  signal WA3W : std_logic_vector(3 downto 0);
+  signal PCSrcD : std_logic;
+  signal PCSrcE : std_logic; 
+  signal PCSrcM : std_logic;
+  -- SAIDAS 
+  -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+  signal Match : std_logic_vector(4 downto 0);
+  signal PCWrPendingF: std_logic;
+  
+  signal s_simulando : std_logic := '0';
+  
+  signal Match : std_logic_vector(4 downto 0);
+			 
+  signal PCWrPendingF : std_LOGIC;
+  signal PCSrcW : std_logic;
+  signal BranchTakenE : std_LOGIC;
+
+begin
+
+  -- instantiate device to be tested
+	h_uni : hazard_unit
+  		 port (
+			 clock => clock,
+			 reset => reset,
+			 
+			 RegWriteM => RegWriteM,
+			 RegWriteW => RegWriteW,
+			 MemToRegE => MemToRegE,
+			 
+			 StallF => StallF,
+			 StallD => StallD,
+			 FlushD => FlushD,
+			 FlushE => FlushE,
+			 
+			 ForwardAE => ForwardAE,
+			 ForwardBE => ForwardBE,
+			 
+			 Match => Match,
+			 
+			 PCWrPendingF => PCWrPendingF,
+			 PCSrcW => PCSrcW,
+			 BranchTakenE => BranchTakenE
+		);
+		
+	h_logic : hazard_logic
+	port map (
+		 -- ENTRADAS
+		 clock => clock,
+		 reset > reset,    
+		 RA1D => RA1D,
+		 RA2D => RA2D,
+		 RA1E => RA1E,
+		 RA2E => RA2E,
+		 WA3E => WA3E,
+		 WA3M => WA3M,
+		 WA3W => WA3W,
+		 PCSrcD => PCSrcD,
+		 PCSrcE => PCSrcE, 
+		 PCSrcM => PCSrcM,
+		 -- SAIDAS 
+		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+		 Match => Match,
+		 PCWrPendingF => PCWrPendingF
+	 );
+
+  -- Generate clock with 10 ns period
+  PROCESS begin
+    clockk <= '1';
+    WAIT FOR 5 ns;
+    clockk <= '0';
+    WAIT FOR 5 ns;
+  end PROCESS;
+
+
+  -- check that 7 gets written to address 84 
+  -- at end of program
+  fim_sim : PROCESS 
+  (clock,   reset,   RA1E,   RA2E,   WA3M,   
+    RegWriteM,   RegWriteW,   MemToRegE, s_simulando, PCWrPendingF,
+	 PCSrcW, BranchTakenE, Match)
+  begin
+    IF (clk'event AND clk = '0') THEN
+      IF (s_simulando = '1') THEN			
+			if(Match(2) and RegWriteM) then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
+			if(Match(3) and RegWriteM) then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
+			else then assert ( ForwardAE = "00" ) report "ForwardA errado" severity error end if;
+			
+			if(Match(2) and RegWriteM) then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
+			if(Match(3) and RegWriteM) then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
+			else then assert ( ForwardBE = "00" ) report "ForwardB errado" severity error end if;
+			
+        --REport "NO ERRORS: Simulation succeeded" SEVERITY note;
+      ELSIF () THEN
+      end IF;
+    end IF;
+  end PROCESS;
+	
+	main_sim : PROCESS 
+  (clock,   reset,   RA1E,   RA2E,   WA3M,   
+    RegWriteM,   RegWriteW,   MemToRegE)
+	begin
+	 reset <= '1';
+    WAIT FOR 22 ns;
+    reset <= '0';
+    WAIT;
+	 
+	 s_simulando <= '1';
+	 
+	 RA1E <= X"A";
+	 RA2E <= X"B";
+	 
+	 RA1D <= X"C";
+	 RA2D <= X"D";
+	 
+	RegWriteM <= '1';
+	RegWriteW <= '0';
+	MemToRegE <= '1';
+
+	PCWrPendingF <= '0'; -- ???
+	
+	PCSrcW <= '0'; -- Sem branch
+	PCSrcD <= '0';
+	PCSrcE <= '0'; 
+	PCSrcM <= '0';	 
+	BranchTakenE <= '0';
+
+	WA3E <= x"1"; -- Endereco de write back da instr
+	WA3M <= x"2";
+	WA3W <= x"3";
+
+	 s_simulando <= '0';	
+	 
+	end process;
+	
+end architecture;
+
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- HAZARD_UNIT
@@ -413,8 +628,8 @@ entity hazard_unit is
   port (
     clock : in std_logic;
     reset : in std_logic;
-    RA1E : in std_logic_vector(31 downto 0);
-    RA2E : in std_logic_vector(31 downto 0);
+    RA1E : in std_logic_vector(4 downto 0);
+    RA2E : in std_logic_vector(4 downto 0);
     WA3M : in std_logic_vector(31 downto 0);
     RegWriteM : in std_logic;
     RegWriteW : in std_logic;

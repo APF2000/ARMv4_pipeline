@@ -167,10 +167,18 @@ begin
     db_ALUOutW =>  db_ALUOutW
   );
 
-  i_imem : imem port map(PC, instr);
+  i_imem : imem port map(
+    a => PC,
+    rd => instr
+  );
+
   i_dmem : dmem port map(
-    clk, MemWrite, DataAdr,
-    WriteData, ReadData);
+    clk => clk, 
+    we => MemWrite, 
+    a => DataAdr,
+    wd => WriteData, 
+    rd => ReadData
+  );
 end;
 
 -------------------------------------------------------------------------
@@ -598,7 +606,7 @@ component controller
       ALUFlags : out std_logic_vector(3 downto 0);
       PC : BUFFER std_logic_vector(31 downto 0);
       instrIn : in std_logic_vector(31 downto 0);
-      instrOut : in std_logic_vector(31 downto 0);
+      instrOut : out std_logic_vector(27 downto 12);
       ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
       ReadData : in std_logic_vector(31 downto 0);
       MemWriteIn : in std_logic;
@@ -695,7 +703,7 @@ begin
 
     PC => s_PC,
     instrIn => instrF,
-    instrOut => InstrD,
+    instrOut => instrD(27 downto 12),
 
     ReadData => ReadData, -- [VERIFICAR] VEM DA RAM, DATA MEMORY [e uma entrada]
 
@@ -1343,7 +1351,7 @@ begin
   );*/
   
 
-  i_alu : alu
+  aluinst : alu
   port map
   (
     a => RD1E, -- [MUDAR PRO PIPELINE] Deve vir de SrcAE
@@ -1643,4 +1651,40 @@ begin
       d3 when "11",
       d0 when others;
   
+end;
+
+library IEEE; use IEEE.STD_LOGIC_1164.all; 
+use IEEE.NUMERIC_STD_UNSIGNED.all;
+entity alu is 
+  port(a, b:       in  STD_LOGIC_VECTOR(31 downto 0);
+       ALUControl: in  STD_LOGIC_VECTOR(1 downto 0);
+       Result:     buffer STD_LOGIC_VECTOR(31 downto 0);
+       ALUFlags:      out STD_LOGIC_VECTOR(3 downto 0)
+  );
+end;
+
+architecture behave of alu is
+  signal condinvb: STD_LOGIC_VECTOR(31 downto 0);
+  signal sum:      STD_LOGIC_VECTOR(32 downto 0);
+  signal neg, zero, carry, overflow: STD_LOGIC;
+begin
+  condinvb <= not b when ALUControl(0) else b;
+  sum <= ('0', a) + ('0', condinvb) + ALUControl(0);
+
+  process(all) begin
+    case? ALUControl(1 downto 0) is
+      when "0-"   => result <= sum(31 downto 0); 
+      when "10"   => result <= a and b; 
+      when "11"   => result <= a or b; 
+      when others => result <= (others => '-');
+    end case?;
+  end process;
+
+  neg      <= Result(31);
+  zero     <= '1' when (Result = 0) else '0';
+  carry    <= (not ALUControl(1)) and sum(32);
+  overflow <= (not ALUControl(1)) and
+             (not (a(31) xor b(31) xor ALUControl(0))) and
+             (a(31) xor sum(31));
+  ALUFlags    <= (neg, zero, carry, overflow);
 end;

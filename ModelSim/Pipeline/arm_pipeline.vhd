@@ -611,7 +611,7 @@ component controller
       ReadData : in std_logic_vector(31 downto 0);
       MemWriteIn : in std_logic;
       MemWriteOut : out std_logic;
-      ALUResultOut: out std_logic_vector(31 downto 0);
+      ALUOut: out std_logic_vector(31 downto 0);
       -- [VERIFICAR] TEM QUE ESTAR CONECTADOS QUANDO TIVER O PIPELINE
       FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
       Branch : in std_logic --adicionar na top level entity
@@ -709,7 +709,8 @@ begin
 
     MemWriteOut => MemWriteM,
     WriteData => WriteDataM,
-    ALUResult => ALUResultM
+    --ALUResult => ALUResultM [VERIFICAR] ESSE SINAL NAO SERVE PRA NADA
+    ALUOut => ALUResultM
 
     -- [MUDAR PIPELINE] ESTES SINAIS JA ESTAO INTERNAMENTE NO DATAPATH
     /*ALUResult => ALUResultE, 
@@ -969,11 +970,14 @@ entity datapath is
     PC : BUFFER std_logic_vector(31 downto 0);
     instrIn : in std_logic_vector(31 downto 0);
     instrOut : out std_logic_vector(27 downto 12);
+
     ALUResult, WriteData : BUFFER std_logic_vector(31 downto 0);
     ReadData : in std_logic_vector(31 downto 0);
+
     MemWriteIn : in std_logic;
     MemWriteOut : out std_logic;
-    ALUResultOut: out std_logic_vector(31 downto 0);
+
+    ALUOut: out std_logic_vector(31 downto 0);
     FlagWrite : in std_logic_vector(1 downto 0); --[esta certo sim, confia]confirmar se tamanho esta certo e adicionar na top level entity
     Branch : in std_logic --adicionar na top level entity
   );
@@ -1208,6 +1212,8 @@ begin
     instrF <= instrIn;
 
     ALUResult <= ALUResultM;
+    ALUOut <= ALUOutM;
+
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
     MemWriteOut <= MemWriteM; --saida do datapath

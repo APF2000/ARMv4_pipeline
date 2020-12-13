@@ -595,9 +595,9 @@ architecture tb of tb_arm is
   -- check that 7 gets written to address 84 
   -- at end of program
   PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
-    IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
+    IF (clk'event AND clk = '0' /*AND MemWrite = /*'1'*/) THEN
    
-        REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
+        --REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
       ELSE THEN
       end IF;
     end IF;

@@ -648,6 +648,13 @@ begin
 			if(Match(3) and RegWriteM = '1') then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
 			else then assert ( ForwardBE = "00" ) report "ForwardB errado" severity error end if;
 			
+			
+			assert (PCWrPendingF = PCSrcD or PCSrcE or PCSrcM) report "PCWr errado" severity error;
+			assert (FlushD = PCWrPendingF or PCSrcW or BranchTakenE) report "FlushD errado" severity error;
+--			StallD = LDRstall;
+--			StallF = LDRstall + PCWrPendingF;
+--			FlushE = LDRstall + BranchTakenE;
+
         --REport "NO ERRORS: Simulation succeeded" SEVERITY note;
       ELSIF () THEN
       end IF;
@@ -666,19 +673,17 @@ begin
 	 s_simulando <= '1';
 	 
 	 ------------------------
-	 --  Teste1
+	 --  Teste1 : ID: ADD, EX: ADD, MEM: ADD
 	 ------------------------
 	 RA1E <= X"A";
-	 RA2E <= X"2"; -- conflito com wa3m
+	 RA2E <= X"3"; -- conflito com wa3w
 	 
 	 RA1D <= X"C";
-	 RA2D <= X"3"; -- conflito com wa3w
+	 RA2D <= X"2"; -- conflito com wa3m
 	 
 	RegWriteM <= '1';
-	RegWriteW <= '0';
+	RegWriteW <= '1';
 	MemToRegE <= '1';
-
-	PCWrPendingF <= '0'; -- ???
 	
 	PCSrcW <= '0'; -- Sem branch
 	PCSrcD <= '0';
@@ -691,20 +696,30 @@ begin
 	WA3M <= x"2"; -- Hazard
 	WA3W <= x"3"; -- Hazard
 	
-	 ------------------------
-	 --  Teste2
-	 ------------------------
+	assert ( false ) report "Teste 1" severity note;
+	
+	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
+	
+	-- Esperar terminar instr e apagar o que estava para ir pro EX
+	assert ( StallF = '1' ) report "StallF errado" severity error;
+	assert ( StallD = '1' ) report "StallD errado" severity error;
+	
+	assert ( FlushD = '0' ) report "FlushD errado" severity error;
+	assert ( FlushE = '1' ) report "FlushE errado" severity error;
+	
+	
+	 ------------------------------------------
+	 --  Teste2 IF: SUM, ID: SUM, EX: LDR, MEM: SUM 
+	 ------------------------------------------
 	 RA1E <= X"A";
 	 RA2E <= X"2"; -- conflito com wa3m
 	 
 	 RA1D <= X"C";
-	 RA2D <= X"3"; -- conflito com wa3w
+	 RA2D <= X"1"; -- conflito com wa3e : livro pag 436
 	 
 	RegWriteM <= '1';
 	RegWriteW <= '0';
 	MemToRegE <= '1';
-
-	PCWrPendingF <= '0'; -- ???
 	
 	PCSrcW <= '0'; -- Sem branch
 	PCSrcD <= '0';
@@ -717,58 +732,19 @@ begin
 	WA3M <= x"2"; -- Hazard
 	WA3W <= x"3"; -- Hazard
 	
-	 ------------------------
-	 --  Teste3
-	 ------------------------
-	 RA1E <= X"A";
-	 RA2E <= X"2"; -- conflito com wa3m
-	 
-	 RA1D <= X"C";
-	 RA2D <= X"3"; -- conflito com wa3w
-	 
-	RegWriteM <= '1';
-	RegWriteW <= '0';
-	MemToRegE <= '1';
-
-	PCWrPendingF <= '0'; -- ???
+	assert ( false ) report "Teste 2" severity error;
 	
-	PCSrcW <= '0'; -- Sem branch
-	PCSrcD <= '0';
-	PCSrcE <= '0';
-	PCSrcM <= '0';	 
-	BranchTakenE <= '0';
-
-	WA3E <= x"1"; -- Endereco de write back da instr
+	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
 	
-	WA3M <= x"2"; -- Hazard
-	WA3W <= x"3"; -- Hazard
+	assert ( StallF = '1' ) report "StallF errado" severity error;
+	assert ( StallD = '1' ) report "StallD errado" severity error;
 	
-	 ------------------------
-	 --  Teste4
-	 ------------------------
-	 RA1E <= X"A";
-	 RA2E <= X"2"; -- conflito com wa3m
-	 
-	 RA1D <= X"C";
-	 RA2D <= X"3"; -- conflito com wa3w
-	 
-	RegWriteM <= '1';
-	RegWriteW <= '0';
-	MemToRegE <= '1';
-
-	PCWrPendingF <= '0'; -- ???
+	assert ( FlushD = '0' ) report "FlushD errado" severity error; -- [VERIFICAR] zero ou um ??
+	assert ( FlushE = '1' ) report "FlushE errado" severity error;
 	
-	PCSrcW <= '0'; -- Sem branch
-	PCSrcD <= '0';
-	PCSrcE <= '0';
-	PCSrcM <= '0';	 
-	BranchTakenE <= '0';
 
-	WA3E <= x"1"; -- Endereco de write back da instr
+	---------------------------------------------------------------------
 	
-	WA3M <= x"2"; -- Hazard
-	WA3W <= x"3"; -- Hazard
-
 	 s_simulando <= '0';	
 	 
 	end process;

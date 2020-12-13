@@ -677,7 +677,7 @@ begin
   WriteData <= WriteDataM;
   ALUResult <= ALUResultM;
 
-  instrD <= instr;
+  instrF <= instr;
 
   cont : controller port map(
     clk => clk, 
@@ -721,7 +721,7 @@ begin
     ALUFlags => ALUFlags,
 
     PC => s_PC,
-    instr => instrD,
+    instr => instrF,
 
     ReadData => ReadData, -- [VERIFICAR] VEM DA RAM, DATA MEMORY [e uma entrada]
 

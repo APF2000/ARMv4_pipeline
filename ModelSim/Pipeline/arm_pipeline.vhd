@@ -297,7 +297,7 @@ begin
   generic map(width => 32)
   port map
   (
-    clk => clk,
+    clk => clock,
     reset => s_flush,
     en => s_not_stall,
     d => instrF,
@@ -367,7 +367,7 @@ begin
   generic map(width => 126)
   port map
   (
-    clk => clk,
+    clk => clock,
     reset => s_flush,
     en => '1',
     d => s_in,
@@ -455,7 +455,7 @@ begin
   generic map(width => 72)
   port map
   (
-    clk => clk,
+    clk => clock,
     reset => reset,
     en => '1',
     d => s_in,
@@ -492,6 +492,7 @@ use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity partial_MEM_WB is
   port (
     clock : in std_logic;
+    reset : in std_logic;
 
     PCSrcM : in std_logic;
     RegWriteM : in std_logic;
@@ -529,7 +530,7 @@ begin
   generic map(width => 71)
   port map
   (
-    clk => clk,
+    clk => clock,
     reset => reset,
     en => '1',
     d => s_in,
@@ -549,289 +550,276 @@ begin
   PCSrcW <= s_out  (2);
   RegWriteW <= s_out  (1);
   MemtoRegW <= s_out  (0); 
-----------------------------------
-  PCSrcW <= s_PCSrc;
-  RegWriteW <= s_RegWrite;
-  MemtoRegW <= s_MemtoReg;
-
-  ALUOutW <= s_ALUOut;
-  WA3W <= s_WA3;
-  ReadDataW <= s_RD;
 
 end architecture;
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- TESTBENCH HAZARD_UNIT
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-library IEEE;
-use IEEE.std_logic_1164.all;
-use STD.TEXTIO.all;
-use IEEE.NUMERIC_STD_UNSIGNED.all;
-
-entity
-
-entity hazard_unit is
-
-end entity;
-
-architecture arch of tb_hazard_unit is
-	component hazard_unit is
-		 port (
-			 clock : in std_logic;
-			 reset : in std_logic;
-			 Match : in std_logic_vector(4 downto 0);
-
-			 PCWrPendingF : in std_LOGIC;
-			 PCSrcW : in std_logic;
-			 BranchTakenE : in std_LOGIC;
-
-			RegWriteM : in std_logic;
-			RegWriteW : in std_logic;
-			MemToRegE : in std_logic;
-
-			 StallF : out std_logic;
-			 StallD : out std_logic;
-
-			 FlushD : out std_logic;
-			 FlushE : out std_logic;
-			 ForwardAE : out std_logic_vector(1 downto 0);
-			 ForwardBE : out std_logic_vector(1 downto 0)
-		);
-  end component;
-
-  component hazard_logic is
-		port (
-		 -- ENTRADAS
-		 clock : in std_logic;
-		 reset : in std_logic;
-		 RA1D : in std_logic_vector(3 downto 0);
-		 RA2D : in std_logic_vector(3 downto 0);
-		 RA1E : in std_logic_vector(3 downto 0);
-		 RA2E : in std_logic_vector(3 downto 0);
-		 WA3E : in std_logic_vector(3 downto 0);
-		 WA3M : in std_logic_vector(3 downto 0);
-		 WA3W : in std_logic_vector(3 downto 0);
-		 PCSrcD : in std_logic;
-		 PCSrcE : in std_logic;
-		 PCSrcM : in std_logic;
-		 -- SAIDAS
-		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
-		 Match : out std_logic_vector(4 downto 0);
-		 PCWrPendingF: out std_logic
-	  );
-	end component;
-
-  signal clock : std_logic;
-  signal reset : std_logic;
-  signal RegWriteM : std_logic;
-  signal RegWriteW : std_logic;
-  signal MemToRegE : std_logic;
-  signal StallF : std_logic;
-  signal StallD : std_logic;
-  signal FlushD : std_logic;
-  signal FlushE : std_logic;
-  signal ForwardAE : std_logic_vector(1 downto 0);
-  signal ForwardBE : std_logic_vector(1 downto 0);
-
-  signal RA1D : std_logic_vector(3 downto 0);
-  signal RA2D : std_logic_vector(3 downto 0);
-  signal RA1E : std_logic_vector(3 downto 0);
-  signal RA2E : std_logic_vector(3 downto 0);
-  signal WA3E : std_logic_vector(3 downto 0);
-  signal WA3M : std_logic_vector(3 downto 0);
-  signal WA3W : std_logic_vector(3 downto 0);
-  signal PCSrcD : std_logic;
-  signal PCSrcE : std_logic;
-  signal PCSrcM : std_logic;
-  -- SAIDAS
-  -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
-  signal Match : std_logic_vector(4 downto 0);
-  signal PCWrPendingF: std_logic;
-
-  signal s_simulando : std_logic := '0';
-
-  signal Match : std_logic_vector(4 downto 0);
-
-  signal PCWrPendingF : std_LOGIC;
-  signal PCSrcW : std_logic;
-  signal BranchTakenE : std_LOGIC;
-
-begin
-
-  -- instantiate device to be tested
-	h_uni : hazard_unit
-  		 port (
-			 clock => clock,
-			 reset => reset,
-
-			 RegWriteM => RegWriteM,
-			 RegWriteW => RegWriteW,
-			 MemToRegE => MemToRegE,
-
-			 StallF => StallF,
-			 StallD => StallD,
-			 FlushD => FlushD,
-			 FlushE => FlushE,
-
-			 ForwardAE => ForwardAE,
-			 ForwardBE => ForwardBE,
-
-			 Match => Match,
-
-			 PCWrPendingF => PCWrPendingF,
-			 PCSrcW => PCSrcW,
-			 BranchTakenE => BranchTakenE
-		);
-
-	h_logic : hazard_logic
-	port map (
-		 -- ENTRADAS
-		 clock => clock,
-		 reset > reset,
-		 RA1D => RA1D,
-		 RA2D => RA2D,
-		 RA1E => RA1E,
-		 RA2E => RA2E,
-		 WA3E => WA3E,
-		 WA3M => WA3M,
-		 WA3W => WA3W,
-		 PCSrcD => PCSrcD,
-		 PCSrcE => PCSrcE,
-		 PCSrcM => PCSrcM,
-		 -- SAIDAS
-		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
-		 Match => Match,
-		 PCWrPendingF => PCWrPendingF
-	 );
-
-  -- Generate clock with 10 ns period
-  PROCESS begin
-    clockk <= '1';
-    WAIT FOR 5 ns;
-    clockk <= '0';
-    WAIT FOR 5 ns;
-  end PROCESS;
+-- library IEEE;
+-- use IEEE.std_logic_1164.all;
+-- use STD.TEXTIO.all;
+-- use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 
-  -- check that 7 gets written to address 84
-  -- at end of program
-  verif : PROCESS
-  (clock,   reset,   RA1E,   RA2E,   WA3M,
-    RegWriteM,   RegWriteW,   MemToRegE, s_simulando, PCWrPendingF,
-	 PCSrcW, BranchTakenE, Match)
-  begin
-    IF (clk'event AND clk = '0') THEN
-      IF (s_simulando = '1') THEN
-			if(Match(2) and RegWriteM = '1') then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
-			if(Match(3) and RegWriteM = '1') then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
-			else then assert ( ForwardAE = "00" ) report "ForwardA errado" severity error end if;
+-- entity tb_hazard_unit is
+-- end entity;
 
-			if(Match(2) and RegWriteM = '1') then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
-			if(Match(3) and RegWriteM = '1') then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
-			else then assert ( ForwardBE = "00" ) report "ForwardB errado" severity error end if;
+-- architecture arch of tb_hazard_unit is
+-- 	component hazard_unit is
+-- 		 port (
+-- 			 clock : in std_logic;
+-- 			 reset : in std_logic;
+-- 			 Match : in std_logic_vector(4 downto 0);
+
+-- 			 PCWrPendingF : in std_LOGIC;
+-- 			 PCSrcW : in std_logic;
+-- 			 BranchTakenE : in std_LOGIC;
+
+-- 			RegWriteM : in std_logic;
+-- 			RegWriteW : in std_logic;
+-- 			MemToRegE : in std_logic;
+
+-- 			 StallF : out std_logic;
+-- 			 StallD : out std_logic;
+
+-- 			 FlushD : out std_logic;
+-- 			 FlushE : out std_logic;
+-- 			 ForwardAE : out std_logic_vector(1 downto 0);
+-- 			 ForwardBE : out std_logic_vector(1 downto 0)
+-- 		);
+--   end component;
+
+--   component hazard_logic is
+-- 		port (
+-- 		 -- ENTRADAS
+-- 		 clock : in std_logic;
+-- 		 reset : in std_logic;
+-- 		 RA1D : in std_logic_vector(3 downto 0);
+-- 		 RA2D : in std_logic_vector(3 downto 0);
+-- 		 RA1E : in std_logic_vector(3 downto 0);
+-- 		 RA2E : in std_logic_vector(3 downto 0);
+-- 		 WA3E : in std_logic_vector(3 downto 0);
+-- 		 WA3M : in std_logic_vector(3 downto 0);
+-- 		 WA3W : in std_logic_vector(3 downto 0);
+-- 		 PCSrcD : in std_logic;
+-- 		 PCSrcE : in std_logic;
+-- 		 PCSrcM : in std_logic;
+-- 		 -- SAIDAS
+-- 		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+-- 		 Match : out std_logic_vector(4 downto 0);
+-- 		 PCWrPendingF: out std_logic
+-- 	  );
+-- 	end component;
+
+--   signal clock : std_logic;
+--   signal reset : std_logic;
+--   signal RegWriteM : std_logic;
+--   signal RegWriteW : std_logic;
+--   signal MemToRegE : std_logic;
+--   signal StallF : std_logic;
+--   signal StallD : std_logic;
+--   signal FlushD : std_logic;
+--   signal FlushE : std_logic;
+--   signal ForwardAE : std_logic_vector(1 downto 0);
+--   signal ForwardBE : std_logic_vector(1 downto 0);
+
+--   signal RA1D : std_logic_vector(3 downto 0);
+--   signal RA2D : std_logic_vector(3 downto 0);
+--   signal RA1E : std_logic_vector(3 downto 0);
+--   signal RA2E : std_logic_vector(3 downto 0);
+--   signal WA3E : std_logic_vector(3 downto 0);
+--   signal WA3M : std_logic_vector(3 downto 0);
+--   signal WA3W : std_logic_vector(3 downto 0);
+--   signal PCSrcD : std_logic;
+--   signal PCSrcE : std_logic;
+--   signal PCSrcM : std_logic;
+--   -- SAIDAS
+--   -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+--   signal Match : std_logic_vector(4 downto 0);
+--   signal PCWrPendingF: std_logic;
+
+--   signal s_simulando : std_logic := '0';
+  
+--   signal PCSrcW : std_logic;
+--   signal BranchTakenE : std_LOGIC;
+
+-- begin
+
+--   -- instantiate device to be tested
+-- 	h_uni : hazard_unit
+--   		 port map (
+-- 			 clock => clock,
+-- 			 reset => reset,
+
+-- 			 RegWriteM => RegWriteM,
+-- 			 RegWriteW => RegWriteW,
+-- 			 MemToRegE => MemToRegE,
+
+-- 			 StallF => StallF,
+-- 			 StallD => StallD,
+-- 			 FlushD => FlushD,
+-- 			 FlushE => FlushE,
+
+-- 			 ForwardAE => ForwardAE,
+-- 			 ForwardBE => ForwardBE,
+
+-- 			 Match => Match,
+
+-- 			 PCWrPendingF => PCWrPendingF,
+-- 			 PCSrcW => PCSrcW,
+-- 			 BranchTakenE => BranchTakenE
+-- 		);
+
+-- 	h_logic : hazard_logic
+-- 	port map (
+-- 		 -- ENTRADAS
+-- 		 clock => clock,
+-- 		 reset => reset,
+-- 		 RA1D => RA1D,
+-- 		 RA2D => RA2D,
+-- 		 RA1E => RA1E,
+-- 		 RA2E => RA2E,
+-- 		 WA3E => WA3E,
+-- 		 WA3M => WA3M,
+-- 		 WA3W => WA3W,
+-- 		 PCSrcD => PCSrcD,
+-- 		 PCSrcE => PCSrcE,
+-- 		 PCSrcM => PCSrcM,
+-- 		 -- SAIDAS
+-- 		 -- (Match_12D_E, Match_2E_W, Match_2E_M, Match_1E_W, Match_1E_M)
+-- 		 Match => Match,
+-- 		 PCWrPendingF => PCWrPendingF
+-- 	 );
+
+--   -- Generate clock with 10 ns period
+--   PROCESS begin
+--     clock <= '1';
+--     WAIT FOR 5 ns;
+--     clock <= '0';
+--     WAIT FOR 5 ns;
+--   end PROCESS;
 
 
-			assert (PCWrPendingF = PCSrcD or PCSrcE or PCSrcM) report "PCWr errado" severity error;
-			assert (FlushD = PCWrPendingF or PCSrcW or BranchTakenE) report "FlushD errado" severity error;
---			StallD = LDRstall;
---			StallF = LDRstall + PCWrPendingF;
---			FlushE = LDRstall + BranchTakenE;
+--   -- check that 7 gets written to address 84
+--   -- at end of program
+--   verif : PROCESS
+--   (clock,   reset,   RA1E,   RA2E,   WA3M,
+--     RegWriteM,   RegWriteW,   MemToRegE, s_simulando, PCWrPendingF,
+-- 	 PCSrcW, BranchTakenE, Match)
+--   begin
+--     IF (clock'event AND clock = '0') THEN
+--       IF (s_simulando = '1') THEN
+-- 			elsif( (Match(2) and RegWriteM) = '1') then assert ( ForwardAE = "10" ) report "ForwardA errado" severity error;
+-- 			elsif( (Match(3) and RegWriteM) = '1') then assert ( ForwardAE = "01" ) report "ForwardA errado" severity error;
+-- 			else assert ( ForwardAE = "00" ) report "ForwardA errado" severity error; end if;
 
-        --REport "NO ERRORS: Simulation succeeded" SEVERITY note;
-      ELSIF () THEN
-      end IF;
-    end IF;
-  end PROCESS;
-
-	main_sim : PROCESS
-  (clock,   reset,   RA1E,   RA2E,   WA3M,
-    RegWriteM,   RegWriteW,   MemToRegE)
-	begin
-	 reset <= '1';
-    WAIT FOR 22 ns;
-    reset <= '0';
-    WAIT;
-
-	 s_simulando <= '1';
-
-	 ------------------------
-	 --  Teste1 : ID: ADD, EX: ADD, MEM: ADD
-	 ------------------------
-	 RA1E <= X"A";
-	 RA2E <= X"3"; -- conflito com wa3w
-
-	 RA1D <= X"C";
-	 RA2D <= X"2"; -- conflito com wa3m
-
-	RegWriteM <= '1';
-	RegWriteW <= '1';
-	MemToRegE <= '1';
-
-	PCSrcW <= '0'; -- Sem branch
-	PCSrcD <= '0';
-	PCSrcE <= '0';
-	PCSrcM <= '0';
-	BranchTakenE <= '0';
-
-	WA3E <= x"1"; -- Endereco de write back da instr
-
-	WA3M <= x"2"; -- Hazard
-	WA3W <= x"3"; -- Hazard
-
-	assert ( false ) report "Teste 1" severity note;
-
-	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
-
-	-- Esperar terminar instr e apagar o que estava para ir pro EX
-	assert ( StallF = '1' ) report "StallF errado" severity error;
-	assert ( StallD = '1' ) report "StallD errado" severity error;
-
-	assert ( FlushD = '0' ) report "FlushD errado" severity error;
-	assert ( FlushE = '1' ) report "FlushE errado" severity error;
+-- 			elsif( (Match(2) and RegWriteM) = '1') then assert ( ForwardBE = "10" ) report "ForwardB errado" severity error;
+-- 			elsif( (Match(3) and RegWriteM) = '1') then assert ( ForwardBE = "01" ) report "ForwardB errado" severity error;
+-- 			else assert ( ForwardBE = "00" ) report "ForwardB errado" severity error; end if;
 
 
-	 ------------------------------------------
-	 --  Teste2 IF: SUM, ID: SUM, EX: LDR, MEM: SUM
-	 ------------------------------------------
-	 RA1E <= X"A";
-	 RA2E <= X"2"; -- conflito com wa3m
+-- 			assert (PCWrPendingF = (PCSrcD or PCSrcE or PCSrcM) ) report "PCWr errado" severity error;
+-- 			assert (FlushD = (PCWrPendingF or PCSrcW or BranchTakenE) ) report "FlushD errado" severity error;
+-- --			StallD = LDRstall;
+-- --			StallF = LDRstall + PCWrPendingF;
+-- --			FlushE = LDRstall + BranchTakenE;
 
-	 RA1D <= X"C";
-	 RA2D <= X"1"; -- conflito com wa3e : livro pag 436
+--         --REport "NO ERRORS: Simulation succeeded" SEVERITY note;
+--       --ELSIF () THEN
+--       --end IF;
+--     end IF;
+--   end PROCESS;
 
-	RegWriteM <= '1';
-	RegWriteW <= '0';
-	MemToRegE <= '1';
+-- 	main_sim : PROCESS
+--   (all)--clock,   reset,   RA1E,   RA2E,   WA3M,
+--     --RegWriteM,   RegWriteW,   MemToRegE)
+-- 	begin
+-- 	 reset <= '1';
+--     WAIT FOR 22 ns;
+--     reset <= '0';
+--     WAIT;
 
-	PCSrcW <= '0'; -- Sem branch
-	PCSrcD <= '0';
-	PCSrcE <= '0';
-	PCSrcM <= '0';
-	BranchTakenE <= '0';
+-- 	 s_simulando <= '1';
 
-	WA3E <= x"1"; -- Endereco de write back da instr
+-- 	 ------------------------
+-- 	 --  Teste1 : ID: ADD, EX: ADD, MEM: ADD
+-- 	 ------------------------
+-- 	 RA1E <= X"A";
+-- 	 RA2E <= X"3"; -- conflito com wa3w
 
-	WA3M <= x"2"; -- Hazard
-	WA3W <= x"3"; -- Hazard
+-- 	 RA1D <= X"C";
+-- 	 RA2D <= X"2"; -- conflito com wa3m
 
-	assert ( false ) report "Teste 2" severity error;
+-- 	RegWriteM <= '1';
+-- 	RegWriteW <= '1';
+-- 	MemToRegE <= '1';
 
-	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
+-- 	PCSrcW <= '0'; -- Sem branch
+-- 	PCSrcD <= '0';
+-- 	PCSrcE <= '0';
+-- 	PCSrcM <= '0';
+-- 	BranchTakenE <= '0';
 
-	assert ( StallF = '1' ) report "StallF errado" severity error;
-	assert ( StallD = '1' ) report "StallD errado" severity error;
+-- 	WA3E <= x"1"; -- Endereco de write back da instr
 
-	assert ( FlushD = '0' ) report "FlushD errado" severity error; -- [VERIFICAR] zero ou um ??
-	assert ( FlushE = '1' ) report "FlushE errado" severity error;
+-- 	WA3M <= x"2"; -- Hazard
+-- 	WA3W <= x"3"; -- Hazard
+
+-- 	assert ( false ) report "Teste 1" severity note;
+
+-- 	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
+
+-- 	-- Esperar terminar instr e apagar o que estava para ir pro EX
+-- 	assert ( StallF = '1' ) report "StallF errado" severity error;
+-- 	assert ( StallD = '1' ) report "StallD errado" severity error;
+
+-- 	assert ( FlushD = '0' ) report "FlushD errado" severity error;
+-- 	assert ( FlushE = '1' ) report "FlushE errado" severity error;
 
 
-	---------------------------------------------------------------------
+-- 	 ------------------------------------------
+-- 	 --  Teste2 IF: SUM, ID: SUM, EX: LDR, MEM: SUM
+-- 	 ------------------------------------------
+-- 	 RA1E <= X"A";
+-- 	 RA2E <= X"2"; -- conflito com wa3m
 
-	 s_simulando <= '0';
+-- 	 RA1D <= X"C";
+-- 	 RA2D <= X"1"; -- conflito com wa3e : livro pag 436
 
-	end process;
+-- 	RegWriteM <= '1';
+-- 	RegWriteW <= '0';
+-- 	MemToRegE <= '1';
 
-end architecture;
+-- 	PCSrcW <= '0'; -- Sem branch
+-- 	PCSrcD <= '0';
+-- 	PCSrcE <= '0';
+-- 	PCSrcM <= '0';
+-- 	BranchTakenE <= '0';
+
+-- 	WA3E <= x"1"; -- Endereco de write back da instr
+
+-- 	WA3M <= x"2"; -- Hazard
+-- 	WA3W <= x"3"; -- Hazard
+
+-- 	assert ( false ) report "Teste 2" severity error;
+
+-- 	assert ( PCWrPendingF = '0' ) report "PCWr errado" severity error;
+
+-- 	assert ( StallF = '1' ) report "StallF errado" severity error;
+-- 	assert ( StallD = '1' ) report "StallD errado" severity error;
+
+-- 	assert ( FlushD = '0' ) report "FlushD errado" severity error; -- [VERIFICAR] zero ou um ??
+-- 	assert ( FlushE = '1' ) report "FlushE errado" severity error;
+
+
+-- 	---------------------------------------------------------------------
+
+-- 	 s_simulando <= '0';
+
+-- 	end process;
+
+-- end architecture;*/
 
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -1101,7 +1089,9 @@ architecture tb of tb_arm is
 
 	 signal MemWrite :  std_logic;
 	 signal ALUResult, WriteData :  std_logic_vector(31 downto 0);
-	 signal ReadData :  std_logic_vector(31 downto 0);
+   signal ReadData :  std_logic_vector(31 downto 0);
+   
+   signal DataAdr : std_logic_vector(31 downto 0);
 
   begin
 
@@ -1143,12 +1133,11 @@ architecture tb of tb_arm is
 
 
 
-  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
-    IF (clk'event AND clk = '0' /*AND MemWrite = /*'1'*/) THEN
+  PROCESS begin--(clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
+    IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
 
         --REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
-      ELSE THEN
-      end IF;
+    ELSE
     end IF;
   end PROCESS;
 
@@ -1156,7 +1145,7 @@ architecture tb of tb_arm is
   -- Instrucoes:
   --
   --
-  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData )
+  PROCESS --(clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData )
   begin
 		wait until reset = '0';
 
@@ -1291,7 +1280,7 @@ component controller
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
- signal Branch : std_logic --adicionar na top level entity
+ signal Branch : std_logic; --adicionar na top level entity
 
 
 begin
@@ -1357,12 +1346,6 @@ begin
     WriteData => WriteDataM,
     --ALUResult => ALUResultM [VERIFICAR] ESSE SINAL NAO SERVE PRA NADA
     ALUOut => ALUResultM
-
-    -- [MUDAR PIPELINE] ESTES SINAIS JA ESTAO INTERNAMENTE NO DATAPATH
-    /*ALUResult => ALUResultE,
-    WriteData => WriteDataE,
-    ReadData => ReadDataW,
-    MemWrite => MemWRite*/
   );
 end architecture;
 
@@ -1392,7 +1375,7 @@ entity controller is -- single cycle control decoder
     FlagWrite : out std_logic_vector(1 downto 0);-- [VERIFICAR] E BIT OU E VETOR??
     Branch : out std_logic
   );
-end;
+end entity;
 
 architecture struct OF controller is
   component decoder
@@ -1515,7 +1498,7 @@ entity cond_unit is -- Conditional logic
 
     Flags: out std_logic_vector(3 downto 0);
     PCSrc, RegWrite : out std_logic;
-    MemWrite : out std_logic
+    MemWrite : out std_logic;
     BranchTaken : out std_logic
   );
 end;
@@ -1760,6 +1743,7 @@ end component;
 component partial_MEM_WB is
   port (
     clock : in std_logic;
+    reset : in std_logic;
 
     PCSrcM : in std_logic;
     RegWriteM : in std_logic;
@@ -1778,24 +1762,23 @@ component partial_MEM_WB is
 end component;
 
 ---------------------------------------------------------
-component cond_unit
-port (
-    clk, reset : in std_logic;
+  component cond_unit
+  port (
+      clk, reset : in std_logic;
 
-    Cond : in std_logic_vector(3 downto 0);
-    ALUFlags : in std_logic_vector(3 downto 0);
-    FlagW : in std_logic_vector(1 downto 0);
-    PCS, RegW, MemW : in std_logic;
-    FlagsE: in std_logic_vector(3 downto 0);
-    Branch : in std_logic;
+      Cond : in std_logic_vector(3 downto 0);
+      ALUFlags : in std_logic_vector(3 downto 0);
+      FlagW : in std_logic_vector(1 downto 0);
+      PCS, RegW, MemW : in std_logic;
+      FlagsE: in std_logic_vector(3 downto 0);
+      Branch : in std_logic;
 
-    Flags: out std_logic_vector(3 downto 0);
-    PCSrc, RegWrite : out std_logic;
-    MemWrite : out std_logic
-    BranchTaken : out std_logic
+      Flags: out std_logic_vector(3 downto 0);
+      PCSrc, RegWrite : out std_logic;
+      MemWrite : out std_logic;
+      BranchTaken : out std_logic
   );
-);
-end component;
+  end component;
 -----------------------------------------------------------
 
   component alu
@@ -1842,8 +1825,9 @@ end component;
   generic (width : integer);
     port (
       d0, d1, d2, d3 : in std_logic_vector(width - 1 downto 0);
-      s : in std_logic;
-      y : out std_logic_vector(width - 1 downto 0));
+      s : in std_logic_vector(1 downto 0);
+      y : out std_logic_vector(width - 1 downto 0)
+    );
   end component;
   component flopenr -- flip-flop with enable and asynchronous reset
   generic (width : integer);
@@ -1886,7 +1870,7 @@ end component;
  signal PCPlus4F : std_logic_vector(31 downto 0);
 
  -- Decode
- signal stallD, flushD : std_logic;
+ --signal stallD, flushD : std_logic;
  signal instrD : std_logic_vector(31 downto 0);
  signal PCSrcD, RegWriteD : std_logic;
  signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
@@ -1896,7 +1880,7 @@ end component;
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
- signal FLushE : std_logic;
+ --signal FLushE : std_logic;
  signal PCPlus8D : std_logic_vector(31 downto 0);
 
  -- Execute
@@ -2007,7 +1991,7 @@ begin
     y => PCNext2
   );
 
-  pcreg : flopenr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
+  pcreg : flopENr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
   generic map(width => 32)
   port map(
     clk => clk,
@@ -2089,25 +2073,25 @@ begin
   );
 
   srcBmux4 : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2E),d1(ResultW),d2(partial_EX_MEM AluResultM)
-  generic map (width => 32);
+  generic map (width => 32)
   port map (
     d0 => RD2E,
     d1 => ResultW,
-    d2 => ALUOutM--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
+    d2 => ALUOutM,--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
     d3 => (others => '0'),
     s => ForwardBE, -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
     y => WriteDataE--SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
   );
 
   srcAmux4 : mux4 -- [OBS] SO TEM UM MUX PRO A MESMO
-  generic map (width => 32);
+  generic map (width => 32)
   port map
   (
     d0 => RD1E, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1E),d1(ResultW),d2(partial_EX_MEM AluResultM)
     d1 => ResultW,
-    d2 => ALUOutM--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
+    d2 => ALUOutM,--ALUResultM, [VERIFICAR] ACHO QUE O ALURESULTM NEM EXISTE MAIS
     d3 => (others => '0'),
-    s => ForwardAE -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    s => ForwardAE, -- [MUDAR PRO PIPELINE] utilizar ForwardAE
     y => SrcAE -- [MUDAR PRO PIPELINE] saida ira para SrcAE [MUDADO] [VERIFICAR] DELCARACAO DESSE SINAL
   );
 
@@ -2197,7 +2181,7 @@ port map
   MemWrite => MemWriteE2,--MemWrite
 
   Branch => BranchE, -- [VERIFICAR] VEM DOS REGS DE PIPELINE PRA ENTRAR AQUI
-  BranchTaken => BranchTakenE -- [VERIFICAR] TEM QUE TER UMA SAIDA BRANCH DA CONDUNIT PRA MANDAR LA PRO MUX DO PC
+  BranchTaken => BranchTakenE, -- [VERIFICAR] TEM QUE TER UMA SAIDA BRANCH DA CONDUNIT PRA MANDAR LA PRO MUX DO PC
 
   Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
   FlagW => FlagWriteE,
@@ -2298,6 +2282,7 @@ port map
 inst_partial_MEM_WB : partial_MEM_WB
 port map (
   clock => clk,
+  reset => reset,
 
   PCSrcM => PCSrcM,
   RegWriteM => RegWriteM,
@@ -2487,7 +2472,8 @@ entity mux4 is -- two-input multiplexer
   port (
     d0, d1, d2, d3 : in std_logic_vector(width - 1 downto 0);
     s : in std_logic_vector(1 downto 0);
-    y : out std_logic_vector(width - 1 downto 0));
+    y : out std_logic_vector(width - 1 downto 0)
+  );
 end;
 
 architecture behave OF mux4 is
@@ -2505,15 +2491,18 @@ end;
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- ALU
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-library IEEE; use IEEE.STD_LOGIC_1164.all;
+library IEEE; 
+use IEEE.STD_LOGIC_1164.all; 
 use IEEE.NUMERIC_STD_UNSIGNED.all;
-entity alu is
-  port(a, b:       in  STD_LOGIC_VECTOR(31 downto 0);
+
+entity alu is 
+  port(
+      a, b:       in  STD_LOGIC_VECTOR(31 downto 0);
        ALUControl: in  STD_LOGIC_VECTOR(1 downto 0);
        Result:     buffer STD_LOGIC_VECTOR(31 downto 0);
        ALUFlags:      out STD_LOGIC_VECTOR(3 downto 0)
   );
-end;
+end entity;
 
 architecture behave of alu is
   signal condinvb: STD_LOGIC_VECTOR(31 downto 0);
@@ -2525,9 +2514,9 @@ begin
 
   process(all) begin
     case? ALUControl(1 downto 0) is
-      when "0-"   => result <= sum(31 downto 0);
-      when "10"   => result <= a and b;
-      when "11"   => result <= a or b;
+      when "0-"   => result <= sum(31 downto 0); 
+      when "10"   => result <= a and b; 
+      when "11"   => result <= a or b; 
       when others => result <= (others => '-');
     end case?;
   end process;
@@ -2539,4 +2528,4 @@ begin
              (not (a(31) xor b(31) xor ALUControl(0))) and
              (a(31) xor sum(31));
   ALUFlags    <= (neg, zero, carry, overflow);
-end;
+end architecture;

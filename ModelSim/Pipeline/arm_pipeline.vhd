@@ -281,12 +281,30 @@ end entity;
 
 architecture arch of partial_IF_ID is
 
+  component flopenr is -- flip-flop with enable and asynchronous reset
+  generic (width : integer);
+  port (
+    clk, reset, en : in std_logic;
+    d : in std_logic_vector(width - 1 downto 0);
+    q : out std_logic_vector(width - 1 downto 0));
+  end component;
+
   signal s_instr : std_logic_vector(31 downto 0);
-  signal s_stall, s_flush : std_logic;
+  signal s_not_stall, s_flush : std_logic;
 
 begin
+  flnr_IF_ID_0 : flopenr
+  generic map(width => 32)
+  port map
+  (
+    clk => clk,
+    reset => reset,
+    en => s_not_stall,
+    d => instrF,
+    q => instrD
+  );
 
-  instrD <= instrF;
+  s_not_stall <= not stallD;
 
 end architecture;
 
@@ -313,6 +331,9 @@ entity partial_ID_EX is
     FlagsD : in std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
 
     FLushE : in std_logic;
+    RA1D, RA2D : in std_logic_vector(3 downto 0);
+    
+    RA1E, RA2E : out std_logic_vector(3 downto 0);
 
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
@@ -335,6 +356,7 @@ architecture arch OF partial_ID_EX is
     signal s_WA3D : std_logic_vector(3 downto 0);
     signal s_Cond: std_logic_vector(3 downto 0);
     signal s_Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
+    signal s_RA1D, s_RA2D : std_logic_vector(3 downto 0);
 
 begin
 
@@ -352,6 +374,8 @@ begin
    s_WA3D <= WA3D;
    s_Cond <= CondD;
    s_Flags <= FlagsD;
+   s_RA1D <= RA1D;
+   s_RA2D <= RA2D;
 
    PCSrcE <= s_PCSrc;
    RegWriteE <= s_RegWrite;
@@ -367,6 +391,8 @@ begin
    WA3E <= s_WA3D;
    CondE <= s_Cond;
    FlagsE <= s_Flags;
+   RA1E <= s_RA1D;
+   RA2E <= s_RA2D;
 
 end architecture;
 
@@ -1209,6 +1235,7 @@ component controller
 
  -- Datapath
  signal s_PC : std_logic_vector(31 downto 0);
+ signal Branch : std_logic --adicionar na top level entity
 
 
 begin
@@ -1232,15 +1259,14 @@ begin
     MemToReg => MemtoRegD,
     MemWrite => MemWriteD,--MemWrite,
     ALUControl => ALUControlD,
-    -- [MUDAR PIPELINE] ADICIONAR BRANCH D
     ALUSrc => ALUSrcD,
-    -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D
     ImmSrc => ImmSrcD,
 
     RegSrc => RegSrcD,
 
-    FlagWrite => FlagWriteD,
-    Branch => open -- [MUDAR PIPELINE] TEM QUE ENTRAR NO DATAPATH PRA DEFINIR SE E BRANCH OU NAO
+    FlagWrite => FlagWriteD, -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D
+    Branch => Branch -- [MUDAR PIPELINE] TEM QUE ENTRAR NO DATAPATH PRA DEFINIR SE E BRANCH OU NAO 
+    -- [MUDAR PIPELINE] ADICIONAR BRANCH D
   );
 
   datap : datapath
@@ -1253,9 +1279,11 @@ begin
     MemToReg => MemtoRegD,
     MemWriteIn => MemWriteD,--MemWrite,
     ALUControl => ALUControlD,
+    
     -- [MUDAR PIPELINE] ADICIONAR BRANCH D
-    Branch => '0',
+    Branch => Branch,
     ALUSrc => ALUSrcD,
+
     -- [MUDAR PIPELINE] ADICIONAR FLAGWRITE D [MUDADO]
     FlagWrite => FlagWriteD,
     ImmSrc => ImmSrcD,
@@ -1427,10 +1455,13 @@ entity cond_unit is -- Conditional logic
     FlagW : in std_logic_vector(1 downto 0);
     PCS, RegW, MemW : in std_logic;
     FlagsE: in std_logic_vector(3 downto 0);
+    Branch : in std_logic;
 
     Flags: out std_logic_vector(3 downto 0);
     PCSrc, RegWrite : out std_logic;
-    MemWrite : out std_logic);
+    MemWrite : out std_logic
+    BranchTaken : out std_logic
+  );
 end;
 
 architecture behave OF cond_unit is
@@ -1477,10 +1508,13 @@ begin
     CondEx => CondEx
   );
 
-  FlagWrite <= FlagW AND (CondEx, CondEx);
+  PCSrc <= PCS AND CondEx;
   RegWrite <= RegW AND CondEx;
   MemWrite <= MemW AND CondEx;
-  PCSrc <= PCS AND CondEx;
+  FlagWrite <= FlagW AND (CondEx, CondEx);
+
+  BranchTaken <= Branch and CondEx;
+
 end;
 
 
@@ -1634,7 +1668,9 @@ component partial_ID_EX is
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : in std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
     FLushE : in std_logic;
-
+    RA1D, RA2D : in std_logic_vector(3 downto 0);
+    
+    RA1E, RA2E : out std_logic_vector(3 downto 0);
     PCSrcE, RegWriteE : out std_logic;
     MemtoRegE, MemWriteE : out std_logic;
     ALUControlE, FlagWriteE : out std_logic_vector(1 downto 0);
@@ -1688,16 +1724,21 @@ end component;
 ---------------------------------------------------------
 component cond_unit
 port (
-  clk, reset : in std_logic;
-  Cond : in std_logic_vector(3 downto 0);
-  ALUFlags : in std_logic_vector(3 downto 0);
-  FlagW : in std_logic_vector(1 downto 0);
-  PCS, RegW, MemW : in std_logic;
-  FlagsE: in std_logic_vector(3 downto 0);
+    clk, reset : in std_logic;
 
-  Flags: out std_logic_vector(3 downto 0);
-  PCSrc, RegWrite : out std_logic;
-  MemWrite : out std_logic);
+    Cond : in std_logic_vector(3 downto 0);
+    ALUFlags : in std_logic_vector(3 downto 0);
+    FlagW : in std_logic_vector(1 downto 0);
+    PCS, RegW, MemW : in std_logic;
+    FlagsE: in std_logic_vector(3 downto 0);
+    Branch : in std_logic;
+
+    Flags: out std_logic_vector(3 downto 0);
+    PCSrc, RegWrite : out std_logic;
+    MemWrite : out std_logic
+    BranchTaken : out std_logic
+  );
+);
 end component;
 -----------------------------------------------------------
 
@@ -1746,10 +1787,11 @@ end component;
       y : out std_logic_vector(width - 1 downto 0));
   end component;
 
-  signal PCNext, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
+  signal PCNext1, PCNext2, PCPlus4, PCPlus8 : std_logic_vector(31 downto 0);
   signal ExtImm : std_logic_vector(31 downto 0);
-  signal SrcAE, SrcBE : std_logic_vector(31 downto 0);
+  signal SrcAE, SrcBE, SrcB : std_logic_vector(31 downto 0);
   signal RA1D, RA2D : std_logic_vector(3 downto 0);
+  signal RA1E, RA2E : std_logic_vector(3 downto 0);
 
   --WriteData : out std_logic_vector(31 downto 0);
  --ReadData : in std_logic_vector(31 downto 0));
@@ -1775,6 +1817,7 @@ end component;
 
  -- Fetch
  signal instrF : std_logic_vector(31 downto 0);
+ signal PCPlus4F : std_logic_vector(31 downto 0);
 
  -- Decode
  signal stallD, flushD : std_logic;
@@ -1788,11 +1831,13 @@ end component;
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
  signal FLushE : std_logic;
+ signal PCPlus8D : std_logic_vector(31 downto 0);
 
  -- Execute
  signal PCSrcE1, PCSrcE2, RegWriteE1, RegWriteE2 : std_logic;
  signal MemtoRegE, MemWriteE1, MemWriteE2 : std_logic;
  signal ALUControlE, FlagWriteE : std_logic_vector(1 downto 0);
+ 
  -- [MUDAR PIPELINE] PRECISA LIGAR O ALURESULT NO SEGUNDO MUX DO PC
  signal ALUResultE : std_logic_vector(31 downto 0);
  signal WriteDataE : std_logic_vector(31 downto 0);
@@ -1876,14 +1921,25 @@ begin
   WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
   WA3D <= instrD(15 downto 12);
 
+  PCPlus8D <= PCPlus4F;
+
   -- next PC logic
-  pcmux : mux2
+  pcmux1 : mux2 -- Mais a esquerda na imagem
   generic map(width => 32)
   port map(
-    d0 => PCPlus4, --[MUDAR PRO PIPELINE] TEM QUE ADICIONAR UM OUTRO MUX2 ANTES DO PC+4
+    d0 => PCPlus4F, --[MUDAR PRO PIPELINE] TEM QUE ADICIONAR UM OUTRO MUX2 ANTES DO PC+4
     d1 => ResultW,
     s => PCSrcW,
-    y => PCNext
+    y => PCNext1
+  );
+
+  pcmux2 : mux2 -- mais a direita na imagem
+  generic map(width => 32)
+  port map(
+    d0 => PCNext1, --[MUDAR PRO PIPELINE] TEM QUE ADICIONAR UM OUTRO MUX2 ANTES DO PC+4
+    d1 => ResultW, -- [VERIFICAR] CERTINHO DE ONDE VEM
+    s => BranchTakenE, -- [VERIFICAR] SERA QUE ESSE SINAL TA VINDO DA CONTROL UNIT MESMO?
+    y => PCNext2
   );
 
   pcreg : flopr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
@@ -1891,22 +1947,15 @@ begin
   port map(
     clk => clk,
     reset => reset,
-    d => PCNext,
+    d => PCNext2,
     q => s_PC
   );
 
-  pcadd1 : adder
+  pcadd : adder
   port map(
     a => s_PC,
     b => X"00000004",
-    y => PCPlus4
-  );
-
-  pcadd2 : adder --[MUDAR QUANDO FOR PIPELINE] apaga-lo
-  port map(
-    a => PCPlus4,
-    b => X"00000004",
-    y => PCPlus8
+    y => PCPlus4F
   );
 
   ra1mux : mux2
@@ -1934,9 +1983,9 @@ begin
     we3 => RegWriteW, -- [VERIFICAR] JA ESTA NO DATAPATH O SINAL
     ra1 => RA1D,
     ra2 => RA2D,
-    wa3 => instrD(15 downto 12), -- [MUDAR PIPELINE] VEM DO WA3W
+    wa3 => WA3W,--instrD(15 downto 12), -- [MUDAR PIPELINE] VEM DO WA3W [MUDADO]
     wd3 => ResultW,
-    r15 => PCPlus8, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D
+    r15 => PCPlus8D, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D [MUDADO] [VERIFICAR] SE VEM DA ALU
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
     rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
@@ -1951,6 +2000,7 @@ begin
     s => MemToRegW, -- [VERIFICAR] Sinais devem estar vindo do partial_MEM_WB
     y => ResultW
   );
+
   ext : extend
   port map
   (
@@ -1964,42 +2014,42 @@ begin
   generic map(width => 32) --[MUDAR PRO PIPELINE] d0(outro mux intermediario) d1(partial_ID_EX ExtImmE)
   port map
   (
-    d0 => RD2E,--WriteData, [VERIFICAR] talvez seja o writedata mesmo
+    d0 => SrcB,--WriteData, [VERIFICAR] talvez seja o writedata mesmo
     d1 => ExtImmE, -- [VERIFICAR]
     s => ALUSrcE,
     y => SrcBE
   );
 
-  /*srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2D),d1(ResultW),d2(partial_EX_MEM AluResultM)
+  srcbmux : mux4 --[MUDAR PRO PIPELINE] d0(partial_ID_EX RD2E),d1(ResultW),d2(partial_EX_MEM AluResultM)
   generic map (width => 32);
   port map (
-    d0 => WriteData,
-    d1 => ExtImm,
-    d2 => (others => '0'),
+    d0 => RD2E,
+    d1 => ResultW,
+    d2 => ALUResultM,
     d3 => (others => '0'),
-    s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
+    s => ForwardBE -- [MUDAR PRO PIPELINE] passara a vir da hazard unit, com o nomr ForwardBE
     y => SrcB -- [MUDAR PRO PIPELINE] saida ira para o mux que ja existia na versao monociclo
-  );*/
+  );
 
 
 
-  /*srcamux : mux4
+  srcamux : mux4
   generic map (width => 32);
   port map
   (
-    d0 => WriteData, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1D),d1(ResultW),d2(partial_EX_MEM AluResultM)
-    d1 => ExtImm,
-    d2 => (others => '0'),
+    d0 => RD1E, -- [MUDAR PRO PIPELINE] d0(partial_ID_EX RD1E),d1(ResultW),d2(partial_EX_MEM AluResultM)
+    d1 => ResultW,
+    d2 => ALUResultM,
     d3 => (others => '0'),
-    s => '0' & ALUSrc -- [MUDAR PRO PIPELINE] utilizar ForwardAE
-    y => SrcB -- [MUDAR PRO PIPELINE] saida ira para SrcAE
-  );*/
+    s => ForwardAE -- [MUDAR PRO PIPELINE] utilizar ForwardAE
+    y => SrcAE -- [MUDAR PRO PIPELINE] saida ira para SrcAE
+  );
 
 
   aluinst : alu
   port map
   (
-    a => RD1E, -- [MUDAR PRO PIPELINE] Deve vir de SrcAE
+    a => SrcAE, -- [MUDAR PRO PIPELINE] Deve vir de SrcAE
     b => SrcBE, -- [MUDAR PRO PIPELINE] Deve vir de SrcBE
     ALUControl => ALUControlE, -- [VERIFICAR] sinal deve vir de partial_ID_EX AluControlE
     Result => ALUResultE,--ALUResult,
@@ -2017,8 +2067,8 @@ begin
      reset => reset,
      RA1D => RA1D,
      RA2D => RA2D,
-     RA1E => ,
-     RA2E => ,
+     RA1E => RA1E,
+     RA2E => RA2E,
      WA3E => WA3E,
      WA3M => WA3M,
      WA3W => WA3W,
@@ -2081,7 +2131,10 @@ port map
 
   PCSrc => PCSrcE2,
   RegWrite => RegWriteE2,
-  MemWrite => MemWriteE2--MemWrite
+  MemWrite => MemWriteE2,--MemWrite
+
+  Branch => BranchE, -- [VERIFICAR] VEM DOS REGS DE PIPELINE PRA ENTRAR AQUI
+  BranchTaken => BranchTakenE -- [VERIFICAR] TEM QUE TER UMA SAIDA BRANCH DA CONDUNIT PRA MANDAR LA PRO MUX DO PC
 );
 
 
@@ -2119,7 +2172,11 @@ port map
   CondD => CondD,
   FlagsD => Flags,
   FLushE => reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
-
+  RA1D => RA1D,
+  RA2D => RA2D,
+    
+  RA1E => RA1E,
+  RA2E => RA2E,
   PCSrcE => PCSrcE1,--[VERIFICAR] Colocar sinais com E1 em algum AND
   RegWriteE => RegWriteE1,
   MemtoRegE => MemtoRegE,
@@ -2189,6 +2246,11 @@ port map (
 
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- REGFILE
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.NUMERIC_STD_UNSIGNED.all;
@@ -2245,6 +2307,10 @@ begin
   y <= a + b;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- EXTEND
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity extend is
@@ -2267,6 +2333,10 @@ begin
   end PROCESS;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- FLOPNR
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity flopenr is -- flip-flop with enable and asynchronous reset
@@ -2290,6 +2360,10 @@ begin
   end PROCESS;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- FLOPR
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity flopr is -- flip-flop with asynchronous reset
@@ -2311,6 +2385,10 @@ begin
   end PROCESS;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- MUX2
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity mux2 is -- two-input multiplexer
@@ -2327,6 +2405,10 @@ begin
     d0;
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- MUX4
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity mux4 is -- two-input multiplexer
@@ -2346,9 +2428,12 @@ begin
       d2 when "10",
       d3 when "11",
       d0 when others;
-
 end;
 
+
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- ALU
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE; use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD_UNSIGNED.all;
 entity alu is

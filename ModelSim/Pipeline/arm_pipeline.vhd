@@ -88,6 +88,84 @@ begin
   end PROCESS;
 end architecture;
 
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- TB TOP 2 [VERIFICAR] PRECISA DE UM MEMFILE.DAT DIFERENTE
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.NUMERIC_STD_UNSIGNED.all;
+entity tb_top_2 is
+end;
+
+architecture tb of tb_top_2 is
+  component top
+    port (
+      clk, reset : in std_logic;
+      WriteData, DatAadr : out std_logic_vector(31 downto 0);
+      MemWrite : out std_logic;
+
+      db_instrF : out std_logic_vector(31 downto 0);
+      --db_PC : out std_logic_vector(31 downto 0);
+      db_RD1, db_RD2 : out std_logic_vector(31 downto 0);
+      db_ALUResultE : out std_logic_vector(31 downto 0);
+      db_WriteDataE : out std_logic_vector(31 downto 0);
+      db_ReadDataW : out std_logic_vector(31 downto 0);
+      db_ALUOutW : out std_logic_vector(31 downto 0)  
+    );
+  end component;
+  signal WriteData, DataAdr : std_logic_vector(31 downto 0);
+  signal clk, reset, MemWrite : std_logic;
+
+  signal db_instrF : std_logic_vector(31 downto 0);
+    --db_PC : std_logic_vector(31 downto 0);
+  signal db_RD1, db_RD2 : std_logic_vector(31 downto 0);
+  signal db_ALUResultE : std_logic_vector(31 downto 0);
+  signal db_WriteDataE : std_logic_vector(31 downto 0);
+  signal db_ReadDataW : std_logic_vector(31 downto 0);
+  signal db_ALUOutW : std_logic_vector(31 downto 0);  
+
+begin
+
+  -- instantiate device to be tested
+  dut : top port map(clk, reset, WriteData, DataAdr, MemWrite,
+    db_instrF,
+    db_RD1, 
+    db_RD2,
+    db_ALUResultE,
+    db_WriteDataE,
+    db_ReadDataW,
+    db_ALUOutW 
+  );
+
+  -- Generate clock with 10 ns period
+  PROCESS begin
+    clk <= '1';
+    WAIT FOR 5 ns;
+    clk <= '0';
+    WAIT FOR 5 ns;
+  end PROCESS;
+
+  -- Generate reset for first two clock cycles
+  PROCESS begin
+    reset <= '1';
+    WAIT FOR 22 ns;
+    reset <= '0';
+    WAIT;
+  end PROCESS;
+
+  -- check that 7 gets written to address 84 
+  -- at end of program
+  PROCESS (clk, MemWrite, DataAdr, WriteData) begin
+    IF (clk'event AND clk = '0' AND MemWrite = '1') THEN
+      IF (to_integer(DataAdr) = 100 AND
+        to_integer(WriteData) = 7) THEN
+        REport "NO ERRORS: Simulation succeeded" SEVERITY failure;
+      ELSIF (DataAdr /= 96) THEN
+        REport "Simulation failed" SEVERITY failure;
+      end IF;
+    end IF;
+  end PROCESS;
+end architecture;
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- TOP
@@ -521,7 +599,7 @@ begin
   end PROCESS;
 end;
 
-
+-- [VERIFICAR] TALVEZ NAO SEJA NECESSARIO ESTE TB
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- TESTBENCH ARM
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -590,10 +668,16 @@ architecture tb of tb_arm is
 			 clk <= '0';
 			 WAIT FOR 5 ns;
 		  end PROCESS;
+		  
+   PROCESS begin
+    reset <= '1';
+    WAIT FOR 22 ns;
+    reset <= '0';
+    WAIT;
+  end PROCESS;
 
 
-  -- check that 7 gets written to address 84 
-  -- at end of program
+
   PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) begin
     IF (clk'event AND clk = '0' /*AND MemWrite = /*'1'*/) THEN
    
@@ -601,6 +685,18 @@ architecture tb of tb_arm is
       ELSE THEN
       end IF;
     end IF;
+  end PROCESS;
+  
+  ------------------------
+  -- Instrucoes: 
+  --	
+  --
+  PROCESS (clk, reset, PC, instr, MemWrite,  ALUResult, WriteData, ReadData ) 
+  begin
+		wait until reset = '0';
+		
+		
+	 
   end PROCESS;
   
  end architecture;
@@ -851,10 +947,20 @@ architecture struct OF controller is
 
 begin
   dec : decoder port map(
-    instr(27 downto 26), instr(25 downto 20),
-    instr(15 downto 12), FlagW, PCS,
-    RegW, MemW, MemtoReg, ALUSrc, ImmSrc,
-    RegSrc, ALUControl);
+    Op => instr(27 downto 26), 
+    Funct => instr(25 downto 20),
+    Rd => instr(15 downto 12), 
+    
+    FlagW => FlagW, 
+    PCS => PCS,
+    RegW => RegW, 
+    MemW => MemW, 
+    MemtoReg => MemToReg, 
+    ALUSrc => ALUSrc, 
+    ImmSrc => ImmSrc,
+    RegSrc => RegSrc, 
+    ALUControl => ALUControl
+  );
 
    PCSrc <= PCS; 
    RegWrite <= RegW; 
@@ -866,7 +972,7 @@ end;
 
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 -- DECODER
--- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+-- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&componn&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
 entity decoder is -- main control decoder
@@ -886,7 +992,9 @@ architecture behave OF decoder is
   signal ALUOp, Branch : std_logic;
   signal op2 : std_logic_vector(3 downto 0);
 begin
+
   op2 <= (Op, Funct(5), Funct(0));
+  
   PROCESS (all) begin -- Main Decoder
     CASE ? (op2) is
       WHEN "000-" => controls <= "0000001001";

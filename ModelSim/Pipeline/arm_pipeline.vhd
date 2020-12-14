@@ -2238,16 +2238,18 @@ begin
     end IF;
   end PROCESS;
   PROCESS (all) begin
-    IF (to_integer(ra1) = 15) THEN
-      rd1 <= r15;
-    ELSE
-      rd1 <= mem(to_integer(ra1));
-    end IF;
-    IF (to_integer(ra2) = 15) THEN
-      rd2 <= r15;
-    ELSE
-      rd2 <= mem(to_integer(ra2));
-    end IF;
+    if rising_edge(clk) then
+      IF (to_integer(ra1) = 15) THEN
+        rd1 <= r15;
+      ELSE
+        rd1 <= mem(to_integer(ra1));
+      end IF;
+      IF (to_integer(ra2) = 15) THEN
+        rd2 <= r15;
+      ELSE
+        rd2 <= mem(to_integer(ra2));
+      end IF;
+    end if;
   end PROCESS;
 
   db_r0 <= mem(0);
@@ -2332,7 +2334,9 @@ begin
   PROCESS (clk, reset) begin
     IF reset THEN
       q <= (OTHERS => '0');
-    ELSIF rising_edge(clk) THEN
+    elsif falling_edge(clk) then -- escrita
+      q <= q;
+    ELSIF rising_edge(clk) THEN -- leitura
       IF en THEN
         q <= d;
       end IF;

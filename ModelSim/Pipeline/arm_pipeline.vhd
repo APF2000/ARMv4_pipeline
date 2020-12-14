@@ -1086,27 +1086,6 @@ end;
 
 architecture struct OF arm is
 
-component hazard_unit is
-  port (
-    clock : in std_logic;
-    reset : in std_logic;
-    RA1E : in std_logic_vector(31 downto 0);
-    RA2E : in std_logic_vector(31 downto 0);
-    WA3M : in std_logic_vector(3 downto 0);
-    RegWriteM : in std_logic;
-    RegWriteW : in std_logic;
-    MemToRegE : in std_logic;
-    StallF : out std_logic;
-    StallD : out std_logic;
-    FlushD : out std_logic;
-    FlushE : out std_logic;
-    ForwardAE : out std_logic_vector(1 downto 0);
-    ForwardBE : out std_logic_vector(1 downto 0)
-  );
-end component;
-
--------------------------------------------------------
-
 component controller
     port (
       clk, reset : in std_logic;
@@ -1706,7 +1685,9 @@ end component;
       we3 : in std_logic;
       ra1, ra2, wa3 : in std_logic_vector(3 downto 0);
       wd3, r15 : in std_logic_vector(31 downto 0);
-      rd1, rd2 : out std_logic_vector(31 downto 0));
+      rd1, rd2 : out std_logic_vector(31 downto 0);
+      db_r0, db_r1, db_r2, db_r3, db_r4, db_r5, db_r6, db_r7, db_r8, db_r9, db_r10, db_r11, db_r12, db_r13, db_r14, db_r15 : out std_logic_vector(31 downto 0)
+      );
   end component;
   component adder
     port (
@@ -1750,7 +1731,7 @@ end component;
   end component;
 
   signal PCNext1, PCNext2 : std_logic_vector(31 downto 0);
-  signal ExtImm : std_logic_vector(31 downto 0);
+  --signal ExtImm : std_logic_vector(31 downto 0);
   signal SrcAE, SrcBE, SrcB : std_logic_vector(31 downto 0);
   signal RA1D, RA2D : std_logic_vector(3 downto 0);
   signal RA1E, RA2E : std_logic_vector(3 downto 0);
@@ -1860,6 +1841,7 @@ begin
 
     --[VERIFICAR] LA EM CIMA DIZ QUE ESTE SINAL N SERVE PRA NADA --ALUResult <= ALUResultM; -- [VERIFICAR]?? SSE SINAL E NECESSARIO MESMO    
     ALUOut <= ALUOutM;
+    ALUResultM <= ALUOutM; -- [VERIFICAR] E ISSO?
 
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
@@ -1945,7 +1927,24 @@ begin
     r15 => PCPlus8D, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D [MUDADO] [VERIFICAR] SE VEM DA ALU
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
-    rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
+    rd2 => RD2D,--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
+    db_r0 => open, 
+    db_r1 => open, 
+    db_r2 => open, 
+    db_r3 => open, 
+    db_r4 => open, 
+    db_r5 => open, 
+    db_r6 => open, 
+    db_r7 => open, 
+    db_r8 => open, 
+    db_r9 => open, 
+    db_r10 => open, 
+    db_r11 => open, 
+    db_r12 => open, 
+    db_r13 => open, 
+    db_r14 => open, 
+    db_r15 => open
+
   );
 
   res_mux : mux2
@@ -2221,7 +2220,9 @@ entity regfile is -- three-port register file
     we3 : in std_logic;
     ra1, ra2, wa3 : in std_logic_vector(3 downto 0);
     wd3, r15 : in std_logic_vector(31 downto 0);
-    rd1, rd2 : out std_logic_vector(31 downto 0));
+    rd1, rd2 : out std_logic_vector(31 downto 0);
+    db_r0, db_r1, db_r2, db_r3, db_r4, db_r5, db_r6, db_r7, db_r8, db_r9, db_r10, db_r11, db_r12, db_r13, db_r14, db_r15 : out std_logic_vector(31 downto 0)
+  );
 end;
 
 architecture behave OF regfile is
@@ -2230,7 +2231,7 @@ architecture behave OF regfile is
   signal mem : ramtype;
 begin
   PROCESS (clk) begin
-    IF rising_edge(clk) THEN
+    IF falling_edge(clk) THEN
       IF we3 = '1' THEN
         mem(to_integer(wa3)) <= wd3;
       end IF;
@@ -2248,6 +2249,24 @@ begin
       rd2 <= mem(to_integer(ra2));
     end IF;
   end PROCESS;
+
+  db_r0 <= mem(0);
+  db_r1 <= mem(1);
+  db_r2 <= mem(2);
+  db_r3 <= mem(3);
+  db_r4 <= mem(4);
+  db_r5 <= mem(5);
+  db_r6 <= mem(6);
+  db_r7 <= mem(7);
+  db_r8 <= mem(8);
+  db_r9 <= mem(9);
+  db_r10 <= mem(10);
+  db_r11 <= mem(11);
+  db_r12 <= mem(12);
+  db_r13 <= mem(13);
+  db_r14 <= mem(14);
+  db_r15 <= mem(15);
+
 end;
 
 

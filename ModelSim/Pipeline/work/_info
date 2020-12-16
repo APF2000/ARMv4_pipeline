@@ -10,11 +10,11 @@ z2
 cModel Technology
 d/home/arthur/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim
 Eadder
-Z0 w1607911054
+Z0 w1608140352
 Z1 DPx4 ieee 20 numeric_std_unsigned 0 22 L9z`>=>LNY9h8oAIomUKm3
 Z2 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z3 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
-!i122 115
+!i122 119
 Z4 d/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline
 Z5 8/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd
 Z6 F/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd
@@ -24,9 +24,9 @@ Vh=@=ag0O7K>5UL>SeGdO00
 !s100 jE[317TYUzWGOK[27SZSk3
 Z7 OV;C;2020.1;71
 33
-Z8 !s110 1607911350
+Z8 !s110 1608140387
 !i10b 1
-Z9 !s108 1607911350.000000
+Z9 !s108 1608140387.000000
 Z10 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd|
 Z11 !s107 /home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd|
 !i113 1
@@ -37,7 +37,7 @@ R1
 R2
 R3
 Z14 DEx4 work 5 adder 0 22 h=@=ag0O7K>5UL>SeGdO00
-!i122 115
+!i122 119
 Z15 l2288
 Z16 L2287 4
 Z17 VKWjQhbQe>HdWMoCb]8:4B1
@@ -57,7 +57,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -80,7 +80,7 @@ R1
 R2
 R3
 Z19 DEx4 work 3 alu 0 22 4_[^enAik0khO]LWJjlj[0
-!i122 115
+!i122 119
 Z20 l2439
 Z21 L2435 25
 Z22 VWdY0zzfd058[5HkM[la8K0
@@ -99,7 +99,7 @@ Earm
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -121,7 +121,7 @@ Astruct
 R2
 R3
 Z24 DEx4 work 3 arm 0 22 UUHnl[78D=9gD?7bjI9GZ3
-!i122 115
+!i122 119
 Z25 l1169
 Z26 L1087 147
 Z27 VzWMZKnzeKhTo9@WWeWF`a0
@@ -140,7 +140,7 @@ Econd_unit
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -162,7 +162,7 @@ Abehave
 R2
 R3
 Z29 DEx4 work 9 cond_unit 0 22 X=ULe78eA77Q5LZ]d[=O01
-!i122 115
+!i122 119
 Z30 l1415
 Z31 L1397 52
 Z32 VjLP11gOGS4ez02c>Wz0X@3
@@ -181,7 +181,7 @@ Econdcheck
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -203,7 +203,7 @@ Abehave
 R2
 R3
 Z34 DEx4 work 9 condcheck 0 22 CJHH_b@:g@^O:Dced<g<=3
-!i122 115
+!i122 119
 Z35 l1465
 Z36 L1463 27
 Z37 V]dL5S5UoT`=baIF6QSj;N1
@@ -222,7 +222,7 @@ Econtroller
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -244,7 +244,7 @@ Astruct
 R2
 R3
 Z39 DEx4 work 10 controller 0 22 iCfNGdbYHK[@`PEWI3M8k0
-!i122 115
+!i122 119
 Z40 l1284
 Z41 L1263 47
 Z42 VP0;mD;lAm5:IMLTCmI4o72
@@ -263,7 +263,7 @@ Edatapath
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -285,7 +285,7 @@ Astruct
 R2
 R3
 Z44 DEx4 work 8 datapath 0 22 jeeDQBJH?04Azo77O`fUK3
-!i122 115
+!i122 119
 Z45 l1834
 Z46 L1524 684
 Z47 V[>TZ;[DbDM`L?JUec@@oa1
@@ -304,7 +304,7 @@ Edecoder
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -326,7 +326,7 @@ Abehave
 R2
 R3
 Z49 DEx4 work 7 decoder 0 22 5VO_O784;Y[f1RSmk7O5d1
-!i122 115
+!i122 119
 Z50 l1334
 Z51 L1330 42
 Z52 V:B@>P?GU4jLeQ?eF7;kmf3
@@ -346,7 +346,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -369,7 +369,7 @@ R1
 R2
 R3
 Z54 DEx4 work 4 dmem 0 22 9lgZ_XzSTC>6V=7ARkVU?2
-!i122 115
+!i122 119
 l906
 Z55 L905 18
 Z56 V<<gGWMoaPBX]]V:Dzo<XC0
@@ -388,7 +388,7 @@ Eextend
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -410,7 +410,7 @@ Abehave
 R2
 R3
 Z58 DEx4 work 6 extend 0 22 DY8U:<lKhQ]7c71g_M8`h1
-!i122 115
+!i122 119
 Z59 l2306
 Z60 L2305 12
 Z61 V>Bld;f_TzeTHdZoV[i<b=2
@@ -429,7 +429,7 @@ Eflopenr
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -451,11 +451,11 @@ Aasynchronous
 R2
 R3
 Z63 DEx4 work 7 flopenr 0 22 TA]ilh4NOd^eU^]QYoX^L2
-!i122 115
+!i122 119
 Z64 l2333
 Z65 L2332 14
-VPJWlhGXAVa4acOjk@JI0G3
-!s100 cEg7PjBbJYBC@?IkWb>lY0
+VSK?fBLN;Pl`;94YPLS?^Q0
+!s100 <7[z4o1g>SQ1fIFoPdPGd3
 R7
 33
 R8
@@ -470,7 +470,7 @@ Eflopr
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -492,7 +492,7 @@ Aasynchronous
 R2
 R3
 Z66 DEx4 work 5 flopr 0 22 :f@>D8ZQB5LMRhEG1XW3C3
-!i122 115
+!i122 119
 Z67 l2362
 Z68 L2361 10
 Z69 Ve36GMUe=_P1jlJEC^_dXC3
@@ -512,7 +512,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -535,7 +535,7 @@ R1
 R2
 R3
 Z71 DEx4 work 12 hazard_logic 0 22 D:hgRZ3E`>^2i_lN2[TZL3
-!i122 115
+!i122 119
 l863
 Z72 L851 38
 Z73 V5`klmLGRAN<DTmicnGXVn2
@@ -555,7 +555,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -578,7 +578,7 @@ R1
 R2
 R3
 Z75 DEx4 work 11 hazard_unit 0 22 Pn9lfQmKlgAWdcg1g[hco3
-!i122 115
+!i122 119
 l795
 Z76 L786 34
 Z77 V8imLCZ?QWLX6AD2^3<o<=1
@@ -598,7 +598,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -621,7 +621,7 @@ R1
 R2
 R3
 Z79 DEx4 work 4 imem 0 22 FikK[L^4^;;c>elTAgXka2
-!i122 115
+!i122 119
 l938
 Z80 L937 45
 Z81 VEE3ZNo>dGU_P3];06CB9E1
@@ -640,7 +640,7 @@ Emux2
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -662,7 +662,7 @@ Abehave
 R2
 R3
 Z83 DEx4 work 4 mux2 0 22 _[?diWBOz6h^U=Rdjl8?<1
-!i122 115
+!i122 119
 Z84 l2387
 Z85 L2386 5
 Z86 VlzmTJ4540fBanB0eO`XGz1
@@ -681,7 +681,7 @@ Emux4
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -703,7 +703,7 @@ Abehave
 R2
 R3
 Z88 DEx4 work 4 mux4 0 22 c;kGS>5Y9W6a3IcHLX7^C2
-!i122 115
+!i122 119
 Z89 l2408
 Z90 L2407 10
 Z91 VU3iRAXeb3o8oS8EWNF8d43
@@ -723,7 +723,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -746,7 +746,7 @@ R1
 R2
 R3
 Z93 DEx4 work 14 partial_ex_mem 0 22 Kd=>ZQ?`a`bakFf>TEa1]1
-!i122 115
+!i122 119
 l380
 Z94 L367 43
 Z95 VLjm6f4N5[bPnaQc0FaKHe2
@@ -766,7 +766,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -789,7 +789,7 @@ R1
 R2
 R3
 Z97 DEx4 work 13 partial_id_ex 0 22 1WQWm_O8TD2G>o6E]nicL3
-!i122 115
+!i122 119
 l292
 Z98 L278 65
 Z99 Vk9JPeOEk9mhjkCcG;@gX_0
@@ -809,7 +809,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -832,7 +832,7 @@ R1
 R2
 R3
 Z101 DEx4 work 13 partial_if_id 0 22 C^a@E0HhU=8dF762Z38PM3
-!i122 115
+!i122 119
 l223
 Z102 L210 29
 Z103 Von]=4da7CgAgPhk@gL9@_2
@@ -852,7 +852,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -875,7 +875,7 @@ R1
 R2
 R3
 Z105 DEx4 work 14 partial_mem_wb 0 22 UPKEfan@N9T@HhckJL9F]1
-!i122 115
+!i122 119
 l455
 Z106 L441 42
 Z107 V[W?^0U;Uk5047j2NGMkHh3
@@ -895,7 +895,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -918,11 +918,11 @@ R1
 R2
 R3
 Z109 DEx4 work 7 regfile 0 22 oMzegNjS5ezfJ]N9CL6]>0
-!i122 115
+!i122 119
 Z110 l2232
 Z111 L2228 45
-Z112 V>46kzbW7ORCi3g10UI3UV0
-Z113 !s100 MiQgG?UIeZ;kZ[]4=YKji2
+Z112 VaMA4L=o@?^h]^zA9eO73o3
+Z113 !s100 QS?fge8n12OecBMekiHc=0
 R7
 33
 R8
@@ -937,7 +937,7 @@ Etb_arm
 R0
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -959,7 +959,7 @@ Atb
 R2
 R3
 Z114 DEx4 work 6 tb_arm 0 22 dm8fGSdbQFIfPYKUnDA_c3
-!i122 115
+!i122 119
 Z115 l1016
 Z116 L992 77
 Z117 VIH]FSm91;Qi3Ra?fF7ki^3
@@ -1002,7 +1002,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -1025,7 +1025,7 @@ R1
 R2
 R3
 Z119 DEx4 work 8 tb_top_2 0 22 nP:@[LoP]ZcNN7>ecI@T63
-!i122 115
+!i122 119
 l87
 Z120 L76 45
 Z121 V`9X[DFU309SEK=k0lRFRR2
@@ -1045,7 +1045,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -1068,7 +1068,7 @@ R1
 R2
 R3
 Z123 DEx4 work 9 testbench 0 22 ^:L`LU;0m:IC;2jaENLY13
-!i122 115
+!i122 119
 l32
 Z124 L21 45
 Z125 VkP?e9UH>;P2ldY1>FmKE71
@@ -1088,7 +1088,7 @@ R0
 R1
 R2
 R3
-!i122 115
+!i122 119
 R4
 R5
 R6
@@ -1111,7 +1111,7 @@ R1
 R2
 R3
 Z127 DEx4 work 3 top 0 22 ^fIm;=FS46J_cjJ<B6ET_0
-!i122 115
+!i122 119
 l161
 Z128 L136 53
 Z129 VYfBXZ5EJ3a6Oi6L_UB_8z0

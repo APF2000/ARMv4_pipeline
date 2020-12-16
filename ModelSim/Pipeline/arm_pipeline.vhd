@@ -1878,7 +1878,7 @@ begin
     y => PCNext2
   );
 
-  pcreg : flopENr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
+  pcreg : flopENr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enable
   generic map(width => 32)
   port map(
     clk => clk,
@@ -2231,11 +2231,11 @@ architecture behave OF regfile is
   signal mem : ramtype;
 begin
   PROCESS (clk) begin
-    IF falling_edge(clk) THEN
+    --IF falling_edge(clk) THEN
       IF we3 = '1' THEN
         mem(to_integer(wa3)) <= wd3;
       end IF;
-    end IF;
+    --end IF;
   end PROCESS;
   PROCESS (all) begin
     if rising_edge(clk) then
@@ -2335,10 +2335,10 @@ begin
     IF reset THEN
       q <= (OTHERS => '0');
     elsif falling_edge(clk) then -- escrita
-      q <= q;
+      q <= d;
     ELSIF rising_edge(clk) THEN -- leitura
       IF en THEN
-        q <= d;
+        q <= q;
       end IF;
     end IF;
   end PROCESS;

@@ -2230,15 +2230,12 @@ architecture behave OF regfile is
   std_logic_vector(31 downto 0);
   signal mem : ramtype;
 begin
-  PROCESS (clk) begin
-    --IF falling_edge(clk) THEN
+  PROCESS (all) begin
+    IF falling_edge(clk) THEN -- escrita
       IF we3 = '1' THEN
         mem(to_integer(wa3)) <= wd3;
       end IF;
-    --end IF;
-  end PROCESS;
-  PROCESS (all) begin
-    if rising_edge(clk) then
+    elsif rising_edge(clk) then -- leitura
       IF (to_integer(ra1) = 15) THEN
         rd1 <= r15;
       ELSE
@@ -2335,11 +2332,11 @@ begin
     IF reset THEN
       q <= (OTHERS => '0');
     elsif falling_edge(clk) then -- escrita
-      q <= d;
-    ELSIF rising_edge(clk) THEN -- leitura
       IF en THEN
-        q <= q;
+        q <= d;
       end IF;
+    else--ELSIF rising_edge(clk) THEN -- leitura
+      q <= q;
     end IF;
   end PROCESS;
 end;

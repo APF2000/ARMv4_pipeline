@@ -1147,11 +1147,11 @@ component controller
  signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
  signal BranchD, ALUSrcD : std_logic;
- signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
+ --signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
- signal FLushE : std_logic;
+ --signal FLushE : std_logic;
  signal MemWriteD : std_logic;
  signal ImmSrcD : std_logic_vector(1 downto 0);
  signal RegSrcD :  std_logic_vector(1 downto 0);
@@ -1769,7 +1769,7 @@ end component;
  signal PCSrcD, RegWriteD : std_logic;
  signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
- signal BranchD, ALUSrcD : std_logic;
+ signal ALUSrcD : std_logic; --BranchD, 
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);

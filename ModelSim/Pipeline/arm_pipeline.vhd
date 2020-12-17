@@ -1766,10 +1766,11 @@ end component;
  -- Decode
  --signal stallD, flushD : std_logic;
  signal instrD : std_logic_vector(31 downto 0);
- signal PCSrcD, RegWriteD : std_logic;
- signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
- signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
- signal ALUSrcD : std_logic; --BranchD, 
+ -- [VERIFICAR] JA VEM TODOS DA UC
+ --signal PCSrcD, RegWriteD : std_logic;
+-- signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
+ --signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
+ --signal ALUSrcD : std_logic; --BranchD, 
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
@@ -1846,7 +1847,7 @@ begin
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
     MemWriteOut <= MemWriteM; --saida do datapath
-    PCSrcD <= PCSrc;
+    --PCSrcD <= PCSrc;
 
     PC <= s_PC;
 
@@ -2027,7 +2028,7 @@ begin
      WA3E => WA3E,
      WA3M => WA3M,
      WA3W => WA3W,
-     PCSrcD => PCSrcD,
+     PCSrcD => PCSrc,
      PCSrcE => PCSrcE1,
      PCSrcM => PCSrcM,
      

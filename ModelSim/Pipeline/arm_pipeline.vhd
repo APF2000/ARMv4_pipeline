@@ -2235,18 +2235,20 @@ begin
       IF we3 = '1' THEN
         mem(to_integer(wa3)) <= wd3;
       end IF;
-    elsif rising_edge(clk) then -- leitura
+    end if;
+    --elsif rising_edge(clk) and clk = '1' then -- leitura
       IF (to_integer(ra1) = 15) THEN
         rd1 <= r15;
       ELSE
         rd1 <= mem(to_integer(ra1));
       end IF;
+
       IF (to_integer(ra2) = 15) THEN
         rd2 <= r15;
       ELSE
         rd2 <= mem(to_integer(ra2));
       end IF;
-    end if;
+    --end if;
   end PROCESS;
 
   db_r0 <= mem(0);
@@ -2331,7 +2333,7 @@ begin
   PROCESS (clk, reset) begin
     IF reset THEN
       q <= (OTHERS => '0');
-    elsif falling_edge(clk) then -- escrita
+    elsif rising_edge(clk) then -- escrita
       IF en THEN
         q <= d;
       end IF;
@@ -2360,7 +2362,7 @@ begin
   PROCESS (clk, reset) begin
     IF reset THEN
       q <= (OTHERS => '0');
-    ELSIF rising_edge(clk) THEN
+    ELSIF rising_edge(clk) and clk = '1' THEN
       q <= d;
     end IF;
   end PROCESS;

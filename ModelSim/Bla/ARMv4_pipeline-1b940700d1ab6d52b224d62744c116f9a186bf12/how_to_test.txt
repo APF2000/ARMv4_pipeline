@@ -1,9 +1,0 @@
-cd /intelFPGA_lite/20.1/modelsim_ase/linuxaloem
-../../vcom -check_synthesis -2008 arm_single.vhd
-../../vsim -c -do "run -all" testbench
-
-E5902060
-
-    (op)(funct)
-     vv vvvvvvv
-1110_01_01_1001_0000_0010_0000_0110_0000

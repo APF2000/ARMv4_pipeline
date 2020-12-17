@@ -1854,7 +1854,7 @@ begin
   CondD <= instrD(31 downto 28);
   instrOut <= instrD(27 downto 12);
 
-  WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
+  --WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
   WA3D <= instrD(15 downto 12);
 
   PCPlus8D <= PCPlus4F;
@@ -2403,15 +2403,14 @@ entity mux4 is -- two-input multiplexer
   );
 end;
 
-architecture behave OF mux4 is
+architecture behave_mux4 OF mux4 is
 begin
   with s select
     y <=
       d0 when "00",
       d1 when "01",
       d2 when "10",
-      d3 when "11",
-      d0 when others;
+      d3 when others;
 end;
 
 

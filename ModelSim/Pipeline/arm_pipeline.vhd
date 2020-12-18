@@ -1615,7 +1615,7 @@ component partial_ID_EX is
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : in std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
-    FLushE : in std_logic;
+    FLushE : in std_logic; -- Entra por baixo na imagem
     RA1D, RA2D : in std_logic_vector(3 downto 0);
     
     RA1E, RA2E : out std_logic_vector(3 downto 0);

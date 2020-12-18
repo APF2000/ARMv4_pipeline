@@ -878,6 +878,7 @@ begin
   Match_12D_E <= Match_12D_Ea or Match_12D_Eb;
 
   -- Quando uma escrita de branch no PC estaria ocorrendo nos estagios Decode ou Execution ou Memory
+  -- Melhor dizendo: quando ResultW vira o proximo pc em D,E ou M
   PCWrPendingF <= PCSrcD or PCSrcE or PCSrcM;
 
   Match(4) <= Match_12D_E;
@@ -1929,23 +1930,6 @@ begin
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
     rd2 => RD2D,--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
-    db_r0 => open, 
-    db_r1 => open, 
-    db_r2 => open, 
-    db_r3 => open, 
-    db_r4 => open, 
-    db_r5 => open, 
-    db_r6 => open, 
-    db_r7 => open, 
-    db_r8 => open, 
-    db_r9 => open, 
-    db_r10 => open, 
-    db_r11 => open, 
-    db_r12 => open, 
-    db_r13 => open, 
-    db_r14 => open, 
-    db_r15 => open
-
   );
 
   res_mux : mux2
@@ -2062,6 +2046,7 @@ begin
      StallD => StallD, -- [VERIFICAR] Ligar em enable IF/ID
      FlushD => FlushD, -- [VERIFICAR] Ligar em clear IF/ID
      FlushE => FlushE, -- [VERIFICAR] Ligar em clear ID/EX
+     
      ForwardAE => ForwardAE, -- [VERIFICAR] Ligar em mux para SrcAE
      ForwardBE => ForwardBE -- [VERIFICAR] Ligar em mux para SrcBE
    );

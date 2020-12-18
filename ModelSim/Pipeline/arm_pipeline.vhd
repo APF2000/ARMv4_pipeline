@@ -213,12 +213,13 @@ architecture arch of partial_IF_ID is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
 
   signal s_instr : std_logic_vector(31 downto 0);
-  signal s_not_stall, s_flush : std_logic;
+  signal s_not_stall : std_logic;
 
 begin
   flnr_IF_ID_0 : flopenr
@@ -226,14 +227,16 @@ begin
   port map
   (
     clk => clock,
-    reset => s_flush,
+    reset => reset,
     en => s_not_stall,
     d => instrF,
-    q => instrD
+    q => instrD,
+
+    clear => flushD
   );
 
   s_not_stall <= not stallD;
-  s_flush <= flushD or reset;
+  --s_flush <= flushD or reset;
 
 end architecture;
 
@@ -281,13 +284,14 @@ architecture arch OF partial_ID_EX is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
 
   signal s_in: std_logic_vector(125 downto 0);
   signal s_out: std_logic_vector(125 downto 0);
-  signal s_flush : std_logic;
+  --signal s_flush : std_logic;
 
 begin
 
@@ -296,12 +300,14 @@ begin
   port map
   (
     clk => clock,
-    reset => s_flush,
+    reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => flushE
   );
-  s_flush <= flushE or reset;
+  --s_flush <= flushE or reset;
   
   s_in (125 downto 94) <= RD1D;
   s_in (93 downto 62) <= RD2D;
@@ -370,6 +376,7 @@ architecture arch of partial_EX_MEM is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -387,7 +394,9 @@ begin
     reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => '0'
   );
 
   s_in (71 downto 40) <= ALUResultE;
@@ -444,6 +453,7 @@ architecture arch OF partial_MEM_WB is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -462,7 +472,9 @@ begin
     reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => '0'
   );
 
   s_in (70 downto 39) <= ALUOutM;
@@ -1405,6 +1417,7 @@ architecture behave OF cond_unit is
   component flopenr generic (width : integer);
     port (
       clk, reset, en : in std_logic;
+      clear : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -1420,7 +1433,9 @@ begin
     reset => reset,
     en => FlagWrite(1),
     d => ALUFlags(3 downto 2),
-    q => Flags(3 downto 2)
+    q => Flags(3 downto 2),
+
+    clear => '0'
   );
 
   flagreg0 : flopenr
@@ -1430,7 +1445,9 @@ begin
     reset => reset,
     en => FlagWrite(0),
     d => ALUFlags(1 downto 0),
-    q => Flags(1 downto 0)
+    q => Flags(1 downto 0),
+
+    clear => '0'
   );
 
   cc : condcheck port map(
@@ -1727,6 +1744,7 @@ end component;
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -1887,7 +1905,9 @@ begin
     reset => reset,
     en => not_StallF,
     d => PCNext2,
-    q => s_PC
+    q => s_PC,
+
+    clear => '0'
   );
   not_StallF <= not StallF; 
 
@@ -1929,7 +1949,7 @@ begin
     r15 => PCPlus8D, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D [MUDADO] [VERIFICAR] SE VEM DA ALU
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
-    rd2 => RD2D,--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
+    rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
   );
 
   res_mux : mux2
@@ -2116,7 +2136,7 @@ port map
   WA3D => WA3D,
   CondD => CondD,
   FlagsD => Flags,
-  FLushE => reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
+  FLushE => FlushE,--reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
   RA1D => RA1D,
   RA2D => RA2D,
     
@@ -2306,12 +2326,14 @@ end;
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
-entity flopenr is -- flip-flop with enable and asynchronous reset
+entity flopenr is -- flip-flop with enable and asynchronous reset, clear sincrono
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
-    q : out std_logic_vector(width - 1 downto 0));
+    q : out std_logic_vector(width - 1 downto 0)
+  );
 end;
 
 architecture asynchronous OF flopenr is
@@ -2321,11 +2343,13 @@ begin
       q <= (OTHERS => '0');
     elsif rising_edge(clk) then -- escrita
       IF en THEN
-        q <= d;
-      end IF;
-    else--ELSIF rising_edge(clk) THEN -- leitura
-      q <= q;
-    end IF;
+        if clear then
+          q <= (others => '0');
+        else--ELSIF rising_edge(clk) THEN -- leitura
+          q <= d;
+        end IF;
+      end if;
+    end if;
   end PROCESS;
 end;
 

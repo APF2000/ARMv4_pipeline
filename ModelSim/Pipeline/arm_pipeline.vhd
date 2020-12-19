@@ -213,12 +213,13 @@ architecture arch of partial_IF_ID is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
 
   signal s_instr : std_logic_vector(31 downto 0);
-  signal s_not_stall, s_flush : std_logic;
+  signal s_not_stall : std_logic;
 
 begin
   flnr_IF_ID_0 : flopenr
@@ -226,14 +227,16 @@ begin
   port map
   (
     clk => clock,
-    reset => s_flush,
+    reset => reset,
     en => s_not_stall,
     d => instrF,
-    q => instrD
+    q => instrD,
+
+    clear => flushD
   );
 
   s_not_stall <= not stallD;
-  s_flush <= flushD or reset;
+  --s_flush <= flushD or reset;
 
 end architecture;
 
@@ -281,13 +284,14 @@ architecture arch OF partial_ID_EX is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
 
   signal s_in: std_logic_vector(125 downto 0);
   signal s_out: std_logic_vector(125 downto 0);
-  signal s_flush : std_logic;
+  --signal s_flush : std_logic;
 
 begin
 
@@ -296,12 +300,14 @@ begin
   port map
   (
     clk => clock,
-    reset => s_flush,
+    reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => flushE
   );
-  s_flush <= flushE or reset;
+  --s_flush <= flushE or reset;
   
   s_in (125 downto 94) <= RD1D;
   s_in (93 downto 62) <= RD2D;
@@ -370,6 +376,7 @@ architecture arch of partial_EX_MEM is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -387,7 +394,9 @@ begin
     reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => '0'
   );
 
   s_in (71 downto 40) <= ALUResultE;
@@ -444,6 +453,7 @@ architecture arch OF partial_MEM_WB is
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -462,7 +472,9 @@ begin
     reset => reset,
     en => '1',
     d => s_in,
-    q => s_out
+    q => s_out,
+
+    clear => '0'
   );
 
   s_in (70 downto 39) <= ALUOutM;
@@ -878,6 +890,7 @@ begin
   Match_12D_E <= Match_12D_Ea or Match_12D_Eb;
 
   -- Quando uma escrita de branch no PC estaria ocorrendo nos estagios Decode ou Execution ou Memory
+  -- Melhor dizendo: quando ResultW vira o proximo pc em D,E ou M
   PCWrPendingF <= PCSrcD or PCSrcE or PCSrcM;
 
   Match(4) <= Match_12D_E;
@@ -1147,11 +1160,11 @@ component controller
  signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
  signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
  signal BranchD, ALUSrcD : std_logic;
- signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
+ --signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
  signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
- signal FLushE : std_logic;
+ --signal FLushE : std_logic;
  signal MemWriteD : std_logic;
  signal ImmSrcD : std_logic_vector(1 downto 0);
  signal RegSrcD :  std_logic_vector(1 downto 0);
@@ -1404,6 +1417,7 @@ architecture behave OF cond_unit is
   component flopenr generic (width : integer);
     port (
       clk, reset, en : in std_logic;
+      clear : in std_logic;
       d : in std_logic_vector(width - 1 downto 0);
       q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -1419,7 +1433,9 @@ begin
     reset => reset,
     en => FlagWrite(1),
     d => ALUFlags(3 downto 2),
-    q => Flags(3 downto 2)
+    q => Flags(3 downto 2),
+
+    clear => '0'
   );
 
   flagreg0 : flopenr
@@ -1429,7 +1445,9 @@ begin
     reset => reset,
     en => FlagWrite(0),
     d => ALUFlags(1 downto 0),
-    q => Flags(1 downto 0)
+    q => Flags(1 downto 0),
+
+    clear => '0'
   );
 
   cc : condcheck port map(
@@ -1597,7 +1615,7 @@ component partial_ID_EX is
     WA3D : in std_logic_vector(3 downto 0);
     CondD: in std_logic_vector(3 downto 0);
     FlagsD : in std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
-    FLushE : in std_logic;
+    FLushE : in std_logic; -- Entra por baixo na imagem
     RA1D, RA2D : in std_logic_vector(3 downto 0);
     
     RA1E, RA2E : out std_logic_vector(3 downto 0);
@@ -1726,6 +1744,7 @@ end component;
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
     q : out std_logic_vector(width - 1 downto 0));
   end component;
@@ -1766,10 +1785,11 @@ end component;
  -- Decode
  --signal stallD, flushD : std_logic;
  signal instrD : std_logic_vector(31 downto 0);
- signal PCSrcD, RegWriteD : std_logic;
- signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
- signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
- signal BranchD, ALUSrcD : std_logic;
+ -- [VERIFICAR] JA VEM TODOS DA UC
+ --signal PCSrcD, RegWriteD : std_logic;
+-- signal MemtoRegD : std_logic;--, MemWriteD : std_logic;
+ --signal ALUControlD, FlagWriteD : std_logic_vector(1 downto 0);
+ --signal ALUSrcD : std_logic; --BranchD, 
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
@@ -1846,7 +1866,7 @@ begin
     WriteData <= WriteDataM;
     ReadDataM <= ReadData;
     MemWriteOut <= MemWriteM; --saida do datapath
-    PCSrcD <= PCSrc;
+    --PCSrcD <= PCSrc;
 
     PC <= s_PC;
 
@@ -1854,7 +1874,7 @@ begin
   CondD <= instrD(31 downto 28);
   instrOut <= instrD(27 downto 12);
 
-  WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
+  --WriteDataE <= RD2E; -- [MUDAR PIPELINE] RECEBE O QUE SAI DO MUX ANTES DO SrcBE
   WA3D <= instrD(15 downto 12);
 
   PCPlus8D <= PCPlus4F;
@@ -1878,14 +1898,16 @@ begin
     y => PCNext2
   );
 
-  pcreg : flopENr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enanble
+  pcreg : flopENr --[MUDAR QUANDO FOR PIPELINE] torna-lo um registrador para por enable
   generic map(width => 32)
   port map(
     clk => clk,
     reset => reset,
     en => not_StallF,
     d => PCNext2,
-    q => s_PC
+    q => s_PC,
+
+    clear => '0'
   );
   not_StallF <= not StallF; 
 
@@ -1927,24 +1949,7 @@ begin
     r15 => PCPlus8D, -- [MUDAR PIPELINE] VEM DO PCPlus4F ou PCPlus8D [MUDADO] [VERIFICAR] SE VEM DA ALU
 
     rd1 => RD1D,--SrcAE, -- [VERIFICAR] TEM UM MUX NO MEIO QUE GERA SrcAE [VERIFICAR] Deve entrar em partial_ID_EX
-    rd2 => RD2D,--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
-    db_r0 => open, 
-    db_r1 => open, 
-    db_r2 => open, 
-    db_r3 => open, 
-    db_r4 => open, 
-    db_r5 => open, 
-    db_r6 => open, 
-    db_r7 => open, 
-    db_r8 => open, 
-    db_r9 => open, 
-    db_r10 => open, 
-    db_r11 => open, 
-    db_r12 => open, 
-    db_r13 => open, 
-    db_r14 => open, 
-    db_r15 => open
-
+    rd2 => RD2D--WriteData [VERIFICAR] tem que entrar em um mux tbm -- [VERIFICAR] Deve entrar em partial_ID_EX
   );
 
   res_mux : mux2
@@ -2027,7 +2032,7 @@ begin
      WA3E => WA3E,
      WA3M => WA3M,
      WA3W => WA3W,
-     PCSrcD => PCSrcD,
+     PCSrcD => PCSrc,
      PCSrcE => PCSrcE1,
      PCSrcM => PCSrcM,
      
@@ -2061,6 +2066,7 @@ begin
      StallD => StallD, -- [VERIFICAR] Ligar em enable IF/ID
      FlushD => FlushD, -- [VERIFICAR] Ligar em clear IF/ID
      FlushE => FlushE, -- [VERIFICAR] Ligar em clear ID/EX
+     
      ForwardAE => ForwardAE, -- [VERIFICAR] Ligar em mux para SrcAE
      ForwardBE => ForwardBE -- [VERIFICAR] Ligar em mux para SrcBE
    );
@@ -2130,7 +2136,7 @@ port map
   WA3D => WA3D,
   CondD => CondD,
   FlagsD => Flags,
-  FLushE => reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
+  FLushE => FlushE,--reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
   RA1D => RA1D,
   RA2D => RA2D,
     
@@ -2230,26 +2236,25 @@ architecture behave OF regfile is
   std_logic_vector(31 downto 0);
   signal mem : ramtype;
 begin
-  PROCESS (clk) begin
-    IF falling_edge(clk) THEN
+  PROCESS (all) begin
+    IF falling_edge(clk) THEN -- escrita
       IF we3 = '1' THEN
         mem(to_integer(wa3)) <= wd3;
       end IF;
-    end IF;
-  end PROCESS;
-  PROCESS (all) begin
-    if rising_edge(clk) then
+    end if;
+    --elsif rising_edge(clk) and clk = '1' then -- leitura
       IF (to_integer(ra1) = 15) THEN
         rd1 <= r15;
       ELSE
         rd1 <= mem(to_integer(ra1));
       end IF;
+
       IF (to_integer(ra2) = 15) THEN
         rd2 <= r15;
       ELSE
         rd2 <= mem(to_integer(ra2));
       end IF;
-    end if;
+    --end if;
   end PROCESS;
 
   db_r0 <= mem(0);
@@ -2321,12 +2326,14 @@ end;
 -- &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 library IEEE;
 use IEEE.std_logic_1164.all;
-entity flopenr is -- flip-flop with enable and asynchronous reset
+entity flopenr is -- flip-flop with enable and asynchronous reset, clear sincrono
   generic (width : integer);
   port (
     clk, reset, en : in std_logic;
+    clear : in std_logic;
     d : in std_logic_vector(width - 1 downto 0);
-    q : out std_logic_vector(width - 1 downto 0));
+    q : out std_logic_vector(width - 1 downto 0)
+  );
 end;
 
 architecture asynchronous OF flopenr is
@@ -2334,13 +2341,15 @@ begin
   PROCESS (clk, reset) begin
     IF reset THEN
       q <= (OTHERS => '0');
-    elsif falling_edge(clk) then -- escrita
-      q <= q;
-    ELSIF rising_edge(clk) THEN -- leitura
+    elsif rising_edge(clk) then -- escrita
       IF en THEN
-        q <= d;
-      end IF;
-    end IF;
+        if clear then
+          q <= (others => '0');
+        else--ELSIF rising_edge(clk) THEN -- leitura
+          q <= d;
+        end IF;
+      end if;
+    end if;
   end PROCESS;
 end;
 
@@ -2363,7 +2372,7 @@ begin
   PROCESS (clk, reset) begin
     IF reset THEN
       q <= (OTHERS => '0');
-    ELSIF rising_edge(clk) THEN
+    ELSIF rising_edge(clk) and clk = '1' THEN
       q <= d;
     end IF;
   end PROCESS;
@@ -2404,15 +2413,14 @@ entity mux4 is -- two-input multiplexer
   );
 end;
 
-architecture behave OF mux4 is
+architecture behave_mux4 OF mux4 is
 begin
   with s select
     y <=
       d0 when "00",
       d1 when "01",
       d2 when "10",
-      d3 when "11",
-      d0 when others;
+      d3 when others;
 end;
 
 

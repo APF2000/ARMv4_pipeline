@@ -1,0 +1,42 @@
+/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Single/arm_single.vhd {1 {vcom -work work -2008 -explicit -stats=none /home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Single/arm_single.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD_UNSIGNED
+-- Compiling entity testbench
+-- Compiling architecture test of testbench
+-- Compiling entity top
+-- Compiling architecture test of top
+-- Compiling entity dmem
+-- Compiling architecture behave of dmem
+-- Compiling entity imem
+-- Compiling architecture behave of imem
+-- Compiling entity arm
+-- Compiling architecture struct of arm
+-- Compiling entity controller
+-- Compiling architecture struct of controller
+-- Compiling entity decoder
+-- Compiling architecture behave of decoder
+-- Compiling entity condlogic
+-- Compiling architecture behave of condlogic
+-- Compiling entity condcheck
+-- Compiling architecture behave of condcheck
+-- Compiling entity datapath
+-- Compiling architecture struct of datapath
+-- Compiling entity regfile
+-- Compiling architecture behave of regfile
+-- Compiling entity adder
+-- Compiling architecture behave of adder
+-- Compiling entity extend
+-- Compiling architecture behave of extend
+-- Compiling entity flopenr
+-- Compiling architecture asynchronous of flopenr
+-- Compiling entity flopr
+-- Compiling architecture asynchronous of flopr
+-- Compiling entity mux2
+-- Compiling architecture behave of mux2
+-- Compiling entity alu
+-- Compiling architecture behave of alu
+
+} {} {}}

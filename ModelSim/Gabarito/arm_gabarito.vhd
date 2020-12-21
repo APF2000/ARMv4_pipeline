@@ -364,18 +364,24 @@ begin
  ValsEnext <= (ALUSrcD, ALUControlD);
  flushedregsE: floprc generic map (7)
  port map(clk, reset, FlushE, FlushedValsEnext, FlushedValsE);
+
  regsE: flopr generic map (3)
  port map(clk, reset, ValsEnext, ValsE);
+
  condregE: flopr generic map (4)
  port map(clk, reset, InstrD(31 downto 28), CondE);
+
  flagsreg: flopr generic map (4)
  port map(clk, reset, FlagsNextE, FlagsE);
+
  (FlagWriteE, BranchE, MemWriteE, RegWriteE, PCSrcE, MemtoRegE) <=
 FlushedValsE;
  (ALUSrcE, ALUControlE) <= ValsE;
+ 
  -- write and Branch controls are conditional
  Cond: conditional port map(CondE, FlagsE, ALUFlagsE, FlagWriteE,
 CondExE, FlagsNextE);
+
  BranchTakenE <= BranchE and CondExE;
  RegWriteGatedE <= RegWriteE and CondExE;
  MemWriteGatedE <= MemWriteE and CondExE;

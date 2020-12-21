@@ -1456,12 +1456,24 @@ begin
     CondEx => CondEx
   );
 
-  PCSrc <= PCS AND CondEx;
-  RegWrite <= RegW AND CondEx;
-  MemWrite <= MemW AND CondEx;
-  FlagWrite <= FlagW AND (CondEx, CondEx);
+  -- [GAMBIARRA]
+  --teste : process(all) is begin
+  --  if not(rising_edge(clk)) then
+      PCSrc <= PCS AND CondEx;
+      RegWrite <= RegW AND CondEx;
+      MemWrite <= MemW AND CondEx;
+      FlagWrite <= FlagW AND (CondEx, CondEx);
 
-  BranchTaken <= Branch and CondEx;
+      BranchTaken <= Branch and CondEx;
+  --  else
+  --     PCSrc <= PCSrc;
+  --     RegWrite <= RegWrite;
+  --     MemWrite <= MemWrite;
+  --     FlagWrite <= FlagWrite;
+
+  --     BranchTaken <= BranchTaken;
+  --   end if;
+  -- end process;
 
 end;
 

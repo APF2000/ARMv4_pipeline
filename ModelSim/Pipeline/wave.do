@@ -13,10 +13,20 @@ add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/ALUOutW
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/aluinst/a
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/aluinst/b
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/aluinst/Result
+add wave -noupdate /testbench/dut/i_arm/datap/inst_partial_ID_EX/ALUControlD
+add wave -noupdate /testbench/dut/i_arm/datap/inst_partial_ID_EX/ALUControlE
+add wave -noupdate /testbench/dut/i_arm/datap/inst_partial_ID_EX/ALUSrcD
+add wave -noupdate /testbench/dut/i_arm/datap/inst_partial_ID_EX/ALUSrcE
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/ALUFlags
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/BranchTaken
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/Cond
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/CondEx
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/FlagsE
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/FlagsLinha
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {95000 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 224
+configure wave -namecolwidth 322
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
@@ -30,4 +40,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {144376 ps}
+WaveRestoreZoom {0 ps} {367765 ps}

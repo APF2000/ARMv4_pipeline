@@ -293,6 +293,8 @@ architecture arch OF partial_ID_EX is
   signal s_out: std_logic_vector(125 downto 0);
   --signal s_flush : std_logic;
 
+  signal s_alu_in, s_alu_out : std_logic_vector(2 downto 0);
+
 begin
 
   flnr_ID_EX : flopenr
@@ -307,6 +309,20 @@ begin
 
     clear => flushE
   );
+
+  flop_alu : flopenr
+  generic map(width => 3)
+  port map
+  (
+    clk => clock,
+    reset => reset,
+    en => '1',
+    d => s_alu_in,
+    q => s_alu_out,
+
+    clear => '0'
+  );
+
   --s_flush <= flushE or reset;
   
   s_in (125 downto 94) <= RD1D;
@@ -317,14 +333,14 @@ begin
   s_in (21 downto 18) <= FlagsD;
   s_in (17 downto 14) <= RA1D;
   s_in (13 downto 10) <= RA2D;
-  s_in (9 downto 8) <= ALUControlD;
+  --s_in (9 downto 8) <= ALUControlD;
   s_in (7 downto 6) <= FlagWriteD;
   s_in (5) <= PCSrcD;
   s_in (4) <= RegWriteD;
   s_in (3) <= MemtoRegD;
   s_in (2) <= MemWriteD;
   s_in (1) <= BranchD;
-  s_in (0) <= ALUSrcD;
+  --s_in (0) <= ALUSrcD;
 
    
   RD1E <= s_out (125 downto 94);
@@ -335,15 +351,17 @@ begin
   FlagsE <= s_out (21 downto 18);
   RA1E <= s_out (17 downto 14);
   RA2E <= s_out (13 downto 10);
-  ALUControlE <= s_out (9 downto 8);
+  --ALUControlE <= s_out (9 downto 8);
   FlagWriteE <= s_out (7 downto 6);
   PCSrcE <= s_out (5);
   RegWriteE <= s_out (4);
   MemtoRegE <= s_out (3);
   MemWriteE <= s_out (2);
   BranchE <= s_out (1);
-  ALUSrcE <= s_out (0);
+  --ALUSrcE <= s_out (0);
 
+  s_alu_in <= (ALUControlD, ALUSrcD);
+  (ALUCOntrolE, ALUSrcE) <= s_alu_out;
 
 end architecture;
 
@@ -1163,7 +1181,7 @@ component controller
  --signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
- signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
+ --signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
  --signal FLushE : std_logic;
  signal MemWriteD : std_logic;
  signal ImmSrcD : std_logic_vector(1 downto 0);
@@ -1400,7 +1418,7 @@ entity cond_unit is -- Conditional logic
     FlagsE: in std_logic_vector(3 downto 0);
     Branch : in std_logic;
 
-    Flags: out std_logic_vector(3 downto 0);
+    FlagsLinha: out std_logic_vector(3 downto 0);
     PCSrc, RegWrite : out std_logic;
     MemWrite : out std_logic;
     BranchTaken : out std_logic
@@ -1427,28 +1445,28 @@ architecture behave OF cond_unit is
   signal CondEx : std_logic;
 
 begin
-  flagreg1 : flopenr generic map(2)
-  port map(
-    clk => clk,
-    reset => reset,
-    en => FlagWrite(1),
-    d => ALUFlags(3 downto 2),
-    q => Flags(3 downto 2),
+  -- flagreg1 : flopenr generic map(2)
+  -- port map(
+  --   clk => clk,
+  --   reset => reset,
+  --   en => FlagWrite(1),
+  --   d => ALUFlags(3 downto 2),
+  --   q => Flags(3 downto 2),
 
-    clear => '0'
-  );
+  --   clear => '0'
+  -- );
 
-  flagreg0 : flopenr
-  generic map(width => 2)
-  port map(
-    clk => clk,
-    reset => reset,
-    en => FlagWrite(0),
-    d => ALUFlags(1 downto 0),
-    q => Flags(1 downto 0),
+  -- flagreg0 : flopenr
+  -- generic map(width => 2)
+  -- port map(
+  --   clk => clk,
+  --   reset => reset,
+  --   en => FlagWrite(0),
+  --   d => ALUFlags(1 downto 0),
+  --   q => Flags(1 downto 0),
 
-    clear => '0'
-  );
+  --   clear => '0'
+  -- );
 
   cc : condcheck port map(
     Cond => Cond,
@@ -1456,12 +1474,31 @@ begin
     CondEx => CondEx
   );
 
-  PCSrc <= PCS AND CondEx;
-  RegWrite <= RegW AND CondEx;
-  MemWrite <= MemW AND CondEx;
-  FlagWrite <= FlagW AND (CondEx, CondEx);
+  -- [GAMBIARRA]
+  --teste : process(all) is begin
+  --  if not(rising_edge(clk)) then
+      PCSrc <= PCS AND CondEx;
+      RegWrite <= RegW AND CondEx;
+      MemWrite <= MemW AND CondEx;
+      FlagWrite <= FlagW AND (CondEx, CondEx);
 
-  BranchTaken <= Branch and CondEx;
+      BranchTaken <= Branch and CondEx;
+  --  else
+  --     PCSrc <= PCSrc;
+  --     RegWrite <= RegWrite;
+  --     MemWrite <= MemWrite;
+  --     FlagWrite <= FlagWrite;
+
+  --     BranchTaken <= BranchTaken;
+  --   end if;
+  -- end process;
+
+
+  FlagsLinha(3 downto 2) <= ALUFlags(3 downto 2) when (FlagWrite(1) and
+  CondEx) else FlagsE(3 downto 2);
+
+  FlagsLinha(1 downto 0) <= ALUFlags(1 downto 0) when (FlagWrite(0) and
+  CondEx) else FlagsE(1 downto 0);
 
 end;
 
@@ -1682,7 +1719,8 @@ end component;
       FlagsE: in std_logic_vector(3 downto 0);
       Branch : in std_logic;
 
-      Flags: out std_logic_vector(3 downto 0);
+      FlagsLinha: out std_logic_vector(3 downto 0);
+      --Flags: out std_logic_vector(3 downto 0);
       PCSrc, RegWrite : out std_logic;
       MemWrite : out std_logic;
       BranchTaken : out std_logic
@@ -1793,7 +1831,7 @@ end component;
  signal RD1D, RD2D, ExtImmD : std_logic_vector(31 downto 0);
  signal WA3D : std_logic_vector(3 downto 0);
  signal CondD: std_logic_vector(3 downto 0);
- signal Flags : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
+ signal FlagsLinha : std_logic_vector(3 downto 0);--[nao precisa mais ver tamanho]
  --signal FLushE : std_logic;
  signal PCPlus8D : std_logic_vector(31 downto 0);
 
@@ -2093,7 +2131,7 @@ port map
   Branch => BranchE, -- [VERIFICAR] VEM DOS REGS DE PIPELINE PRA ENTRAR AQUI
   BranchTaken => BranchTakenE, -- [VERIFICAR] TEM QUE TER UMA SAIDA BRANCH DA CONDUNIT PRA MANDAR LA PRO MUX DO PC
 
-  Flags => Flags, --adicionar sinal e adicionar Flags E na entidade cond_unit
+  FlagsLinha => FlagsLinha, --adicionar sinal e adicionar Flags E na entidade cond_unit
   FlagW => FlagWriteE,
 
   Cond => condE,--instr(31 downto 28),
@@ -2135,7 +2173,7 @@ port map
   ExtImmD => ExtImmD, --[VERIFICAR] vir de Extend
   WA3D => WA3D,
   CondD => CondD,
-  FlagsD => Flags,
+  FlagsD => FlagsLinha,
   FLushE => FlushE,--reset, --[MUDAR PRO PIPELINE]trocar pelo input FlushE do hazard unit
   RA1D => RA1D,
   RA2D => RA2D,

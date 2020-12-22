@@ -56,7 +56,7 @@
 //           ADD    R0,  R2,            #14    					; shouldn't happen              	
 	1110 001 0100 0 0000 0010 0000 0000 1110 E280200E 0x48
 
-//          B END             									; always taken					
+//          B  END             									; always taken					
 	1110 1010 0000 0000 0000 0000 0000 0001  EA000001 0x4c
 //           ADD    R0,  R2,            #13   					; shouldn't happen				
 	1110 001 0100 0 0000 0010 0000 0000 1001 E280200D 0x50

@@ -2352,7 +2352,7 @@ begin
       WHEN "00" => ExtImm <= (X"000000", instr(7 downto 0));
       WHEN "01" => ExtImm <= (X"00000", instr(11 downto 0));
       WHEN "10" => ExtImm <= (instr(23), instr(23), instr(23),
-        instr(23), instr(23), instr(23), instr(23 downto 0), "00");
+        instr(23), instr(23), instr(23), instr(23 downto 0), "00"); -- vezes 4 
       WHEN OTHERS => ExtImm <= X"--------";
     end CASE;
   end PROCESS;

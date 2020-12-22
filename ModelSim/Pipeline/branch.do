@@ -1,6 +1,11 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix hexadecimal /testbench/clk
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/PC
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/PCNext1
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/PCNext2
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/PCPlus4F
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/PCPlus8D
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/instrD
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/instrF
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/RA1D
@@ -28,24 +33,26 @@ add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/cl/FlagsLinha
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux2/d0
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux2/d1
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux2/s
-add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux2/width
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux2/y
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/d0
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/d1
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/d2
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/d3
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/s
-add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/width
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcBmux4/y
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/ImmSrc
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/ALUControlE
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/ALUFlags
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/ALUSrcE
+add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/BranchTakenE
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/d0
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/d1
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/d2
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/d3
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/s
-add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/width
 add wave -noupdate -radix hexadecimal /testbench/dut/i_arm/datap/srcAmux4/y
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {95000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {125000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 322
 configure wave -valuecolwidth 100
@@ -61,4 +68,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {187968 ps} {384844 ps}
+WaveRestoreZoom {281484 ps} {379922 ps}

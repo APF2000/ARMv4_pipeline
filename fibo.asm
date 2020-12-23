@@ -3,7 +3,7 @@ R0=0; R1= N; R2=ant; R3=prox; R4=aux; R5=i; R6=Naux R14=return
 E04F000F SUB R0, R15, R15 	; R0 = 0  0x00
 E2801005 ADD R1, R0, #5      	; R1 = 5 calcular 5o fibo 0x04
 EA000004 B FIBO ; 0x08
-EA000000 BACK B BACK ; esquece 0x0C
+00000000 ; nada
 00000000
 00000000
 00000000
@@ -25,8 +25,12 @@ E2843000 ADD R3, R4, #0 ; prox = aux ; 0x54
 E2855001 ADD R5, R5, #1 ; i++ ; 0x58
 EA B LOOP ; 0x5C
 END ADD R14, R5, #0 ; 0x60
-B BACK ; 0x64
+EA000000 BACK B BACK ; 0x64
 
+//       BB  SUB    R15  										; shouldn't be taken            	
+	0000 101 0010 0  1111 0000 0000 0000 1100 0A00000C 0x20
+              ^
+             safe (eu acho)
 ------------------------------
 ADDI   = E28 R1op Rdest 00X
 ADD    = E08 R1op Rdest 00 R2op

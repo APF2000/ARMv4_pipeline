@@ -1373,7 +1373,7 @@ begin
       WHEN "01-0" => controls <= "1001110100";
       WHEN "01-1" => controls <= "0001111000";
       WHEN "101-" => controls <= "0110100010";
-      WHEN "1000" => controls <= "0110100010";
+      WHEN "1000" => controls <= "0111100011";
       WHEN OTHERS => controls <= "----------";
     end CASE?;
   end PROCESS;
@@ -2353,7 +2353,8 @@ begin
       WHEN "00" => ExtImm <= (X"000000", instr(7 downto 0));
       WHEN "01" => ExtImm <= (X"00000", instr(11 downto 0));
       WHEN "10" => ExtImm <= (instr(23), instr(23), instr(23),
-        instr(23), instr(23), instr(23), instr(23 downto 0), "00"); -- vezes 4 
+        instr(23), instr(23), instr(23), instr(23 downto 0), "00");
+      WHEN "11" => ExtImm <= (B"0000_0000_0000_0000_00" instr(11 downto 0), "00"); -- vezes 4 
       WHEN OTHERS => ExtImm <= X"--------";
     end CASE;
   end PROCESS;

@@ -1,6 +1,44 @@
-E04F000F SUB R0, R15, R15 	; R0 = 0
-E2801005 ADD R1, R0, #5      	; R1 = 5 calcular 5o fibo
-EA000001 B FIBO
+R0=0; R1= N; R2=ant; R3=prox; R4=aux; R5=i; R6=Naux R14=return
+
+E04F000F SUB R0, R15, R15 	; R0 = 0  0x00
+E2801005 ADD R1, R0, #5      	; R1 = 5 calcular 5o fibo 0x04
+EA000004 B FIBO ; 0x08
+EA000000 BACK B BACK ; esquece
+00000000
+00000000
+00000000
+00000000
+ ADD R2, R0, #1
+ADD R3, R0, #1
+ADD R5, R0, #0
+ADD R6, R1, #0
+E2511002  SUBS R1, R1, #1 ; 0x2C
+BGE LOOP
+B END
+LOOP SUB R6, R1, R5 ; Naux = N - i
+SUBS R6, R6, #1 ; Naux = (N - 1) - i
+BGE CONTINUE
+B END
+CONTINUE ADD R4, R2, R3 ; aux = ant + prox
+ADD R2, R3, #0 ; ant = prox
+ADD R3, R4, #0 ; prox = aux
+ADD R5, R5, #1 ; i++
+B LOOP
+END ADD R14, R5, #0
+B BACK
+
+def fibo(n):   
+    ant, prox = 1, 1
+
+    if(n < 1):
+        return 1
+
+    for i in range(n):
+        aux = ant + prox
+        ant = prox
+        prox = aux
+
+    return prox
 
 E280300C ADD R3, R0, #12    	; R3 = 12
 E2437009 SUB R7, R3, #9    	; R7 = 3

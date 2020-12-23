@@ -1372,7 +1372,8 @@ begin
       WHEN "001-" => controls <= "0000101001";
       WHEN "01-0" => controls <= "1001110100";
       WHEN "01-1" => controls <= "0001111000";
-      WHEN "10--" => controls <= "0110100010";
+      WHEN "101-" => controls <= "0110100010";
+      WHEN "1000" => controls <= "0110100010";
       WHEN OTHERS => controls <= "----------";
     end CASE?;
   end PROCESS;

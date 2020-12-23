@@ -1,1 +1,61 @@
+/home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd {2 {vcom -work work -2008 -explicit -stats=none /home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD_UNSIGNED
+-- Compiling entity testbench
+-- Compiling architecture test of testbench
+-- Compiling entity tb_top_2
+-- Compiling architecture tb of tb_top_2
+-- Compiling entity top
+-- Compiling architecture test of top
+-- Compiling entity partial_IF_ID
+-- Compiling architecture arch of partial_IF_ID
+-- Compiling entity partial_ID_EX
+-- Compiling architecture arch of partial_ID_EX
+-- Compiling entity partial_EX_MEM
+-- Compiling architecture arch of partial_EX_MEM
+-- Compiling entity partial_MEM_WB
+-- Compiling architecture arch of partial_MEM_WB
+-- Compiling entity hazard_unit
+-- Compiling architecture arch_hazard_unit of hazard_unit
+-- Compiling entity hazard_logic
+-- Compiling architecture arch_hazard_logic of hazard_logic
+-- Compiling entity dmem
+-- Compiling architecture behave of dmem
+-- Compiling entity imem
+-- Compiling architecture behave of imem
+-- Compiling entity tb_arm
+-- Compiling architecture tb of tb_arm
+** Warning: /home/arthurpfonseca/intelFPGA_lite/20.1/modelsim_ase/linuxaloem/ARMv4_pipeline/ModelSim/Pipeline/arm_pipeline.vhd(1085): (vcom-1090) Possible infinite loop: Process contains no WAIT statement.
+-- Compiling entity arm
+-- Compiling architecture struct of arm
+-- Compiling entity controller
+-- Compiling architecture struct of controller
+-- Compiling entity decoder
+-- Compiling architecture behave of decoder
+-- Compiling entity cond_unit
+-- Compiling architecture behave of cond_unit
+-- Compiling entity condcheck
+-- Compiling architecture behave of condcheck
+-- Compiling entity datapath
+-- Compiling architecture struct of datapath
+-- Compiling entity regfile
+-- Compiling architecture behave of regfile
+-- Compiling entity adder
+-- Compiling architecture behave of adder
+-- Compiling entity extend
+-- Compiling architecture behave of extend
+-- Compiling entity flopenr
+-- Compiling architecture asynchronous of flopenr
+-- Compiling entity flopr
+-- Compiling architecture asynchronous of flopr
+-- Compiling entity mux2
+-- Compiling architecture behave of mux2
+-- Compiling entity mux4
+-- Compiling architecture behave_mux4 of mux4
+-- Compiling entity alu
+-- Compiling architecture behave of alu
 
+} {} {}}
